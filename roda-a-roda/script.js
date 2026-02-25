@@ -142,6 +142,7 @@ class RodaARodaGame {
         this.setupModeSelection();
         this.setupInitialConfig();
         this.setupInGameConfig();
+        this.setupDownloadTemplates();
         this.initGameAreaEvents();
         this.initializeGrid();
         this.mapAlphabetLetters();
@@ -1064,22 +1065,63 @@ class RodaARodaGame {
 
     normalizeLetter(letter) { if (!letter) return ''; return letter.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase(); }
 
-    // --- FUNÇÃO MODIFICADA ---
+    setupDownloadTemplates() {
+        const downloadInitial = document.getElementById('download-template-initial');
+        if (downloadInitial) {
+            downloadInitial.addEventListener('click', () => this.downloadExcelTemplate());
+        }
+        const downloadIngame = document.getElementById('download-template-ingame');
+        if (downloadIngame) {
+            downloadIngame.addEventListener('click', () => this.downloadExcelTemplate());
+        }
+    }
+
+    downloadExcelTemplate() {
+        if (typeof XLSX === 'undefined') {
+            this.showToast("Biblioteca Excel não carregada.", "error");
+            return;
+        }
+        const ws_data = [
+            ["Tema", "Palavra", "Dica"],
+            ["Arquitetura de Sistemas", "Hardware", "Componentes físicos de um sistema?"],
+            ["Arquitetura de Sistemas", "Software", "Programas e aplicativos que rodam no sistema?"],
+            ["Bancos de Dados", "MySQL", "Sistema de gerenciamento de banco de dados relacional?"],
+            ["Linguagem C", "Ponteiro", "Variável que armazena endereço de memória?"]
+        ];
+        const ws = XLSX.utils.aoa_to_sheet(ws_data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Perguntas");
+        XLSX.writeFile(wb, "Modelo_Roda_a_Roda.xlsx");
+        this.showToast("Modelo baixado! Preencha e salve sem alterar o cabeçalho.", "success", 6000);
+    }
+
     handleFileUpload(event, context, autoSelectFirst = false) {
         const file = event.target.files[0];
         const input = event.target;
         if (!file) return;
 
+        const isExcel = file.name.toLowerCase().endsWith('.xlsx') || file.name.toLowerCase().endsWith('.xls');
         const reader = new FileReader();
+
         reader.onload = (e) => {
             try {
-                const data = this.parseCSV(e.target.result);
+                let data;
+                if (isExcel) {
+                    if (typeof XLSX === 'undefined') throw new Error("Biblioteca Excel não carregada (verifique a internet).");
+                    const workbook = XLSX.read(e.target.result, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    data = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
+                } else {
+                    data = this.parseCSV(e.target.result);
+                }
+
                 const newDb = this.transformCSVData(data); // Validação agora é feita dentro de transformCSVData
 
                 if (newDb.length === 0) {
                     this.showToast('Nenhum tema ou palavra válida foi encontrada no arquivo. Verifique o conteúdo e o formato.', 'warning', 6000);
-                    if (context === 'initial') this.csvStatusInitial.textContent = "CSV inválido ou vazio.";
-                    else this.csvStatusIngame.textContent = "CSV inválido ou vazio.";
+                    if (context === 'initial') this.csvStatusInitial.textContent = "Planilha inválida ou vazia.";
+                    else this.csvStatusIngame.textContent = "Planilha inválida ou vazia.";
                 } else {
                     this.userDatabase = newDb;
                     this.showToast(`"${file.name}" carregado com sucesso: ${this.userDatabase.length} tema(s) encontrado(s).`, 'success');
@@ -1098,7 +1140,7 @@ class RodaARodaGame {
                     }
                 }
             } catch (err) {
-                console.error("Erro ao processar CSV:", err);
+                console.error("Erro ao processar planilha:", err);
                 this.showToast(`Erro ao processar arquivo: ${err.message}`, 'error');
                 if (context === 'initial') this.csvStatusInitial.textContent = "Erro na leitura.";
                 else this.csvStatusIngame.textContent = "Erro na leitura.";
@@ -1119,7 +1161,12 @@ class RodaARodaGame {
             if (context === 'initial') this.csvStatusInitial.textContent = "Erro na leitura.";
             else this.csvStatusIngame.textContent = "Erro na leitura.";
         };
-        reader.readAsText(file, 'UTF-8');
+
+        if (isExcel) {
+            reader.readAsArrayBuffer(file);
+        } else {
+            reader.readAsText(file, 'UTF-8');
+        }
     }
 
     parseCSV(content) { return content.split(/\r?\n/).filter(l => l.trim() !== '').map(l => l.split(';').map(f => f.trim())); }
@@ -1133,16 +1180,24 @@ class RodaARodaGame {
     // --- FUNÇÃO MODIFICADA ---
     transformCSVData(csvData) {
         const map = {};
-        const hasHeader = csvData[0]?.[0]?.toLowerCase() === 'tema' &&
-            csvData[0]?.[1]?.toLowerCase() === 'palavra' &&
-            csvData[0]?.[2]?.toLowerCase() === 'dica';
+        if (!csvData || csvData.length === 0) return [];
+
+        const headerRow = csvData[0] || [];
+        const hasHeader = headerRow.length >= 3 &&
+            headerRow[0]?.toString().toLowerCase().trim() === 'tema' &&
+            headerRow[1]?.toString().toLowerCase().trim() === 'palavra' &&
+            headerRow[2]?.toString().toLowerCase().trim() === 'dica';
+
         const startIdx = hasHeader ? 1 : 0;
 
         for (let i = startIdx; i < csvData.length; i++) {
             const row = csvData[i];
             // Validação de Linha: Garante que a linha exista e tenha os 3 campos necessários
             if (row && row.length >= 3) {
-                const [theme, word, hint] = row;
+                const theme = row[0]?.toString().trim() || "";
+                const word = row[1]?.toString().trim() || "";
+                const hint = row[2]?.toString().trim() || "";
+
                 // Validação de Campo: Garante que os campos essenciais não sejam vazios
                 if (theme && word && hint) {
                     const upWord = word.toUpperCase();
