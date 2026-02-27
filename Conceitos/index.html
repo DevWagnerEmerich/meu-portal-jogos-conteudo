@@ -1535,10 +1535,67 @@
         padding: 1.5rem;
       }
     }
+
+    /* ════════ TOAST NOTIFICATION ════════ */
+    #toast-container {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      pointer-events: none;
+    }
+
+    .toast-msg {
+      background: var(--card);
+      border-left: 4px solid var(--gold);
+      color: var(--text);
+      padding: 1rem 1.25rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transform: translateX(120%);
+      animation: slideInRight cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s forwards;
+      max-width: 320px;
+      pointer-events: auto;
+    }
+
+    .toast-msg.success {
+      border-left-color: var(--green);
+    }
+
+    .toast-msg.error {
+      border-left-color: var(--red);
+    }
+
+    .toast-msg.fade-out {
+      animation: fadeOutRight ease-out 0.4s forwards;
+    }
+
+    @keyframes slideInRight {
+      to {
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes fadeOutRight {
+      to {
+        transform: translateX(120%);
+        opacity: 0;
+      }
+    }
   </style>
 </head>
 
 <body>
+  <div id="toast-container"></div>
 
   <!-- ════════════════════════════════════════════════════
      TELA 1 — LANDING (escolher modo)
@@ -1848,6 +1905,24 @@ Formate a saída como uma tabela Markdown.
 
   <script>
     // ════════════════════════════════════════════════════
+    // TOAST NOTIFICATIONS
+    // ════════════════════════════════════════════════════
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+
+      const toast = document.createElement('div');
+      toast.className = `toast-msg ${type}`;
+      toast.innerHTML = (type === 'success' ? '✅ ' : '⚠️ ') + message;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('fade-out');
+        toast.addEventListener('animationend', () => toast.remove());
+      }, 4000);
+    }
+
+    // ════════════════════════════════════════════════════
     // CONTROLO DE TABS (VISUAL vs TEXTO)
     // ════════════════════════════════════════════════════
     let entryMode = 'visual';
@@ -1999,7 +2074,7 @@ Formate a saída como uma tabela Markdown.
           }
 
           if (conceitosAdicionados === 0) {
-            alert("Nenhum dado encontrado no Excel! Verifique se você preencheu o arquivo a partir da segunda linha.");
+            showToast("Nenhum dado encontrado no Excel! Verifique se você preencheu o arquivo a partir da segunda linha.", 'error');
             return;
           }
 
@@ -2009,11 +2084,11 @@ Formate a saída como uma tabela Markdown.
           // Muda para a TAB de Texto automaticamente
           setEntryTab('texto');
 
-          alert(`✅ Sucesso! Foram importados ${conceitosAdicionados} conceitos maravilhosos do seu Excel! Eles já estão prontos na caixa de texto.`);
+          showToast(`Sucesso! Foram importados ${conceitosAdicionados} conceitos do seu Excel!`, 'success');
 
         } catch (error) {
           console.error(error);
-          alert("Ocorreu um erro ao carregar o Excel. Você tem certeza que é um arquivo .xlsx válido?");
+          showToast("Ocorreu um erro ao carregar o Excel. Você tem certeza que é um arquivo .xlsx válido?", 'error');
         }
 
         // Limpar o input file para permitir selecionar o mesmo arquivo novamente
