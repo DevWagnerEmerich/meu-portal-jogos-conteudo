@@ -2585,6 +2585,19 @@ Formate a saída como uma tabela Markdown.
       if (msg.type === 'REQUEST_STATE' && state.gameData) {
         // Reenviar estado atual para o projetor recém-aberto
         broadcastState({ type: 'GAME_START', teams: state.teams, tema: `${state.disciplina} · ${state.tema}` });
+
+        if (state.currentIdx !== null) {
+          const c = state.gameData[state.currentIdx];
+          const dicasReveladas = state.dicasReveladas;
+          const dicasExibidas = [c.dica1, c.dica2, c.dica3, c.dica4].slice(0, dicasReveladas);
+
+          broadcastState({
+            type: 'CONCEITO_START',
+            dicas: dicasExibidas,
+            dicasReveladas: dicasReveladas,
+            timerSec: state.timerSec
+          });
+        }
       }
     };
 
