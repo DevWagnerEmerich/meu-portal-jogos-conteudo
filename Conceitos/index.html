@@ -1,0 +1,2374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adivinhe o Conceito 🕵️</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080c14;
+      --surf: #0f1623;
+      --card: #161e2e;
+      --border: #1e2d45;
+      --border2: #2a3d5a;
+      --gold: #f0b429;
+      --gold2: #fcd34d;
+      --cyan: #22d3ee;
+      --green: #34d399;
+      --red: #f87171;
+      --purple: #a78bfa;
+      --text: #e8edf5;
+      --muted: #5a7296;
+      --muted2: #8aa0bc;
+
+      --pts5-c: #f0b429;
+      --pts5-bg: #f0b42918;
+      --pts3-c: #22d3ee;
+      --pts3-bg: #22d3ee18;
+      --pts2-c: #34d399;
+      --pts2-bg: #34d39918;
+      --pts1-c: #a78bfa;
+      --pts1-bg: #a78bfa18;
+    }
+
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ─── NOISE TEXTURE OVERLAY ─────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      opacity: 0.4;
+    }
+
+    /* ─── UTILITIES ──────────────────────────────────── */
+    .screen {
+      display: none;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
+
+    .screen.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── LANDING ────────────────────────────────────── */
+    #landing {
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse 70% 50% at 50% 0%, #0d2040, transparent 70%);
+      padding: 2rem;
+      gap: 2.5rem;
+    }
+
+    .landing-hero {
+      text-align: center;
+    }
+
+    .landing-emoji {
+      font-size: 4rem;
+      display: block;
+      margin-bottom: 1rem;
+      filter: drop-shadow(0 0 30px #f0b42966);
+    }
+
+    .landing-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 40%, var(--cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .landing-sub {
+      margin-top: 0.75rem;
+      font-size: 0.9rem;
+      color: var(--muted2);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .mode-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    @media(max-width:500px) {
+      .mode-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .mode-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 1.8rem 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
+    .mode-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-3px);
+      box-shadow: 0 16px 40px #f0b42918;
+    }
+
+    .mode-card .mc-icon {
+      font-size: 2.2rem;
+    }
+
+    .mode-card .mc-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .mode-card .mc-desc {
+      font-size: 0.78rem;
+      color: var(--muted2);
+      line-height: 1.5;
+    }
+
+    .mode-card.highlight {
+      border-color: var(--gold);
+      background: linear-gradient(135deg, #f0b42910, var(--card));
+    }
+
+    /* ─── SETUP (professor) ──────────────────────────── */
+    #setup {
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse 60% 40% at 50% 0%, #0d2040, transparent);
+      padding: 2rem;
+    }
+
+    .setup-wrap {
+      width: 100%;
+      max-width: 640px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .setup-back {
+      align-self: flex-start;
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 0.6rem;
+      color: var(--muted2);
+      padding: 0.4rem 0.9rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: all 0.15s;
+    }
+
+    .setup-back:hover {
+      border-color: var(--border2);
+      color: var(--text);
+    }
+
+    .setup-header {
+      text-align: center;
+    }
+
+    .setup-header h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+    }
+
+    .setup-header p {
+      color: var(--muted2);
+      font-size: 0.85rem;
+      margin-top: 0.3rem;
+    }
+
+    .setup-panel {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted2);
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+
+    .field-input {
+      width: 100%;
+      background: var(--surf);
+      border: 1.5px solid var(--border);
+      border-radius: 0.7rem;
+      padding: 0.85rem 1rem;
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .field-input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px #f0b42920;
+    }
+
+    .field-input::placeholder {
+      color: var(--muted);
+    }
+
+    textarea.field-input {
+      resize: vertical;
+      min-height: 75px;
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 1rem;
+      border: none;
+      border-radius: 0.8rem;
+      background: linear-gradient(135deg, var(--gold), var(--gold2));
+      color: #0a0c10;
+      font-family: 'Syne', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, opacity 0.2s;
+      box-shadow: 0 4px 24px #f0b42940;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px #f0b42955;
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .err-box {
+      background: #f8717118;
+      border: 1.5px solid #f87171;
+      border-radius: 0.7rem;
+      padding: 0.85rem 1rem;
+      color: #fca5a5;
+      font-size: 0.85rem;
+      display: none;
+    }
+
+    /* ─── LOADING ────────────────────────────────────── */
+    #loading {
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      background: var(--bg);
+    }
+
+    .spin {
+      width: 56px;
+      height: 56px;
+      border: 3px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .load-text {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      color: var(--muted2);
+      animation: breathe 1.6s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+
+      0%,
+      100% {
+        opacity: 0.3
+      }
+
+      50% {
+        opacity: 1
+      }
+    }
+
+    /* ─── PROFESSOR PANEL ────────────────────────────── */
+    #professor {
+      flex-direction: row !important;
+      min-height: 100vh;
+    }
+
+    /* Left sidebar */
+    .prof-sidebar {
+      width: 260px;
+      min-width: 220px;
+      background: var(--surf);
+      border-right: 1.5px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .prof-sidebar-top {
+      padding: 1rem;
+      border-bottom: 1.5px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .sidebar-brand {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--gold), var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .sidebar-tema {
+      font-size: 0.72rem;
+      color: var(--muted2);
+    }
+
+    .btn-open-proj {
+      width: 100%;
+      padding: 0.65rem;
+      border: none;
+      border-radius: 0.6rem;
+      background: linear-gradient(90deg, var(--gold), var(--gold2));
+      color: #0a0c10;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .btn-open-proj:hover {
+      opacity: 0.9;
+    }
+
+    .sidebar-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .sidebar-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.3rem;
+    }
+
+    .card-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.55rem 0.7rem;
+      border-radius: 0.6rem;
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 0.82rem;
+      color: var(--text);
+      font-weight: 500;
+      background: var(--card);
+    }
+
+    .card-item:hover {
+      border-color: var(--border2);
+    }
+
+    .card-item.active {
+      border-color: var(--gold);
+      background: #f0b42912;
+      color: var(--gold);
+    }
+
+    .card-item.used {
+      opacity: 0.3;
+      text-decoration: line-through;
+      pointer-events: none;
+    }
+
+    .card-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--muted);
+      min-width: 20px;
+    }
+
+    /* Right: main control area */
+    .prof-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Scoreboard bar */
+    .score-bar {
+      background: var(--surf);
+      border-bottom: 1.5px solid var(--border);
+      padding: 0.6rem 1.2rem;
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .score-bar-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--muted);
+      margin-right: 0.2rem;
+    }
+
+    .team-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 2rem;
+      padding: 0.25rem 0.5rem 0.25rem 0.85rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      transition: border-color 0.15s;
+    }
+
+    .team-pill:hover {
+      border-color: var(--border2);
+    }
+
+    .team-pill-pts {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      color: var(--gold);
+    }
+
+    .pill-btn {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      font-size: 0.72rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s;
+    }
+
+    .pill-btn:hover {
+      transform: scale(1.2);
+    }
+
+    .pill-plus {
+      background: var(--green);
+      color: #000;
+    }
+
+    .pill-minus {
+      background: var(--red);
+      color: #fff;
+    }
+
+    /* Control content */
+    .prof-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      align-items: center;
+    }
+
+    /* IDLE state */
+    .idle-hint {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      color: var(--muted2);
+      text-align: center;
+    }
+
+    .idle-hint .ih-icon {
+      font-size: 3rem;
+      opacity: 0.4;
+    }
+
+    /* Active concept panel */
+    .ctrl-panel {
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .concept-reveal-box {
+      background: linear-gradient(135deg, #f0b42915, #f0b42905);
+      border: 2px solid var(--gold);
+      border-radius: 1rem;
+      padding: 1.2rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .concept-reveal-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--gold);
+    }
+
+    .proib-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-top: 0.4rem;
+    }
+
+    .proib-tag {
+      background: #f8717118;
+      border: 1px solid #f8717155;
+      color: #fca5a5;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 0.15rem 0.55rem;
+      border-radius: 2rem;
+      text-decoration: line-through;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Timer ring */
+    .timer-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      flex-shrink: 0;
+    }
+
+    .timer-ring {
+      position: relative;
+      width: 72px;
+      height: 72px;
+    }
+
+    .timer-ring svg {
+      transform: rotate(-90deg);
+    }
+
+    .timer-ring circle {
+      transition: stroke-dashoffset 1s linear;
+    }
+
+    .timer-num {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+    }
+
+    .timer-num.urgent {
+      color: var(--red) !important;
+      animation: tshake 0.25s ease infinite;
+    }
+
+    @keyframes tshake {
+
+      0%,
+      100% {
+        transform: translateX(0)
+      }
+
+      33% {
+        transform: translateX(-2px)
+      }
+
+      66% {
+        transform: translateX(2px)
+      }
+    }
+
+    /* Dicas panel - professor sees all, controls reveal */
+    .dicas-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .dica-ctrl-row {
+      display: flex;
+      align-items: stretch;
+      gap: 0.6rem;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      border: 1.5px solid var(--border);
+      transition: border-color 0.2s;
+    }
+
+    .dica-ctrl-row.revealed {
+      border-color: var(--border2);
+    }
+
+    .dica-pts-badge {
+      width: 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-family: 'Syne', sans-serif;
+      font-size: 1.2rem;
+      font-weight: 800;
+      gap: 1px;
+      background: var(--surf);
+    }
+
+    .dica-pts-badge small {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.55rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      opacity: 0.75;
+    }
+
+    .dp5 {
+      color: var(--pts5-c);
+    }
+
+    .dp3 {
+      color: var(--pts3-c);
+    }
+
+    .dp2 {
+      color: var(--pts2-c);
+    }
+
+    .dp1 {
+      color: var(--pts1-c);
+    }
+
+    .dica-ctrl-text {
+      flex: 1;
+      padding: 0.7rem 0.85rem;
+      font-size: 0.88rem;
+      line-height: 1.55;
+      background: var(--card);
+      display: flex;
+      align-items: center;
+      color: var(--text);
+    }
+
+    .dica-ctrl-text.hidden-dica {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .dica-reveal-btn {
+      padding: 0 0.9rem;
+      border: none;
+      border-left: 1.5px solid var(--border);
+      background: var(--surf);
+      color: var(--muted2);
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      white-space: nowrap;
+    }
+
+    .dica-reveal-btn:hover {
+      background: var(--gold);
+      color: #000;
+    }
+
+    .dica-reveal-btn:disabled {
+      opacity: 0.3;
+      cursor: default;
+      background: var(--surf);
+      color: var(--muted);
+    }
+
+    /* Action buttons */
+    .action-row {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-acertou {
+      flex: 1;
+      min-width: 140px;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 0.75rem;
+      background: linear-gradient(135deg, var(--green), #059669);
+      color: #000;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 4px 16px #34d39930;
+    }
+
+    .btn-acertou:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px #34d39945;
+    }
+
+    .btn-pular {
+      padding: 0.8rem 1.2rem;
+      border: 1.5px solid var(--border);
+      border-radius: 0.75rem;
+      background: transparent;
+      color: var(--muted2);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-pular:hover {
+      border-color: var(--border2);
+      color: var(--text);
+    }
+
+    .btn-novo-jogo {
+      padding: 0.8rem 1.2rem;
+      border: 1.5px solid var(--border);
+      border-radius: 0.75rem;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-novo-jogo:hover {
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    /* AWARD MODAL */
+    .modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #00000090;
+      backdrop-filter: blur(6px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .modal-bg.open {
+      display: flex;
+      animation: fadein 0.2s ease;
+    }
+
+    @keyframes fadein {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    .modal-box {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 2rem;
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      animation: popin 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popin {
+      from {
+        transform: scale(0.88);
+        opacity: 0
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    .modal-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      text-align: center;
+      color: var(--muted2);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .modal-pts-info {
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--muted2);
+    }
+
+    .modal-teams {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .modal-team-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.85rem 1.1rem;
+      border-radius: 0.75rem;
+      border: 1.5px solid var(--border);
+      background: var(--surf);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .modal-team-btn:hover {
+      border-color: var(--green);
+      background: #34d39918;
+      color: var(--green);
+    }
+
+    .modal-team-pts {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--muted2);
+    }
+
+    .modal-nobody {
+      padding: 0.75rem;
+      border: 1.5px solid var(--border);
+      border-radius: 0.75rem;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+
+    .modal-nobody:hover {
+      border-color: var(--muted);
+      color: var(--text);
+    }
+
+    /* END MODAL */
+    .end-modal {
+      max-width: 560px;
+    }
+
+    .end-scores {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+    .end-score-card {
+      background: var(--surf);
+      border: 2px solid var(--gold);
+      border-radius: 1rem;
+      padding: 1rem 1.5rem;
+      min-width: 120px;
+      text-align: center;
+    }
+
+    .esc-name {
+      font-size: 0.7rem;
+      color: var(--muted2);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.25rem;
+    }
+
+    .esc-pts {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--gold);
+    }
+
+    /* ─── PROJECTOR SCREEN ───────────────────────────── */
+    #projector {
+      background: #050810;
+      align-items: stretch;
+      justify-content: stretch;
+      min-height: 100vh;
+      background-image: radial-gradient(ellipse 80% 60% at 50% -5%, #0d2040, transparent 65%);
+    }
+
+    .proj-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 4rem;
+      gap: 2rem;
+      position: relative;
+    }
+
+    /* Decorative grid lines */
+    .proj-wrap::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.12;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+    }
+
+    .proj-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 960px;
+    }
+
+    .proj-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .proj-teams-row {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .proj-team-chip {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 2rem;
+      padding: 0.3rem 0.8rem 0.3rem 0.7rem;
+    }
+
+    .proj-team-chip.leader {
+      border-color: var(--gold);
+      background: #f0b42915;
+    }
+
+    .proj-team-name {
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .proj-team-pts {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    /* Main projector content */
+    .proj-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      max-width: 960px;
+      gap: 2.5rem;
+    }
+
+    /* IDLE state projector */
+    .proj-idle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      text-align: center;
+    }
+
+    .proj-idle-icon {
+      font-size: 5rem;
+      filter: drop-shadow(0 0 40px #f0b42944);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(-12px)
+      }
+    }
+
+    .proj-idle-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--gold), var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .proj-idle-sub {
+      color: var(--muted2);
+      font-size: 1rem;
+    }
+
+    /* PLAYING state projector */
+    .proj-playing {
+      display: none;
+      width: 100%;
+      flex-direction: column;
+      gap: 1.8rem;
+      align-items: center;
+    }
+
+    .proj-timer-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .proj-timer-ring {
+      position: relative;
+      width: 88px;
+      height: 88px;
+      flex-shrink: 0;
+    }
+
+    .proj-timer-ring svg {
+      transform: rotate(-90deg);
+    }
+
+    .proj-timer-ring circle {
+      transition: stroke-dashoffset 1s linear;
+    }
+
+    .proj-timer-num {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: var(--text);
+    }
+
+    .proj-timer-num.urgent {
+      color: var(--red) !important;
+      animation: tshake 0.25s ease infinite;
+    }
+
+    .proj-round-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .proj-dica-count {
+      font-size: 0.75rem;
+      color: var(--muted2);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .proj-pts-now {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      /* color set dynamically */
+    }
+
+    /* Dicas on projector */
+    .proj-dicas {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .proj-dica-item {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      border-radius: 1rem;
+      overflow: hidden;
+      border: 1.5px solid var(--border);
+      animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-24px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0)
+      }
+    }
+
+    .proj-dica-badge {
+      width: 72px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      gap: 2px;
+    }
+
+    .proj-dica-badge small {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.6rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      opacity: 0.75;
+    }
+
+    .pdb5 {
+      background: var(--pts5-bg);
+      color: var(--pts5-c);
+    }
+
+    .pdb3 {
+      background: var(--pts3-bg);
+      color: var(--pts3-c);
+    }
+
+    .pdb2 {
+      background: var(--pts2-bg);
+      color: var(--pts2-c);
+    }
+
+    .pdb1 {
+      background: var(--pts1-bg);
+      color: var(--pts1-c);
+    }
+
+    .proj-dica-text {
+      flex: 1;
+      padding: 1rem 1.4rem;
+      font-size: clamp(1rem, 2vw, 1.3rem);
+      line-height: 1.55;
+      background: var(--card);
+      display: flex;
+      align-items: center;
+      color: var(--text);
+    }
+
+    /* REVEAL state projector */
+    .proj-reveal {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      text-align: center;
+    }
+
+    .proj-reveal-label {
+      font-size: 0.85rem;
+      color: var(--muted2);
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+    }
+
+    .proj-reveal-word {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(3rem, 9vw, 7rem);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--gold), var(--gold2), var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: zoomIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes zoomIn {
+      from {
+        transform: scale(0.4);
+        opacity: 0
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    .confetti-wrap {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+      overflow: hidden;
+    }
+
+    .confetti-dot {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+      animation: confettiFall linear forwards;
+    }
+
+    @keyframes confettiFall {
+      0% {
+        transform: translateY(-20px) rotate(0deg);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(110vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    /* ─── Scrollbar ──────────────────────────────────── */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--surf);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 2px;
+    }
+
+    @media(max-width:640px) {
+      .prof-sidebar {
+        display: none;
+      }
+
+      .proj-wrap {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ════════════════════════════════════════════════════
+     TELA 1 — LANDING (escolher modo)
+════════════════════════════════════════════════════ -->
+  <div id="landing" class="screen active">
+    <div class="landing-hero">
+      <span class="landing-emoji">🕵️</span>
+      <h1 class="landing-title">Adivinhe o Conceito</h1>
+      <p class="landing-sub">Jogo para Projetor · EF II &amp; Ensino Médio</p>
+    </div>
+    <div class="mode-cards">
+      <div class="mode-card highlight" onclick="goTo('setup')">
+        <div class="mc-icon">🎛️</div>
+        <div class="mc-title">Painel do Professor</div>
+        <div class="mc-desc">Configure o jogo, controle as dicas e veja o placar. Abra no seu notebook.</div>
+      </div>
+      <div class="mode-card" onclick="abrirProjetor()">
+        <div class="mc-icon">📺</div>
+        <div class="mc-title">Tela do Aluno</div>
+        <div class="mc-desc">Apenas as dicas reveladas. Abra no navegador conectado ao projetor.</div>
+      </div>
+    </div>
+    <p style="font-size:0.75rem;color:var(--muted);text-align:center;max-width:400px;line-height:1.6;">
+      💡 Dica: abra o <strong style="color:var(--muted2)">Painel do Professor</strong> nesta aba e clique em <strong
+        style="color:var(--muted2)">"Abrir Tela do Projetor"</strong> para abrir uma segunda janela sincronizada.
+    </p>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+     TELA 2 — SETUP
+════════════════════════════════════════════════════ -->
+  <div id="setup" class="screen">
+    <div
+      style="flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;background:radial-gradient(ellipse 60% 40% at 50% 0%,#0d2040,transparent)">
+      <div class="setup-wrap">
+        <button class="setup-back" onclick="goTo('landing')">← Voltar</button>
+        <div class="setup-header">
+          <h2>⚙️ Configurar Jogo</h2>
+          <p>Cole abaixo os conceitos copiados do <b>Excel</b>, <b>ChatGPT</b> ou <b>XML</b>.</p>
+          <div style="display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap; margin-top:0.8rem;">
+            <button onclick="mostrarPromptHelper()"
+              style="background:var(--card); border:1.5px solid var(--border); color:var(--text); padding:0.5rem 1rem; border-radius:1rem; cursor:pointer; font-size:0.8rem; font-weight:600;"><span
+                style="color:var(--gold)">✨</span> Como pedir para a IA?</button>
+            <button onclick="baixarTemplateExcel()"
+              style="background:var(--card); border:1.5px solid var(--border); color:var(--text); padding:0.5rem 1rem; border-radius:1rem; cursor:pointer; font-size:0.8rem; font-weight:600;">📥
+              Baixar Arquivo Excel Modelo</button>
+          </div>
+        </div>
+        <div class="setup-panel">
+          <div>
+            <label class="field-label">Título da Aula (Público)</label>
+            <input id="s-tema" class="field-input" placeholder="Ex: Biologia - Citologia Básica">
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-end;">
+              <label class="field-label">Conceitos (Cole aqui)</label>
+              <span style="font-size:0.65rem; color:var(--muted2); margin-bottom:0.5rem;">Aceita Excel, tabela do
+                ChatGPT ou XML</span>
+            </div>
+            <textarea id="s-json-data" class="field-input"
+              style="min-height:160px; font-family:'Plus Jakarta Sans', sans-serif; font-size:0.85rem; line-height:1.4;"
+              placeholder="Exemplo colando do excel:
+Mitocôndria   |   Organela celular...   |   Tem DNA próprio...   |   Consome oxigênio...   |   Usina de energia...   |   energia, ATP, usina
+Núcleo   |   Fica no centro...   |   Guarda material genético...   |   Controla a célula...   |   Onde fica o DNA...   |   DNA, centro, genética"></textarea>
+          </div>
+          <div class="grid2" style="grid-template-columns: 1fr;">
+            <div>
+              <label class="field-label">Equipes</label>
+              <select id="s-eq" class="field-input">
+                <option value="2">2 equipes</option>
+                <option value="3">3 equipes</option>
+                <option value="4" selected>4 equipes</option>
+                <option value="5">5 equipes</option>
+                <option value="6">6 equipes</option>
+              </select>
+            </div>
+          </div>
+          <div id="s-err" class="err-box"></div>
+          <button class="btn-primary" id="btn-gerar" onclick="gerarJogo()">✅ Iniciar Jogo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+     TELA 3 — LOADING
+════════════════════════════════════════════════════ -->
+  <div id="loading" class="screen" style="background:var(--bg);align-items:center;justify-content:center;gap:2rem;">
+    <div class="spin"></div>
+    <div class="load-text" id="loading-msg">Preparando jogo…</div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+     TELA 4 — PROFESSOR
+════════════════════════════════════════════════════ -->
+  <div id="professor" class="screen">
+
+    <!-- Sidebar -->
+    <div class="prof-sidebar">
+      <div class="prof-sidebar-top">
+        <div class="sidebar-brand">🕵️ Adivinhe</div>
+        <div class="sidebar-tema" id="p-label"></div>
+        <button class="btn-open-proj" onclick="abrirProjetor()">📺 Abrir Projetor</button>
+      </div>
+      <div class="sidebar-list">
+        <div class="sidebar-label">Conceitos</div>
+        <div id="p-cards-list"></div>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="prof-main">
+
+      <!-- Score bar -->
+      <div class="score-bar">
+        <span class="score-bar-label">Placar:</span>
+        <div id="p-scorebar"></div>
+        <div style="margin-left:auto;display:flex;gap:0.5rem;">
+          <button onclick="showEndModal()"
+            style="padding:0.35rem 0.8rem;border:1.5px solid var(--border);border-radius:0.5rem;background:transparent;color:var(--muted2);font-size:0.75rem;font-weight:600;cursor:pointer;"
+            onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">🏆
+            Placar Final</button>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="prof-content" id="p-content">
+
+        <!-- IDLE -->
+        <div class="idle-hint" id="p-idle">
+          <div class="ih-icon">👈</div>
+          <p>Selecione um conceito na lista para começar</p>
+          <p style="font-size:0.8rem;color:var(--muted);">O projetor ficará aguardando automaticamente</p>
+        </div>
+
+        <!-- ACTIVE -->
+        <div class="ctrl-panel" id="p-active" style="display:none;">
+
+          <!-- Concept + Timer -->
+          <div class="concept-reveal-box">
+            <div>
+              <div
+                style="font-size:0.65rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--muted2);margin-bottom:0.3rem;">
+                Conceito atual (só você vê)</div>
+              <div class="concept-reveal-name" id="p-concept-name"></div>
+              <div class="proib-list" id="p-proibidas"></div>
+            </div>
+            <div class="timer-wrap">
+              <div class="timer-ring">
+                <svg width="72" height="72" viewBox="0 0 72 72">
+                  <circle cx="36" cy="36" r="30" fill="none" stroke="var(--border)" stroke-width="5" />
+                  <circle id="p-timer-circle" cx="36" cy="36" r="30" fill="none" stroke="var(--gold)" stroke-width="5"
+                    stroke-dasharray="188.5" stroke-dashoffset="0" stroke-linecap="round" />
+                </svg>
+                <div class="timer-num" id="p-timer-num">90</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dicas (professor vê tudo, controla reveal) -->
+          <div class="dicas-panel" id="p-dicas-panel"></div>
+
+          <!-- Actions -->
+          <div class="action-row">
+            <button class="btn-acertou" onclick="abrirAwardModal()">✓ Alguém Acertou!</button>
+            <button class="btn-pular" onclick="pularConceito()">⏭ Pular</button>
+            <button class="btn-novo-jogo" onclick="confirmVoltarSetup()">↩ Novo Jogo</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════
+     TELA 5 — PROJETOR (abre em nova janela)
+════════════════════════════════════════════════════ -->
+  <div id="projector" class="screen">
+    <div class="proj-wrap">
+
+      <div class="proj-header">
+        <div class="proj-logo">🕵️ Adivinhe o Conceito</div>
+        <div class="proj-teams-row" id="proj-teams-row"></div>
+      </div>
+
+      <div class="proj-content">
+
+        <!-- IDLE -->
+        <div class="proj-idle" id="proj-idle">
+          <div class="proj-idle-icon">🎮</div>
+          <div class="proj-idle-title">Aguardando o Professor…</div>
+          <div class="proj-idle-sub">O jogo começará em instantes</div>
+        </div>
+
+        <!-- PLAYING -->
+        <div class="proj-playing" id="proj-playing">
+
+          <div class="proj-timer-row">
+            <div class="proj-timer-ring">
+              <svg width="88" height="88" viewBox="0 0 88 88">
+                <circle cx="44" cy="44" r="38" fill="none" stroke="var(--border)" stroke-width="5" />
+                <circle id="proj-timer-circle" cx="44" cy="44" r="38" fill="none" stroke="var(--gold)" stroke-width="5"
+                  stroke-dasharray="238.8" stroke-dashoffset="0" stroke-linecap="round" />
+              </svg>
+              <div class="proj-timer-num" id="proj-timer-num">90</div>
+            </div>
+            <div class="proj-round-info">
+              <div class="proj-dica-count" id="proj-dica-count">Dica 1 de 4</div>
+              <div class="proj-pts-now" id="proj-pts-now">Vale 5 pts</div>
+            </div>
+          </div>
+
+          <div class="proj-dicas" id="proj-dicas"></div>
+        </div>
+
+        <!-- REVEAL -->
+        <div class="proj-reveal" id="proj-reveal">
+          <div class="proj-reveal-label">A resposta era…</div>
+          <div class="proj-reveal-word" id="proj-reveal-word"></div>
+        </div>
+
+      </div>
+    </div>
+    <div class="confetti-wrap" id="confetti-wrap"></div>
+  </div>
+
+  <!-- ════════════ AWARD MODAL ════════════ -->
+  <div class="modal-bg" id="award-modal">
+    <div class="modal-box">
+      <div class="modal-title">Quem acertou?</div>
+      <div class="modal-pts-info" id="award-pts-info"></div>
+      <div class="modal-teams" id="award-teams"></div>
+      <button class="modal-nobody" onclick="ninguemAcertou()">✗ Ninguém acertou — revelar resposta</button>
+    </div>
+  </div>
+
+  <!-- ════════════ END MODAL ════════════ -->
+  <div class="modal-bg" id="end-modal">
+    <div class="modal-box end-modal">
+      <div class="modal-title">🏆 Placar Final</div>
+      <div class="end-scores" id="end-scores"></div>
+      <div style="display:flex;gap:0.75rem;flex-wrap:wrap;justify-content:center;margin-top:0.5rem;">
+        <button onclick="closeModal('end-modal')"
+          style="padding:0.7rem 1.4rem;border:1.5px solid var(--border);border-radius:0.75rem;background:transparent;color:var(--muted2);font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;">←
+          Continuar</button>
+        <button onclick="confirmVoltarSetup()"
+          style="padding:0.7rem 1.4rem;border:none;border-radius:0.75rem;background:var(--gold);color:#000;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;">🔄
+          Novo Jogo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ PROMPT MODAL ════════════ -->
+  <div class="modal-bg" id="prompt-modal">
+    <div class="modal-box">
+      <div class="modal-title">✨ Como pedir para a IA?</div>
+      <p style="font-size:0.9rem;line-height:1.5;color:var(--muted2);margin-bottom:1rem;">
+        Copie e cole o texto abaixo no ChatGPT (ou outra IA) e peça para ele gerar os conceitos para você.
+        Depois, é só copiar a tabela gerada e colar no campo "Conceitos" acima.
+      </p>
+      <textarea id="prompt-copy-text" readonly
+        style="width:100%;min-height:120px;font-family:'JetBrains Mono',monospace;font-size:0.8rem;line-height:1.4;background:var(--surf);border:1px solid var(--border);border-radius:0.5rem;padding:0.75rem;resize:vertical;color:var(--text);">
+Crie uma tabela com 6 colunas para um jogo de adivinhação de conceitos.
+As colunas devem ser:
+1. "Conceito": O nome do conceito.
+2. "Dica 1": Uma dica bem geral sobre o conceito.
+3. "Dica 2": Uma dica um pouco mais específica.
+4. "Dica 3": Uma dica bem específica, quase entregando o conceito.
+5. "Dica 4": A dica final, que praticamente revela o conceito.
+6. "Palavras Proibidas": Uma lista de 3 a 5 palavras-chave separadas por vírgula que não podem ser ditas ao tentar adivinhar o conceito.
+
+Gere 10 conceitos sobre [TÓPICO DA AULA, EX: "Biologia Celular", "Grandes Navegações", "Revolução Industrial"].
+Formate a saída como uma tabela Markdown.
+</textarea>
+      <div style="display:flex;justify-content:flex-end;gap:0.75rem;margin-top:1rem;">
+        <button onclick="closeModal('prompt-modal')"
+          style="padding:0.7rem 1.4rem;border:1.5px solid var(--border);border-radius:0.75rem;background:transparent;color:var(--muted2);font-family:'Plus Jakarta Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;">Fechar</button>
+        <button id="btn-copiar-prompt" onclick="copiarPrompt()"
+          style="padding:0.7rem 1.4rem;border:none;border-radius:0.75rem;background:var(--gold);color:#000;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;">📋
+          Copiar Texto</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ════════════════════════════════════════════════════
+    // BROADCAST CHANNEL — comunicação entre janelas
+    // ════════════════════════════════════════════════════
+    const CH = new BroadcastChannel('adivinhe_conceito_v2');
+
+    // ════════════════════════════════════════════════════
+    // STATE
+    // ════════════════════════════════════════════════════
+    let state = {
+      gameData: null,
+      teams: [],
+      currentIdx: null,
+      dicasReveladas: 0,
+      timerSec: 90,
+      usedCards: new Set(),
+      disciplina: '',
+      serie: '',
+      tema: '',
+    };
+    let timerInterval = null;
+    let projWin = null;
+
+    // Carregar API key do localStorage se existir
+    document.addEventListener('DOMContentLoaded', () => {
+    });
+
+    // ════════════════════════════════════════════════════
+    // NAVEGAÇÃO E MODAIS
+    // ════════════════════════════════════════════════════
+    function goTo(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function mostrarPromptHelper() {
+      document.getElementById('prompt-modal').classList.add('open');
+    }
+    function copiarPrompt() {
+      const txt = document.getElementById('prompt-copy-text');
+      txt.select();
+      document.execCommand('copy');
+      const btn = document.getElementById('btn-copiar-prompt');
+      btn.textContent = '✓ Copiado!';
+      setTimeout(() => btn.textContent = '📋 Copiar Texto', 2000);
+    }
+
+    // ════════════════════════════════════════════════════
+    // DOWNLOAD EXCEL TEMPLATE (.xlsx via Base64)
+    // ════════════════════════════════════════════════════
+    function baixarTemplateExcel() {
+      const b64 = "UEsDBBQAAAAAAAAAAACkAYS4tQIAALUCAAAaAAAAeGwvX3JlbHMvd29ya2Jvb2sueG1sLnJlbHM8P3htbCB2ZXJzaW9uPSIxLjAiIGVuY29kaW5nPSJVVEYtOCIgc3RhbmRhbG9uZT0ieWVzIj8+DQo8UmVsYXRpb25zaGlwcyB4bWxucz0iaHR0cDovL3NjaGVtYXMub3BlbnhtbGZvcm1hdHMub3JnL3BhY2thZ2UvMjAwNi9yZWxhdGlvbnNoaXBzIj48UmVsYXRpb25zaGlwIElkPSJySWQxIiBUeXBlPSJodHRwOi8vc2NoZW1hcy5vcGVueG1sZm9ybWF0cy5vcmcvb2ZmaWNlRG9jdW1lbnQvMjAwNi9yZWxhdGlvbnNoaXBzL3dvcmtzaGVldCIgVGFyZ2V0PSJ3b3Jrc2hlZXRzL3NoZWV0MS54bWwiLz48UmVsYXRpb25zaGlwIElkPSJySWQyIiBUeXBlPSJodHRwOi8vc2NoZW1hcy5vcGVueG1sZm9ybWF0cy5vcmcvb2ZmaWNlRG9jdW1lbnQvMjAwNi9yZWxhdGlvbnNoaXBzL3RoZW1lIiBUYXJnZXQ9InRoZW1lL3RoZW1lMS54bWwiLz48UmVsYXRpb25zaGlwIElkPSJySWQzIiBUeXBlPSJodHRwOi8vc2NoZW1hcy5vcGVueG1sZm9ybWF0cy5vcmcvb2ZmaWNlRG9jdW1lbnQvMjAwNi9yZWxhdGlvbnNoaXBzL3N0eWxlcyIgVGFyZ2V0PSJzdHlsZXMueG1sIi8+PFJlbGF0aW9uc2hpcCBJZD0icklkNCIgVHlwZT0iaHR0cDovL3NjaGVtYXMub3BlbnhtbGZvcm1hdHMub3JnL29mZmljZURvY3VtZW50LzIwMDYvcmVsYXRpb25zaGlwcy9zaGVldE1ldGFkYXRhIiBUYXJnZXQ9Im1ldGFkYXRhLnhtbCIvPjwvUmVsYXRpb25zaGlwcz5QSwMEFAAAAAAAAAAAADAPiGveHQAA3h0AABMAAAB4bC90aGVtZS90aGVtZTEueG1sPD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/Pg0KPGE6dGhlbWUgeG1sbnM6YT0iaHR0cDovL3NjaGVtYXMub3BlbnhtbGZvcm1hdHMub3JnL2RyYXdpbmdtbC8yMDA2L21haW4iIG5hbWU9Ik9mZmljZSBUaGVtZSI+PGE6dGhlbWVFbGVtZW50cz48YTpjbHJTY2hlbWUgbmFtZT0iT2ZmaWNlIj48YTpkazE+PGE6c3lzQ2xyIHZhbD0id2luZG93VGV4dCIgbGFzdENscj0iMDAwMDAwIi8+PC9hOmRrMT48YTpsdDE+PGE6c3lzQ2xyIHZhbD0id2luZG93IiBsYXN0Q2xyPSJGRkZGRkYiLz48L2E6bHQxPjxhOmRrMj48YTpzcmdiQ2xyIHZhbD0iMUY0OTdEIi8+PC9hOmRrMj48YTpsdDI+PGE6c3JnYkNsciB2YWw9IkVFRUNFMSIvPjwvYTpsdDI+PGE6YWNjZW50MT48YTpzcmdiQ2xyIHZhbD0iNEY4MUJEIi8+PC9hOmFjY2VudDE+PGE6YWNjZW50Mj48YTpzcmdiQ2xyIHZhbD0iQzA1MDREIi8+PC9hOmFjY2VudDI+PGE6YWNjZW50Mz48YTpzcmdiQ2xyIHZhbD0iOUJCQjU5Ii8+PC9hOmFjY2VudDM+PGE6YWNjZW50ND48YTpzcmdiQ2xyIHZhbD0iODA2NEEyIi8+PC9hOmFjY2VudDQ+PGE6YWNjZW50NT48YTpzcmdiQ2xyIHZhbD0iNEJBQ0M2Ii8+PC9hOmFjY2VudDU+PGE6YWNjZW50Nj48YTpzcmdiQ2xyIHZhbD0iRjc5NjQ2Ii8+PC9hOmFjY2VudDY+PGE6aGxpbms+PGE6c3JnYkNsciB2YWw9IjAwMDBGRiIvPjwvYTpobGluaz48YTpmb2xIbGluaz48YTpzcmdiQ2xyIHZhbD0iODAwMDgwIi8+PC9hOmZvbEhsaW5rPjwvYTpjbHJTY2hlbWU+PGE6Zm9udFNjaGVtZSBuYW1lPSJPZmZpY2UiPjxhOm1ham9yRm9udD48YTpsYXRpbiB0eXBlZmFjZT0iQ2FtYnJpYSIvPjxhOmVhIHR5cGVmYWNlPSIiLz48YTpjcyB0eXBlZmFjZT0iIi8+PGE6Zm9udCBzY3JpcHQ9IkpwYW4iIHR5cGVmYWNlPSLvvK3vvLMg77yw44K044K344OD44KvIi8+PGE6Zm9udCBzY3JpcHQ9IkhhbmciIHR5cGVmYWNlPSLrp5HsnYAg6rOg65SVIi8+PGE6Zm9udCBzY3JpcHQ9IkhhbnMiIHR5cGVmYWNlPSLlrovkvZMiLz48YTpmb250IHNjcmlwdD0iSGFudCIgdHlwZWZhY2U9IuaWsOe0sOaYjumrlCIvPjxhOmZvbnQgc2NyaXB0PSJBcmFiIiB0eXBlZmFjZT0iVGltZXMgTmV3IFJvbWFuIi8+PGE6Zm9udCBzY3JpcHQ9IkhlYnIiIHR5cGVmYWNlPSJUaW1lcyBOZXcgUm9tYW4iLz48YTpmb250IHNjcmlwdD0iVGhhaSIgdHlwZWZhY2U9IlRhaG9tYSIvPjxhOmZvbnQgc2NyaXB0PSJFdGhpIiB0eXBlZmFjZT0iTnlhbGEiLz48YTpmb250IHNjcmlwdD0iQmVuZyIgdHlwZWZhY2U9IlZyaW5kYSIvPjxhOmZvbnQgc2NyaXB0PSJHdWpyIiB0eXBlZmFjZT0iU2hydXRpIi8+PGE6Zm9udCBzY3JpcHQ9IktobXIiIHR5cGVmYWNlPSJNb29sQm9yYW4iLz48YTpmb250IHNjcmlwdD0iS25kYSIgdHlwZWZhY2U9IlR1bmdhIi8+PGE6Zm9udCBzY3JpcHQ9Ikd1cnUiIHR5cGVmYWNlPSJSYWF2aSIvPjxhOmZvbnQgc2NyaXB0PSJDYW5zIiB0eXBlZmFjZT0iRXVwaGVtaWEiLz48YTpmb250IHNjcmlwdD0iQ2hlciIgdHlwZWZhY2U9IlBsYW50YWdlbmV0IENoZXJva2VlIi8+PGE6Zm9udCBzY3JpcHQ9IllpaWkiIHR5cGVmYWNlPSJNaWNyb3NvZnQgWWkgQmFpdGkiLz48YTpmb250IHNjcmlwdD0iVGlidCIgdHlwZWZhY2U9Ik1pY3Jvc29mdCBIaW1hbGF5YSIvPjxhOmZvbnQgc2NyaXB0PSJUaGFhIiB0eXBlZmFjZT0iTVYgQm9saSIvPjxhOmZvbnQgc2NyaXB0PSJEZXZhIiB0eXBlZmFjZT0iTWFuZ2FsIi8+PGE6Zm9udCBzY3JpcHQ9IlRlbHUiIHR5cGVmYWNlPSJHYXV0YW1pIi8+PGE6Zm9udCBzY3JpcHQ9IlRhbWwiIHR5cGVmYWNlPSJMYXRoYSIvPjxhOmZvbnQgc2NyaXB0PSJTeXJjIiB0eXBlZmFjZT0iRXN0cmFuZ2VsbyBFZGVzc2EiLz48YTpmb250IHNjcmlwdD0iT3J5YSIgdHlwZWZhY2U9IkthbGluZ2EiLz48YTpmb250IHNjcmlwdD0iTWx5bSIgdHlwZWZhY2U9IkthcnRpa2EiLz48YTpmb250IHNjcmlwdD0iTGFvbyIgdHlwZWZhY2U9IkRva0NoYW1wYSIvPjxhOmZvbnQgc2NyaXB0PSJTaW5oIiB0eXBlZmFjZT0iSXNrb29sYSBQb3RhIi8+PGE6Zm9udCBzY3JpcHQ9Ik1vbmciIHR5cGVmYWNlPSJNb25nb2xpYW4gQmFpdGkiLz48YTpmb250IHNjcmlwdD0iVmlldCIgdHlwZWZhY2U9IlRpbWVzIE5ldyBSb21hbiIvPjxhOmZvbnQgc2NyaXB0PSJVaWdoIiB0eXBlZmFjZT0iTWljcm9zb2Z0IFVpZ2h1ciIvPjxhOmZvbnQgc2NyaXB0PSJHZW9yIiB0eXBlZmFjZT0iU3lsZmFlbiIvPjwvYTptYWpvckZvbnQ+PGE6bWlub3JGb250PjxhOmxhdGluIHR5cGVmYWNlPSJDYWxpYnJpIi8+PGE6ZWEgdHlwZWZhY2U9IiIvPjxhOmNzIHR5cGVmYWNlPSIiLz48YTpmb250IHNjcmlwdD0iSnBhbiIgdHlwZWZhY2U9Iu+8re+8syDvvLDjgrTjgrfjg4Pjgq8iLz48YTpmb250IHNjcmlwdD0iSGFuZyIgdHlwZWZhY2U9IuunkeydgCDqs6DrlJUiLz48YTpmb250IHNjcmlwdD0iSGFucyIgdHlwZWZhY2U9IuWui+S9kyIvPjxhOmZvbnQgc2NyaXB0PSJIYW50IiB0eXBlZmFjZT0i5paw57Sw5piO6auUIi8+PGE6Zm9udCBzY3JpcHQ9IkFyYWIiIHR5cGVmYWNlPSJBcmlhbCIvPjxhOmZvbnQgc2NyaXB0PSJIZWJyIiB0eXBlZmFjZT0iQXJpYWwiLz48YTpmb250IHNjcmlwdD0iVGhhaSIgdHlwZWZhY2U9IlRhaG9tYSIvPjxhOmZvbnQgc2NyaXB0PSJFdGhpIiB0eXBlZmFjZT0iTnlhbGEiLz48YTpmb250IHNjcmlwdD0iQmVuZyIgdHlwZWZhY2U9IlZyaW5kYSIvPjxhOmZvbnQgc2NyaXB0PSJHdWpyIiB0eXBlZmFjZT0iU2hydXRpIi8+PGE6Zm9udCBzY3JpcHQ9IktobXIiIHR5cGVmYWNlPSJEYXVuUGVuaCIvPjxhOmZvbnQgc2NyaXB0PSJLbmRhIiB0eXBlZmFjZT0iVHVuZ2EiLz48YTpmb250IHNjcmlwdD0iR3VydSIgdHlwZWZhY2U9IlJhYXZpIi8+PGE6Zm9udCBzY3JpcHQ9IkNhbnMiIHR5cGVmYWNlPSJFdXBoZW1pYSIvPjxhOmZvbnQgc2NyaXB0PSJDaGVyIiB0eXBlZmFjZT0iUGxhbnRhZ2VuZXQgQ2hlcm9rZWUiLz48YTpmb250IHNjcmlwdD0iWWlpaSIgdHlwZWZhY2U9Ik1pY3Jvc29mdCBZaSBCYWl0aSIvPjxhOmZvbnQgc2NyaXB0PSJUaWJ0IiB0eXBlZmFjZT0iTWljcm9zb2Z0IEhpbWFsYXlhIi8+PGE6Zm9udCBzY3JpcHQ9IlRoYWEiIHR5cGVmYWNlPSJNViBCb2xpIi8+PGE6Zm9udCBzY3JpcHQ9IkRldmEiIHR5cGVmYWNlPSJNYW5nYWwiLz48YTpmb250IHNjcmlwdD0iVGVsdSIgdHlwZWZhY2U9IkdhdXRhbWkiLz48YTpmb250IHNjcmlwdD0iVGFtbCIgdHlwZWZhY2U9IkxhdGhhIi8+PGE6Zm9udCBzY3JpcHQ9IlN5cmMiIHR5cGVmYWNlPSJFc3RyYW5nZWxvIEVkZXNzYSIvPjxhOmZvbnQgc2NyaXB0PSJPcnlhIiB0eXBlZmFjZT0iS2FsaW5nYSIvPjxhOmZvbnQgc2NyaXB0PSJNbHltIiB0eXBlZmFjZT0iS2FydGlrYSIvPjxhOmZvbnQgc2NyaXB0PSJMYW9vIiB0eXBlZmFjZT0iRG9rQ2hhbXBhIi8+PGE6Zm9udCBzY3JpcHQ9IlNpbmgiIHR5cGVmYWNlPSJJc2tvb2xhIFBvdGEiLz48YTpmb250IHNjcmlwdD0iTW9uZyIgdHlwZWZhY2U9Ik1vbmdvbGlhbiBCYWl0aSIvPjxhOmZvbnQgc2NyaXB0PSJWaWV0IiB0eXBlZmFjZT0iQXJpYWwiLz48YTpmb250IHNjcmlwdD0iVWlnaCIgdHlwZWZhY2U9Ik1pY3Jvc29mdCBVaWdodXIiLz48YTpmb250IHNjcmlwdD0iR2VvciIgdHlwZWZhY2U9IlN5bGZhZW4iLz48L2E6bWlub3JGb250PjwvYTpmb250U2NoZW1lPjxhOmZtdFNjaGVtZSBuYW1lPSJPZmZpY2UiPjxhOmZpbGxTdHlsZUxzdD48YTpzb2xpZEZpbGw+PGE6c2NoZW1lQ2xyIHZhbD0icGhDbHIiLz48L2E6c29saWRGaWxsPjxhOmdyYWRGaWxsIHJvdFdpdGhTaGFwZT0iMSI+PGE6Z3NMc3Q+PGE6Z3MgcG9zPSIwIj48YTpzY2hlbWVDbHIgdmFsPSJwaENsciI+PGE6dGludCB2YWw9IjUwMDAwIi8+PGE6c2F0TW9kIHZhbD0iMzAwMDAwIi8+PC9hOnNjaGVtZUNscj48L2E6Z3M+PGE6Z3MgcG9zPSIzNTAwMCI+PGE6c2NoZW1lQ2xyIHZhbD0icGhDbHIiPjxhOnRpbnQgdmFsPSIzNzAwMCIvPjxhOnNhdE1vZCB2YWw9IjMwMDAwMCIvPjwvYTpzY2hlbWVDbHI+PC9hOmdzPjxhOmdzIHBvcz0iMTAwMDAwIj48YTpzY2hlbWVDbHIgdmFsPSJwaENsciI+PGE6dGludCB2YWw9IjE1MDAwIi8+PGE6c2F0TW9kIHZhbD0iMzUwMDAwIi8+PC9hOnNjaGVtZUNscj48L2E6Z3M+PC9hOmdzTHN0PjxhOmxpbiBhbmc9IjE2MjAwMDAwIiBzY2FsZWQ9IjEiLz48L2E6Z3JhZEZpbGw+PGE6Z3JhZEZpbGwgcm90V2l0aFNoYXBlPSIxIj48YTpnc0xzdD48YTpncyBwb3M9IjAiPjxhOnNjaGVtZUNsciB2YWw9InBoQ2xyIj48YTp0aW50IHZhbD0iMTAwMDAwIi8+PGE6c2hhZGUgdmFsPSIxMDAwMDAiLz48YTpzYXRNb2QgdmFsPSIxMzAwMDAiLz48L2E6c2NoZW1lQ2xyPjwvYTpncz48YTpncyBwb3M9IjEwMDAwMCI+PGE6c2NoZW1lQ2xyIHZhbD0icGhDbHIiPjxhOnRpbnQgdmFsPSI1MDAwMCIvPjxhOnNoYWRlIHZhbD0iMTAwMDAwIi8+PGE6c2F0TW9kIHZhbD0iMzUwMDAwIi8+PC9hOnNjaGVtZUNscj48L2E6Z3M+PC9hOmdzTHN0PjxhOmxpbiBhbmc9IjE2MjAwMDAwIiBzY2FsZWQ9IjAiLz48L2E6Z3JhZEZpbGw+PC9hOmZpbGxTdHlsZUxzdD48YTpsblN0eWxlTHN0PjxhOmxuIHc9Ijk1MjUiIGNhcD0iZmxhdCIgY21wZD0ic25nIiBhbGduPSJjdHIiPjxhOnNvbGlkRmlsbD48YTpzY2hlbWVDbHIgdmFsPSJwaENsciI+PGE6c2hhZGUgdmFsPSI5NTAwMCIvPjxhOnNhdE1vZCB2YWw9IjEwNTAwMCIvPjwvYTpzY2hlbWVDbHI+PC9hOnNvbGlkRmlsbD48YTpwcnN0RGFzaCB2YWw9InNvbGlkIi8+PC9hOmxuPjxhOmxuIHc9IjI1NDAwIiBjYXA9ImZsYXQiIGNtcGQ9InNuZyIgYWxnbj0iY3RyIj48YTpzb2xpZEZpbGw+PGE6c2NoZW1lQ2xyIHZhbD0icGhDbHIiLz48L2E6c29saWRGaWxsPjxhOnByc3REYXNoIHZhbD0ic29saWQiLz48L2E6bG4+PGE6bG4gdz0iMzgxMDAiIGNhcD0iZmxhdCIgY21wZD0ic25nIiBhbGduPSJjdHIiPjxhOnNvbGlkRmlsbD48YTpzY2hlbWVDbHIgdmFsPSJwaENsciIvPjwvYTpzb2xpZEZpbGw+PGE6cHJzdERhc2ggdmFsPSJzb2xpZCIvPjwvYTpsbj48L2E6bG5TdHlsZUxzdD48YTplZmZlY3RTdHlsZUxzdD48YTplZmZlY3RTdHlsZT48YTplZmZlY3RMc3Q+PGE6b3V0ZXJTaGR3IGJsdXJSYWQ9IjQwMDAwIiBkaXN0PSIyMDAwMCIgZGlyPSI1NDAwMDAwIiByb3RXaXRoU2hhcGU9IjAiPjxhOnNyZ2JDbHIgdmFsPSIwMDAwMDAiPjxhOmFscGhhIHZhbD0iMzgwMDAiLz48L2E6c3JnYkNscj48L2E6b3V0ZXJTaGR3PjwvYTplZmZlY3RMc3Q+PC9hOmVmZmVjdFN0eWxlPjxhOmVmZmVjdFN0eWxlPjxhOmVmZmVjdExzdD48YTpvdXRlclNoZHcgYmx1clJhZD0iNDAwMDAiIGRpc3Q9IjIzMDAwIiBkaXI9IjU0MDAwMDAiIHJvdFdpdGhTaGFwZT0iMCI+PGE6c3JnYkNsciB2YWw9IjAwMDAwMCI+PGE6YWxwaGEgdmFsPSIzNTAwMCIvPjwvYTpzcmdiQ2xyPjwvYTpvdXRlclNoZHc+PC9hOmVmZmVjdExzdD48L2E6ZWZmZWN0U3R5bGU+PGE6ZWZmZWN0U3R5bGU+PGE6ZWZmZWN0THN0PjxhOm91dGVyU2hkdyBibHVyUmFkPSI0MDAwMCIgZGlzdD0iMjMwMDAiIGRpcj0iNTQwMDAwMCIgcm90V2l0aFNoYXBlPSIwIj48YTpzcmdiQ2xyIHZhbD0iMDAwMDAwIj48YTphbHBoYSB2YWw9IjM1MDAwIi8+PC9hOnNyZ2JDbHI+PC9hOm91dGVyU2hkdz48L2E6ZWZmZWN0THN0PjxhOnNjZW5lM2Q+PGE6Y2FtZXJhIHByc3Q9Im9ydGhvZ3JhcGhpY0Zyb250Ij48YTpyb3QgbGF0PSIwIiBsb249IjAiIHJldj0iMCIvPjwvYTpjYW1lcmE+PGE6bGlnaHRSaWcgcmlnPSJ0aHJlZVB0IiBkaXI9InQiPjxhOnJvdCBsYXQ9IjAiIGxvbj0iMCIgcmV2PSIxMjAwMDAwIi8+PC9hOmxpZ2h0UmlnPjwvYTpzY2VuZTNkPjxhOnNwM2Q+PGE6YmV2ZWxUIHc9IjYzNTAwIiBoPSIyNTQwMCIvPjwvYTpzcDNkPjwvYTplZmZlY3RTdHlsZT48L2E6ZWZmZWN0U3R5bGVMc3Q+PGE6YmdGaWxsU3R5bGVMc3Q+PGE6c29saWRGaWxsPjxhOnNjaGVtZUNsciB2YWw9InBoQ2xyIi8+PC9hOnNvbGlkRmlsbD48YTpncmFkRmlsbCByb3RXaXRoU2hhcGU9IjEiPjxhOmdzTHN0PjxhOmdzIHBvcz0iMCI+PGE6c2NoZW1lQ2xyIHZhbD0icGhDbHIiPjxhOnRpbnQgdmFsPSI0MDAwMCIvPjxhOnNhdE1vZCB2YWw9IjM1MDAwMCIvPjwvYTpzY2hlbWVDbHI+PC9hOmdzPjxhOmdzIHBvcz0iNDAwMDAiPjxhOnNjaGVtZUNsciB2YWw9InBoQ2xyIj48YTp0aW50IHZhbD0iNDUwMDAiLz48YTpzaGFkZSB2YWw9Ijk5MDAwIi8+PGE6c2F0TW9kIHZhbD0iMzUwMDAwIi8+PC9hOnNjaGVtZUNscj48L2E6Z3M+PGE6Z3MgcG9zPSIxMDAwMDAiPjxhOnNjaGVtZUNsciB2YWw9InBoQ2xyIj48YTpzaGFkZSB2YWw9IjIwMDAwIi8+PGE6c2F0TW9kIHZhbD0iMjU1MDAwIi8+PC9hOnNjaGVtZUNscj48L2E6Z3M+PC9hOmdzTHN0PjxhOnBhdGggcGF0aD0iY2lyY2xlIj48YTpmaWxsVG9SZWN0IGw9IjUwMDAwIiB0PSItODAwMDAiIHI9IjUwMDAwIiBiPSIxODAwMDAiLz48L2E6cGF0aD48L2E6Z3JhZEZpbGw+PGE6Z3JhZEZpbGwgcm90V2l0aFNoYXBlPSIxIj48YTpnc0xzdD48YTpncyBwb3M9IjAiPjxhOnNjaGVtZUNsciB2YWw9InBoQ2xyIj48YTp0aW50IHZhbD0iODAwMDAiLz48YTpzYXRNb2QgdmFsPSIzMDAwMDAiLz48L2E6c2NoZW1lQ2xyPjwvYTpncz48YTpncyBwb3M9IjEwMDAwMCI+PGE6c2NoZW1lQ2xyIHZhbD0icGhDbHIiPjxhOnNoYWRlIHZhbD0iMzAwMDAiLz48YTpzYXRNb2QgdmFsPSIyMDAwMDAiLz48L2E6c2NoZW1lQ2xyPjwvYTpncz48L2E6Z3NMc3Q+PGE6cGF0aCBwYXRoPSJjaXJjbGUiPjxhOmZpbGxUb1JlY3QgbD0iNTAwMDAiIHQ9IjUwMDAwIiByPSI1MDAwMCIgYj0iNTAwMDAiLz48L2E6cGF0aD48L2E6Z3JhZEZpbGw+PC9hOmJnRmlsbFN0eWxlTHN0PjwvYTpmbXRTY2hlbWU+PC9hOnRoZW1lRWxlbWVudHM+PGE6b2JqZWN0RGVmYXVsdHM+PGE6c3BEZWY+PGE6c3BQci8+PGE6Ym9keVByLz48YTpsc3RTdHlsZS8+PGE6c3R5bGU+PGE6bG5SZWYgaWR4PSIxIj48YTpzY2hlbWVDbHIgdmFsPSJhY2NlbnQxIi8+PC9hOmxuUmVmPjxhOmZpbGxSZWYgaWR4PSIzIj48YTpzY2hlbWVDbHIgdmFsPSJhY2NlbnQxIi8+PC9hOmZpbGxSZWY+PGE6ZWZmZWN0UmVmIGlkeD0iMiI+PGE6c2NoZW1lQ2xyIHZhbD0iYWNjZW50MSIvPjwvYTplZmZlY3RSZWY+PGE6Zm9udFJlZiBpZHg9Im1pbm9yIj48YTpzY2hlbWVDbHIgdmFsPSJsdDEiLz48L2E6Zm9udFJlZj48L2E6c3R5bGU+PC9hOnNwRGVmPjxhOmxuRGVmPjxhOnNwUHIvPjxhOmJvZHlQci8+PGE6bHN0U3R5bGUvPjxhOnN0eWxlPjxhOmxuUmVmIGlkeD0iMiI+PGE6c2NoZW1lQ2xyIHZhbD0iYWNjZW50MSIvPjwvYTpsblJlZj48YTpmaWxsUmVmIGlkeD0iMCI+PGE6c2NoZW1lQ2xyIHZhbD0iYWNjZW50MSIvPjwvYTpmaWxsUmVmPjxhOmVmZmVjdFJlZiBpZHg9IjEiPjxhOnNjaGVtZUNsciB2YWw9ImFjY2VudDEiLz48L2E6ZWZmZWN0UmVmPjxhOmZvbnRSZWYgaWR4PSJtaW5vciI+PGE6c2NoZW1lQ2xyIHZhbD0idHgxIi8+PC9hOmZvbnRSZWY+PC9hOnN0eWxlPjwvYTpsbkRlZj48L2E6b2JqZWN0RGVmYXVsdHM+PGE6ZXh0cmFDbHJTY2hlbWVMc3QvPjwvYTp0aGVtZT5QSwMEFAAAAAAAAAAAAFX0BJRaBAAAWgQAAA0AAAB4bC9zdHlsZXMueG1sPD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/Pg0KPHN0eWxlU2hlZXQgeG1sbnM9Imh0dHA6Ly9zY2hlbWFzLm9wZW54bWxmb3JtYXRzLm9yZy9zcHJlYWRzaGVldG1sLzIwMDYvbWFpbiIgeG1sbnM6dnQ9Imh0dHA6Ly9zY2hlbWFzLm9wZW54bWxmb3JtYXRzLm9yZy9vZmZpY2VEb2N1bWVudC8yMDA2L2RvY1Byb3BzVlR5cGVzIj48bnVtRm10cyBjb3VudD0iMSI+PG51bUZtdCBudW1GbXRJZD0iNTYiIGZvcm1hdENvZGU9IiZxdW90O+S4iuWNiC/kuIvljYggJnF1b3Q7aGgmcXVvdDvmmYImcXVvdDttbSZxdW90O+WIhiZxdW90O3NzJnF1b3Q756eSICZxdW90OyIvPjwvbnVtRm10cz48Zm9udHMgY291bnQ9IjEiPjxmb250PjxzeiB2YWw9IjEyIi8+PGNvbG9yIHRoZW1lPSIxIi8+PG5hbWUgdmFsPSJDYWxpYnJpIi8+PGZhbWlseSB2YWw9IjIiLz48c2NoZW1lIHZhbD0ibWlub3IiLz48L2ZvbnQ+PC9mb250cz48ZmlsbHMgY291bnQ9IjIiPjxmaWxsPjxwYXR0ZXJuRmlsbCBwYXR0ZXJuVHlwZT0ibm9uZSIvPjwvZmlsbD48ZmlsbD48cGF0dGVybkZpbGwgcGF0dGVyblR5cGU9ImdyYXkxMjUiLz48L2ZpbGw+PC9maWxscz48Ym9yZGVycyBjb3VudD0iMSI+PGJvcmRlcj48bGVmdC8+PHJpZ2h0Lz48dG9wLz48Ym90dG9tLz48ZGlhZ29uYWwvPjwvYm9yZGVyPjwvYm9yZGVycz48Y2VsbFN0eWxlWGZzIGNvdW50PSIxIj48eGYgbnVtRm10SWQ9IjAiIGZvbnRJZD0iMCIgZmlsbElkPSIwIiBib3JkZXJJZD0iMCIvPjwvY2VsbFN0eWxlWGZzPjxjZWxsWGZzIGNvdW50PSIxIj48eGYgbnVtRm10SWQ9IjAiIGZvbnRJZD0iMCIgZmlsbElkPSIwIiBib3JkZXJJZD0iMCIgeGZJZD0iMCIgYXBwbHlOdW1iZXJGb3JtYXQ9IjEiLz48L2NlbGxYZnM+PGNlbGxTdHlsZXMgY291bnQ9IjEiPjxjZWxsU3R5bGUgbmFtZT0iTm9ybWFsIiB4ZklkPSIwIiBidWlsdGluSWQ9IjAiLz48L2NlbGxTdHlsZXM+PGR4ZnMgY291bnQ9IjAiLz48dGFibGVTdHlsZXMgY291bnQ9IjAiIGRlZmF1bHRUYWJsZVN0eWxlPSJUYWJsZVN0eWxlTWVkaXVtOSIgZGVmYXVsdFBpdm90U3R5bGU9IlBpdm90U3R5bGVNZWRpdW00Ii8+PC9zdHlsZVNoZWV0PlBLAwQUAAAAAAAAAAAAEsIS7cQHAADEBwAAGAAAAHhsL3dvcmtzaGVldHMvc2hlZXQxLnhtbDw/eG1sIHZlcnNpb249IjEuMCIgZW5jb2Rpbmc9IlVURi04IiBzdGFuZGFsb25lPSJ5ZXMiPz4NCjx3b3Jrc2hlZXQgeG1sbnM9Imh0dHA6Ly9zY2hlbWFzLm9wZW54bWxmb3JtYXRzLm9yZy9zcHJlYWRzaGVldG1sLzIwMDYvbWFpbiIgeG1sbnM6cj0iaHR0cDovL3NjaGVtYXMub3BlbnhtbGZvcm1hdHMub3JnL29mZmljZURvY3VtZW50LzIwMDYvcmVsYXRpb25zaGlwcyI+PGRpbWVuc2lvbiByZWY9IkExOkYzIi8+PHNoZWV0Vmlld3M+PHNoZWV0VmlldyB3b3JrYm9va1ZpZXdJZD0iMCIvPjwvc2hlZXRWaWV3cz48Y29scz48Y29sIG1pbj0iMSIgbWF4PSIxIiB3aWR0aD0iMjAuODMyMDMxMjUiIGN1c3RvbVdpZHRoPSIxIi8+PGNvbCBtaW49IjIiIG1heD0iMiIgd2lkdGg9IjYwLjgzMjAzMTI1IiBjdXN0b21XaWR0aD0iMSIvPjxjb2wgbWluPSIzIiBtYXg9IjMiIHdpZHRoPSI2MC44MzIwMzEyNSIgY3VzdG9tV2lkdGg9IjEiLz48Y29sIG1pbj0iNCIgbWF4PSI0IiB3aWR0aD0iNjAuODMyMDMxMjUiIGN1c3RvbVdpZHRoPSIxIi8+PGNvbCBtaW49IjUiIG1heD0iNSIgd2lkdGg9IjYwLjgzMjAzMTI1IiBjdXN0b21XaWR0aD0iMSIvPjxjb2wgbWluPSI2IiBtYXg9IjYiIHdpZHRoPSI1MC44MzIwMzEyNSIgY3VzdG9tV2lkdGg9IjEiLz48L2NvbHM+PHNoZWV0RGF0YT48cm93IHI9IjEiPjxjIHI9IkExIiB0PSJzdHIiPjx2PkNvbmNlaXRvPC92PjwvYz48YyByPSJCMSIgdD0ic3RyIj48dj5EaWNhIDE8L3Y+PC9jPjxjIHI9IkMxIiB0PSJzdHIiPjx2PkRpY2EgMjwvdj48L2M+PGMgcj0iRDEiIHQ9InN0ciI+PHY+RGljYSAzPC92PjwvYz48YyByPSJFMSIgdD0ic3RyIj48dj5EaWNhIDQ8L3Y+PC9jPjxjIHI9IkYxIiB0PSJzdHIiPjx2PlBhbGF2cmFzIFByb2liaWRhcyAoc2VwYXJhZGFzIHBvciB2w61yZ3VsYSk8L3Y+PC9jPjwvcm93Pjxyb3cgcj0iMiI+PGMgcj0iQTIiIHQ9InN0ciI+PHY+TUlUT0PDlE5EUklBPC92PjwvYz48YyByPSJCMiIgdD0ic3RyIj48dj7DiSB1bWEgb3JnYW5lbGEgY2VsdWxhciBwcmVzZW50ZSBlbSBjw6lsdWxhcyBldWNhcmlvbnRlcy48L3Y+PC9jPjxjIHI9IkMyIiB0PSJzdHIiPjx2PlBvc3N1aSBzZXUgcHLDs3ByaW8gRE5BIGUgdGVtIGZvcm1hdG8gcXVlIGxlbWJyYSB1bSBmZWlqw6NvemluaG8uPC92PjwvYz48YyByPSJEMiIgdD0ic3RyIj48dj5TZXUgcHJvY2Vzc28gZW52b2x2ZSBvIGNvbnN1bW8gZGUgb3hpZ8OqbmlvIGUgZ2xpY29zZS48L3Y+PC9jPjxjIHI9IkUyIiB0PSJzdHIiPjx2PsOJIGNvbmhlY2lkYSBjb21vIGEgJnF1b3Q7dXNpbmEmcXVvdDsgZGEgY8OpbHVsYSwgcmVzcG9uc8OhdmVsIHBlbGEgcmVzcGlyYcOnw6NvIGNlbHVsYXIuPC92PjwvYz48YyByPSJGMiIgdD0ic3RyIj48dj5FTkVSR0lBLCBSRVNQSVJBw4fDg08sIEFUUCwgVVNJTkE8L3Y+PC9jPjwvcm93Pjxyb3cgcj0iMyI+PGMgcj0iQTMiIHQ9InN0ciI+PHY+R1JBVklEQURFPC92PjwvYz48YyByPSJCMyIgdD0ic3RyIj48dj7DiSB1bWEgZGFzIHF1YXRybyBmb3LDp2FzIGZ1bmRhbWVudGFpcyBkYSBuYXR1cmV6YS48L3Y+PC9jPjxjIHI9IkMzIiB0PSJzdHIiPjx2PkZvaSBkZXNjcml0YSBjbGFzc2ljYW1lbnRlIHBvciBJc2FhYyBOZXd0b24uPC92PjwvYz48YyByPSJEMyIgdD0ic3RyIj48dj7DiSBhIHJhesOjbyBwZWxhIHF1YWwgb3MgcGxhbmV0YXMgb3JiaXRhbSBvIFNvbCBlIG7Do28gc2FlbSBmbHV0dWFuZG8uPC92PjwvYz48YyByPSJFMyIgdD0ic3RyIj48dj7DiSBhIGZvcsOnYSBxdWUgYXRyYWkgb3Mgb2JqZXRvcyBwYXJhIG8gY2VudHJvIGRhIFRlcnJhLjwvdj48L2M+PGMgcj0iRjMiIHQ9InN0ciI+PHY+Q0FJUiwgUEVTTywgTkVXVE9OLCBBVFJBw4fDg088L3Y+PC9jPjwvcm93Pjwvc2hlZXREYXRhPjxpZ25vcmVkRXJyb3JzPjxpZ25vcmVkRXJyb3IgbnVtYmVyU3RvcmVkQXNUZXh0PSIxIiBzcXJlZj0iQTE6RjMiLz48L2lnbm9yZWRFcnJvcnM+PC93b3Jrc2hlZXQ+UEsDBBQAAAAAAAAAAABggACBiAMAAIgDAAAPAAAAeGwvbWV0YWRhdGEueG1sPD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/Pg0KPG1ldGFkYXRhIHhtbG5zPSJodHRwOi8vc2NoZW1hcy5vcGVueG1sZm9ybWF0cy5vcmcvc3ByZWFkc2hlZXRtbC8yMDA2L21haW4iIHhtbG5zOnhscmQ9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vb2ZmaWNlL3NwcmVhZHNoZWV0bWwvMjAxNy9yaWNoZGF0YSIgeG1sbnM6eGRhPSJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL29mZmljZS9zcHJlYWRzaGVldG1sLzIwMTcvZHluYW1pY2FycmF5Ij4KICA8bWV0YWRhdGFUeXBlcyBjb3VudD0iMSI+CiAgICA8bWV0YWRhdGFUeXBlIG5hbWU9IlhMREFQUiIgbWluU3VwcG9ydGVkVmVyc2lvbj0iMTIwMDAwIiBjb3B5PSIxIiBwYXN0ZUFsbD0iMSIgcGFzdGVWYWx1ZXM9IjEiIG1lcmdlPSIxIiBzcGxpdEZpcnN0PSIxIiByb3dDb2xTaGlmdD0iMSIgY2xlYXJGb3JtYXRzPSIxIiBjbGVhckNvbW1lbnRzPSIxIiBhc3NpZ249IjEiIGNvZXJjZT0iMSIgY2VsbE1ldGE9IjEiLz4KICA8L21ldGFkYXRhVHlwZXM+CiAgPGZ1dHVyZU1ldGFkYXRhIG5hbWU9IlhMREFQUiIgY291bnQ9IjEiPgogICAgPGJrPgogICAgICA8ZXh0THN0PgogICAgICAgIDxleHQgdXJpPSJ7YmRiYjhjZGMtZmExZS00OTZlLWE4NTctM2MzZjMwYzAyOWMzfSI+CiAgICAgICAgICA8eGRhOmR5bmFtaWNBcnJheVByb3BlcnRpZXMgZkR5bmFtaWM9IjEiIGZDb2xsYXBzZWQ9IjAiLz4KICAgICAgICA8L2V4dD4KICAgICAgPC9leHRMc3Q+CiAgICA8L2JrPgogIDwvZnV0dXJlTWV0YWRhdGE+CiAgPGNlbGxNZXRhZGF0YSBjb3VudD0iMSI+CiAgICA8Yms+CiAgICAgIDxyYyB0PSIxIiB2PSIwIi8+CiAgICA8L2JrPgogIDwvY2VsbE1ldGFkYXRhPgo8L21ldGFkYXRhPlBLAwQUAAAAAAAAAAAAOaslgEUBAABFAQAADwAAAHhsL3dvcmtib29rLnhtbDw/eG1sIHZlcnNpb249IjEuMCIgZW5jb2Rpbmc9IlVURi04IiBzdGFuZGFsb25lPSJ5ZXMiPz4NCjx3b3JrYm9vayB4bWxucz0iaHR0cDovL3NjaGVtYXMub3BlbnhtbGZvcm1hdHMub3JnL3NwcmVhZHNoZWV0bWwvMjAwNi9tYWluIiB4bWxuczpyPSJodHRwOi8vc2NoZW1hcy5vcGVueG1sZm9ybWF0cy5vcmcvb2ZmaWNlRG9jdW1lbnQvMjAwNi9yZWxhdGlvbnNoaXBzIj48d29ya2Jvb2tQciBjb2RlTmFtZT0iVGhpc1dvcmtib29rIi8+PHNoZWV0cz48c2hlZXQgbmFtZT0iQ29uY2VpdG9zIiBzaGVldElkPSIxIiByOmlkPSJySWQxIi8+PC9zaGVldHM+PC93b3JrYm9vaz5QSwMEFAAAAAAAAAAAAEpqEflMAgAATAIAAAsAAABfcmVscy8ucmVsczw/eG1sIHZlcnNpb249IjEuMCIgZW5jb2Rpbmc9IlVURi04IiBzdGFuZGFsb25lPSJ5ZXMiPz4NCjxSZWxhdGlvbnNoaXBzIHhtbG5zPSJodHRwOi8vc2NoZW1hcy5vcGVueG1sZm9ybWF0cy5vcmcvcGFja2FnZS8yMDA2L3JlbGF0aW9uc2hpcHMiPjxSZWxhdGlvbnNoaXAgSWQ9InJJZDIiIFR5cGU9Imh0dHA6Ly9zY2hlbWFzLm9wZW54bWxmb3JtYXRzLm9yZy9wYWNrYWdlLzIwMDYvcmVsYXRpb25zaGlwcy9tZXRhZGF0YS9jb3JlLXByb3BlcnRpZXMiIFRhcmdldD0iZG9jUHJvcHMvY29yZS54bWwiLz48UmVsYXRpb25zaGlwIElkPSJySWQzIiBUeXBlPSJodHRwOi8vc2NoZW1hcy5vcGVueG1sZm9ybWF0cy5vcmcvb2ZmaWNlRG9jdW1lbnQvMjAwNi9yZWxhdGlvbnNoaXBzL2V4dGVuZGVkLXByb3BlcnRpZXMiIFRhcmdldD0iZG9jUHJvcHMvYXBwLnhtbCIvPjxSZWxhdGlvbnNoaXAgSWQ9InJJZDEiIFR5cGU9Imh0dHA6Ly9zY2hlbWFzLm9wZW54bWxmb3JtYXRzLm9yZy9vZmZpY2VEb2N1bWVudC8yMDA2L3JlbGF0aW9uc2hpcHMvb2ZmaWNlRG9jdW1lbnQiIFRhcmdldD0ieGwvd29ya2Jvb2sueG1sIi8+PC9SZWxhdGlvbnNoaXBzPlBLAwQUAAAAAAAAAAAA32xfLzUCAAA1AgAAEAAAAGRvY1Byb3BzL2FwcC54bWw8P3htbCB2ZXJzaW9uPSIxLjAiIGVuY29kaW5nPSJVVEYtOCIgc3RhbmRhbG9uZT0ieWVzIj8+DQo8UHJvcGVydGllcyB4bWxucz0iaHR0cDovL3NjaGVtYXMub3BlbnhtbGZvcm1hdHMub3JnL29mZmljZURvY3VtZW50LzIwMDYvZXh0ZW5kZWQtcHJvcGVydGllcyIgeG1sbnM6dnQ9Imh0dHA6Ly9zY2hlbWFzLm9wZW54bWxmb3JtYXRzLm9yZy9vZmZpY2VEb2N1bWVudC8yMDA2L2RvY1Byb3BzVlR5cGVzIj48QXBwbGljYXRpb24+U2hlZXRKUzwvQXBwbGljYXRpb24+PEhlYWRpbmdQYWlycz48dnQ6dmVjdG9yIHNpemU9IjIiIGJhc2VUeXBlPSJ2YXJpYW50Ij48dnQ6dmFyaWFudD48dnQ6bHBzdHI+V29ya3NoZWV0czwvdnQ6bHBzdHI+PC92dDp2YXJpYW50Pjx2dDp2YXJpYW50Pjx2dDppND4xPC92dDppND48L3Z0OnZhcmlhbnQ+PC92dDp2ZWN0b3I+PC9IZWFkaW5nUGFpcnM+PFRpdGxlc09mUGFydHM+PHZ0OnZlY3RvciBzaXplPSIxIiBiYXNlVHlwZT0ibHBzdHIiPjx2dDpscHN0cj5Db25jZWl0b3M8L3Z0Omxwc3RyPjwvdnQ6dmVjdG9yPjwvVGl0bGVzT2ZQYXJ0cz48L1Byb3BlcnRpZXM+UEsDBBQAAAAAAAAAAADWknwRWgEAAFoBAAARAAAAZG9jUHJvcHMvY29yZS54bWw8P3htbCB2ZXJzaW9uPSIxLjAiIGVuY29kaW5nPSJVVEYtOCIgc3RhbmRhbG9uZT0ieWVzIj8+DQo8Y3A6Y29yZVByb3BlcnRpZXMgeG1sbnM6Y3A9Imh0dHA6Ly9zY2hlbWFzLm9wZW54bWxmb3JtYXRzLm9yZy9wYWNrYWdlLzIwMDYvbWV0YWRhdGEvY29yZS1wcm9wZXJ0aWVzIiB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iIHhtbG5zOmRjdGVybXM9Imh0dHA6Ly9wdXJsLm9yZy9kYy90ZXJtcy8iIHhtbG5zOmRjbWl0eXBlPSJodHRwOi8vcHVybC5vcmcvZGMvZGNtaXR5cGUvIiB4bWxuczp4c2k9Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvWE1MU2NoZW1hLWluc3RhbmNlIi8+UEsDBBQAAAAAAAAAAACo12qAFQgAABUIAAATAAAAW0NvbnRlbnRfVHlwZXNdLnhtbDw/eG1sIHZlcnNpb249IjEuMCIgZW5jb2Rpbmc9IlVURi04IiBzdGFuZGFsb25lPSJ5ZXMiPz4NCjxUeXBlcyB4bWxucz0iaHR0cDovL3NjaGVtYXMub3BlbnhtbGZvcm1hdHMub3JnL3BhY2thZ2UvMjAwNi9jb250ZW50LXR5cGVzIiB4bWxuczp4c2Q9Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvWE1MU2NoZW1hIiB4bWxuczp4c2k9Imh0dHA6Ly93d3cudzMub3JnLzIwMDEvWE1MU2NoZW1hLWluc3RhbmNlIj48RGVmYXVsdCBFeHRlbnNpb249InhtbCIgQ29udGVudFR5cGU9ImFwcGxpY2F0aW9uL3htbCIvPjxEZWZhdWx0IEV4dGVuc2lvbj0iYmluIiBDb250ZW50VHlwZT0iYXBwbGljYXRpb24vdm5kLm1zLWV4Y2VsLnNoZWV0LmJpbmFyeS5tYWNyb0VuYWJsZWQubWFpbiIvPjxEZWZhdWx0IEV4dGVuc2lvbj0idm1sIiBDb250ZW50VHlwZT0iYXBwbGljYXRpb24vdm5kLm9wZW54bWxmb3JtYXRzLW9mZmljZWRvY3VtZW50LnZtbERyYXdpbmciLz48RGVmYXVsdCBFeHRlbnNpb249ImRhdGEiIENvbnRlbnRUeXBlPSJhcHBsaWNhdGlvbi92bmQub3BlbnhtbGZvcm1hdHMtb2ZmaWNlZG9jdW1lbnQubW9kZWwrZGF0YSIvPjxEZWZhdWx0IEV4dGVuc2lvbj0iYm1wIiBDb250ZW50VHlwZT0iaW1hZ2UvYm1wIi8+PERlZmF1bHQgRXh0ZW5zaW9uPSJwbmciIENvbnRlbnRUeXBlPSJpbWFnZS9wbmciLz48RGVmYXVsdCBFeHRlbnNpb249ImdpZiIgQ29udGVudFR5cGU9ImltYWdlL2dpZiIvPjxEZWZhdWx0IEV4dGVuc2lvbj0iZW1mIiBDb250ZW50VHlwZT0iaW1hZ2UveC1lbWYiLz48RGVmYXVsdCBFeHRlbnNpb249IndtZiIgQ29udGVudFR5cGU9ImltYWdlL3gtd21mIi8+PERlZmF1bHQgRXh0ZW5zaW9uPSJqcGciIENvbnRlbnRUeXBlPSJpbWFnZS9qcGVnIi8+PERlZmF1bHQgRXh0ZW5zaW9uPSJqcGVnIiBDb250ZW50VHlwZT0iaW1hZ2UvanBlZyIvPjxEZWZhdWx0IEV4dGVuc2lvbj0idGlmIiBDb250ZW50VHlwZT0iaW1hZ2UvdGlmZiIvPjxEZWZhdWx0IEV4dGVuc2lvbj0idGlmZiIgQ29udGVudFR5cGU9ImltYWdlL3RpZmYiLz48RGVmYXVsdCBFeHRlbnNpb249InBkZiIgQ29udGVudFR5cGU9ImFwcGxpY2F0aW9uL3BkZiIvPjxEZWZhdWx0IEV4dGVuc2lvbj0icmVscyIgQ29udGVudFR5cGU9ImFwcGxpY2F0aW9uL3ZuZC5vcGVueG1sZm9ybWF0cy1wYWNrYWdlLnJlbGF0aW9uc2hpcHMreG1sIi8+PE92ZXJyaWRlIFBhcnROYW1lPSIveGwvd29ya2Jvb2sueG1sIiBDb250ZW50VHlwZT0iYXBwbGljYXRpb24vdm5kLm9wZW54bWxmb3JtYXRzLW9mZmljZWRvY3VtZW50LnNwcmVhZHNoZWV0bWwuc2hlZXQubWFpbit4bWwiLz48T3ZlcnJpZGUgUGFydE5hbWU9Ii94bC93b3Jrc2hlZXRzL3NoZWV0MS54bWwiIENvbnRlbnRUeXBlPSJhcHBsaWNhdGlvbi92bmQub3BlbnhtbGZvcm1hdHMtb2ZmaWNlZG9jdW1lbnQuc3ByZWFkc2hlZXRtbC53b3Jrc2hlZXQreG1sIi8+PE92ZXJyaWRlIFBhcnROYW1lPSIveGwvdGhlbWUvdGhlbWUxLnhtbCIgQ29udGVudFR5cGU9ImFwcGxpY2F0aW9uL3ZuZC5vcGVueG1sZm9ybWF0cy1vZmZpY2Vkb2N1bWVudC50aGVtZSt4bWwiLz48T3ZlcnJpZGUgUGFydE5hbWU9Ii94bC9zdHlsZXMueG1sIiBDb250ZW50VHlwZT0iYXBwbGljYXRpb24vdm5kLm9wZW54bWxmb3JtYXRzLW9mZmljZWRvY3VtZW50LnNwcmVhZHNoZWV0bWwuc3R5bGVzK3htbCIvPjxPdmVycmlkZSBQYXJ0TmFtZT0iL2RvY1Byb3BzL2NvcmUueG1sIiBDb250ZW50VHlwZT0iYXBwbGljYXRpb24vdm5kLm9wZW54bWxmb3JtYXRzLXBhY2thZ2UuY29yZS1wcm9wZXJ0aWVzK3htbCIvPjxPdmVycmlkZSBQYXJ0TmFtZT0iL2RvY1Byb3BzL2FwcC54bWwiIENvbnRlbnRUeXBlPSJhcHBsaWNhdGlvbi92bmQub3BlbnhtbGZvcm1hdHMtb2ZmaWNlZG9jdW1lbnQuZXh0ZW5kZWQtcHJvcGVydGllcyt4bWwiLz48T3ZlcnJpZGUgUGFydE5hbWU9Ii94bC9tZXRhZGF0YS54bWwiIENvbnRlbnRUeXBlPSJhcHBsaWNhdGlvbi92bmQub3BlbnhtbGZvcm1hdHMtb2ZmaWNlZG9jdW1lbnQuc3ByZWFkc2hlZXRtbC5zaGVldE1ldGFkYXRhK3htbCIvPjwvVHlwZXM+UEsBAgAAFAAAAAAAAAAAAKQBhLi1AgAAtQIAABoAAAAAAAAAAAAAAAAAAAAAAHhsL19yZWxzL3dvcmtib29rLnhtbC5yZWxzUEsBAgAAFAAAAAAAAAAAADAPiGveHQAA3h0AABMAAAAAAAAAAAAAAAAA7QIAAHhsL3RoZW1lL3RoZW1lMS54bWxQSwECAAAUAAAAAAAAAAAAVfQElFoEAABaBAAADQAAAAAAAAAAAAAAAAD8IAAAeGwvc3R5bGVzLnhtbFBLAQIAABQAAAAAAAAAAAASwhLtxAcAAMQHAAAYAAAAAAAAAAAAAAAAAIElAAB4bC93b3Jrc2hlZXRzL3NoZWV0MS54bWxQSwECAAAUAAAAAAAAAAAAYIAAgYgDAACIAwAADwAAAAAAAAAAAAAAAAB7LQAAeGwvbWV0YWRhdGEueG1sUEsBAgAAFAAAAAAAAAAAADmrJYBFAQAARQEAAA8AAAAAAAAAAAAAAAAAMDEAAHhsL3dvcmtib29rLnhtbFBLAQIAABQAAAAAAAAAAABKahH5TAIAAEwCAAALAAAAAAAAAAAAAAAAAKIyAABfcmVscy8ucmVsc1BLAQIAABQAAAAAAAAAAADfbF8vNQIAADUCAAAQAAAAAAAAAAAAAAAAABc1AABkb2NQcm9wcy9hcHAueG1sUEsBAgAAFAAAAAAAAAAAANaSfBFaAQAAWgEAABEAAAAAAAAAAAAAAAAAejcAAGRvY1Byb3BzL2NvcmUueG1sUEsBAgAAFAAAAAAAAAAAAKjXaoAVCAAAFQgAABMAAAAAAAAAAAAAAAAAAzkAAFtDb250ZW50X1R5cGVzXS54bWxQSwUGAAAAAAoACgB7AgAASUEAAAAA";
+      const binary = atob(b64);
+      const array = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) array[i] = binary.charCodeAt(i);
+
+      const blob = new Blob([array], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = "Template_Adivinhe_o_Conceito.xlsx";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // ════════════════════════════════════════════════════
+    // ABRIR PROJETOR
+    // ════════════════════════════════════════════════════
+    function abrirProjetor() {
+      if (projWin && !projWin.closed) { projWin.focus(); return; }
+      projWin = window.open(window.location.href + '#projector', 'ProjetorAluno',
+        'width=1280,height=720,menubar=no,toolbar=no,location=no,status=no');
+    }
+
+    // Detectar se foi aberto como projetor via hash
+    if (window.location.hash === '#projector') {
+      document.addEventListener('DOMContentLoaded', () => {
+        goTo('projector');
+        setupProjectorListener();
+        // Pedir estado atual ao professor
+        CH.postMessage({ type: 'REQUEST_STATE' });
+      });
+    }
+
+    // ════════════════════════════════════════════════════
+    // GERAR JOGO (SEM IA - USANDO DADOS DIRETOS)
+    // ════════════════════════════════════════════════════
+    async function gerarJogo() {
+      const tema = document.getElementById('s-tema').value.trim();
+      const nEq = parseInt(document.getElementById('s-eq').value);
+      const jsonRaw = document.getElementById('s-json-data').value.trim();
+      const errEl = document.getElementById('s-err');
+
+      errEl.style.display = 'none';
+      if (!tema) {
+        errEl.textContent = 'Preencha o título da aula.';
+        errEl.style.display = 'block'; return;
+      }
+      if (!jsonRaw) {
+        errEl.textContent = 'Cole o JSON com os conceitos da aula.';
+        errEl.style.display = 'block'; return;
+      }
+
+      document.getElementById('btn-gerar').disabled = true;
+      goTo('loading');
+
+      try {
+        const parsedData = parseUserInput(jsonRaw);
+
+        // Validação básica do formato
+        for (let i = 0; i < parsedData.length; i++) {
+          const c = parsedData[i];
+          if (!c.nome || !c.dica1 || !c.dica4 || !c.proibidas || c.proibidas.length === 0) {
+            throw new Error(`Na linha/conceito ${i + 1} ("${c.nome || '?'}"), identifiquei que faltam colunas ou os dados estão incompletos. Verifique se copiou as 6 colunas corretamente.`);
+          }
+        }
+
+        state.gameData = parsedData;
+        state.teams = Array.from({ length: nEq }, (_, i) => ({ nome: `Equipe ${i + 1}`, pts: 0 }));
+        state.usedCards = new Set();
+        state.currentIdx = null;
+        state.disciplina = "";
+        state.serie = "";
+        state.tema = tema;
+
+        setTimeout(() => { // delay visual mínimo
+          document.getElementById('btn-gerar').disabled = false;
+          iniciarPainel();
+        }, 600);
+
+      } catch (err) {
+        goTo('setup');
+        document.getElementById('btn-gerar').disabled = false;
+        errEl.textContent = '⚠️ ' + err.message;
+        errEl.style.display = 'block';
+      }
+    }
+
+    // ════════════════════════════════════════════════════
+    // MÁGICA: PARSER DE TABELAS EXCEL / CHATGPT / JSON
+    // ════════════════════════════════════════════════════
+    function parseUserInput(raw) {
+      raw = raw.trim();
+
+      // 1. Tenta parsear como JSON puro primeiro
+      if (raw.startsWith('[') || raw.startsWith('{')) {
+        try {
+          let clean = raw.replace(/```json/gi, '').replace(/```/g, '').trim();
+          let parsed = JSON.parse(clean);
+          if (!Array.isArray(parsed) && parsed.conceitos) parsed = parsed.conceitos;
+          return parsed; // Deu certo, era JSON
+        } catch (e) { }
+      }
+
+      // Extração de JSON escondido no meio do texto
+      try {
+        const match = raw.match(/\[\s*\{[\s\S]*\}\s*\]/);
+        if (match) return JSON.parse(match[0]);
+      } catch (e) { }
+
+      // --- 1.5. PARSE XML ---
+      if (raw.includes('<?xml') || raw.includes('<conceitos>')) {
+        try {
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(raw, "text/xml");
+          const errorNode = xmlDoc.querySelector("parsererror");
+
+          if (!errorNode) {
+            const xmlConceitos = xmlDoc.getElementsByTagName("conceito");
+            const result = [];
+            for (let i = 0; i < xmlConceitos.length; i++) {
+              const node = xmlConceitos[i];
+              const getT = tag => { const e = node.getElementsByTagName(tag)[0]; return e ? e.textContent.trim() : ""; };
+              const nome = getT("nome");
+              if (!nome) continue;
+
+              result.push({
+                nome: nome,
+                dica1: getT("dica1"),
+                dica2: getT("dica2"),
+                dica3: getT("dica3"),
+                dica4: getT("dica4"),
+                proibidas: getT("proibidas").split(',').map(s => s.trim()).filter(Boolean)
+              });
+            }
+            if (result.length > 0) return result;
+          }
+        } catch (e) { }
+      }
+
+      // 2. Transforma Markdown Tables ou TSV (Excel) em Objeto
+      const lines = raw.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+      const conceitos = [];
+
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+        let cols = [];
+
+        // Se a linha for uma linha Markdown do ChatGPT ex: | Conceito | Dica 1 |
+        if (line.startsWith('|') && line.endsWith('|')) {
+          if (line.includes('---')) continue; // Pula linha separadora do markdown
+          // Extrai colunas e remove espaços vazios inúteis
+          cols = line.split('|').map(s => s.trim()).slice(1, -1);
+        } else if (line.includes('\t')) {
+          // Se for TSV copiado livremente do Excel
+          cols = line.split('\t').map(s => s.trim());
+        }
+
+        if (cols.length >= 6) {
+          if (cols[0].toLowerCase().includes('conceito') || cols[0].toLowerCase() === 'nome') continue; // Pula cabeçalho
+
+          conceitos.push({
+            nome: cols[0],
+            dica1: cols[1],
+            dica2: cols[2],
+            dica3: cols[3],
+            dica4: cols[4],
+            proibidas: cols[5].split(',').map(s => s.trim()).filter(Boolean)
+          });
+        }
+      }
+
+      if (conceitos.length > 0) return conceitos;
+
+      throw new Error("Não consegui entender o formato. Por favor, cole a Tabela gerada pelo ChatGPT ou copiada diretamente das células do Excel (com as 6 colunas).");
+    }
+
+    // ════════════════════════════════════════════════════
+    // INICIAR PAINEL PROFESSOR
+    // ════════════════════════════════════════════════════
+    function iniciarPainel() {
+      goTo('professor');
+
+      document.getElementById('p-label').textContent =
+        `${state.disciplina}${state.serie ? ' · ' + state.serie : ''} · ${state.tema}`;
+
+      renderScorebar();
+      renderCardList();
+      broadcastState({ type: 'GAME_START', teams: state.teams, tema: `${state.disciplina} · ${state.tema}` });
+    }
+
+    function renderScorebar() {
+      const sb = document.getElementById('p-scorebar');
+      sb.innerHTML = '';
+      state.teams.forEach((t, i) => {
+        const pill = document.createElement('div');
+        pill.className = 'team-pill';
+        pill.id = `pill-${i}`;
+        pill.innerHTML = `
+      <span class="team-pill-name">${t.nome}</span>
+      <span class="team-pill-pts" id="pill-pts-${i}">${t.pts}</span>
+      <button class="pill-btn pill-plus" onclick="addPts(${i},1)">+</button>
+      <button class="pill-btn pill-minus" onclick="addPts(${i},-1)">−</button>
+    `;
+        sb.appendChild(pill);
+      });
+    }
+
+    function renderCardList() {
+      const list = document.getElementById('p-cards-list');
+      list.innerHTML = '';
+      state.gameData.forEach((c, i) => {
+        const d = document.createElement('div');
+        d.className = 'card-item';
+        d.id = `ci-${i}`;
+        d.onclick = () => selecionarConceito(i);
+        d.innerHTML = `<span class="card-num">${String(i + 1).padStart(2, '0')}</span>${c.nome}`;
+        if (state.usedCards.has(i)) d.classList.add('used');
+        list.appendChild(d);
+      });
+    }
+
+    // ════════════════════════════════════════════════════
+    // SELECIONAR CONCEITO
+    // ════════════════════════════════════════════════════
+    function selecionarConceito(idx) {
+      stopTimer();
+      state.currentIdx = idx;
+      state.dicasReveladas = 1;
+
+      document.querySelectorAll('.card-item').forEach((el, i) => el.classList.toggle('active', i === idx));
+
+      const c = state.gameData[idx];
+
+      document.getElementById('p-concept-name').textContent = c.nome;
+      const pr = document.getElementById('p-proibidas');
+      pr.innerHTML = c.proibidas.map(p => `<span class="proib-tag">🚫 ${p}</span>`).join('');
+
+      renderDicasPainel(c);
+
+      document.getElementById('p-idle').style.display = 'none';
+      document.getElementById('p-active').style.display = 'flex';
+
+      startTimer();
+
+      // Broadcast para projetor
+      broadcastState({
+        type: 'CONCEITO_START',
+        dicas: [c.dica1],
+        dicasReveladas: 1,
+        timerSec: 90,
+      });
+    }
+
+    function renderDicasPainel(c) {
+      const dicas = [c.dica1, c.dica2, c.dica3, c.dica4];
+      const pts = [5, 3, 2, 1];
+      const cls = ['dp5', 'dp3', 'dp2', 'dp1'];
+      const pcls = ['pdb5', 'pdb3', 'pdb2', 'pdb1'];
+      const panel = document.getElementById('p-dicas-panel');
+      panel.innerHTML = '';
+
+      dicas.forEach((dica, i) => {
+        const row = document.createElement('div');
+        row.className = 'dica-ctrl-row' + (i < state.dicasReveladas ? ' revealed' : '');
+        row.id = `drow-${i}`;
+
+        const badge = document.createElement('div');
+        badge.className = `dica-pts-badge ${cls[i]}`;
+        badge.innerHTML = `${pts[i]}<small>pts</small>`;
+
+        const textEl = document.createElement('div');
+        textEl.className = 'dica-ctrl-text' + (i < state.dicasReveladas ? '' : ' hidden-dica');
+        textEl.id = `dtxt-${i}`;
+        textEl.textContent = i < state.dicasReveladas ? dica : '🔒 Não revelada ainda';
+
+        const revBtn = document.createElement('button');
+        revBtn.className = 'dica-reveal-btn';
+        revBtn.id = `drbtn-${i}`;
+        revBtn.textContent = i < state.dicasReveladas ? '✓ Revelada' : '👁 Revelar';
+        revBtn.disabled = i < state.dicasReveladas || i > state.dicasReveladas;
+        if (i === state.dicasReveladas) revBtn.disabled = false;
+        revBtn.onclick = () => revelarDica(i);
+
+        row.appendChild(badge);
+        row.appendChild(textEl);
+        row.appendChild(revBtn);
+        panel.appendChild(row);
+      });
+    }
+
+    function revelarDica(i) {
+      if (i !== state.dicasReveladas) return;
+
+      const c = state.gameData[state.currentIdx];
+      const dicas = [c.dica1, c.dica2, c.dica3, c.dica4];
+
+      state.dicasReveladas++;
+
+      const row = document.getElementById(`drow-${i}`);
+      const txtEl = document.getElementById(`dtxt-${i}`);
+      const revBtn = document.getElementById(`drbtn-${i}`);
+      const nextBtn = document.getElementById(`drbtn-${i + 1}`);
+
+      row.classList.add('revealed');
+      txtEl.classList.remove('hidden-dica');
+      txtEl.textContent = dicas[i];
+      revBtn.textContent = '✓ Revelada';
+      revBtn.disabled = true;
+      if (nextBtn) nextBtn.disabled = false;
+
+      playBeep('reveal');
+
+      // Broadcast
+      const todasReveladas = dicas.slice(0, state.dicasReveladas);
+      broadcastState({
+        type: 'DICA_REVEAL',
+        dicas: todasReveladas,
+        dicasReveladas: state.dicasReveladas,
+      });
+    }
+
+    // ════════════════════════════════════════════════════
+    // TIMER
+    // ════════════════════════════════════════════════════
+    function startTimer() {
+      stopTimer();
+      state.timerSec = 90;
+      updateTimerUI();
+      timerInterval = setInterval(() => {
+        state.timerSec--;
+        updateTimerUI();
+        broadcastState({ type: 'TIMER_TICK', sec: state.timerSec });
+        if (state.timerSec <= 0) { stopTimer(); playBeep('timeout'); }
+      }, 1000);
+    }
+
+    function stopTimer() {
+      if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    }
+
+    function updateTimerUI() {
+      const s = state.timerSec;
+      const frac = Math.max(s, 0) / 90;
+      const total = 188.5;
+      const tc = document.getElementById('p-timer-circle');
+      const tn = document.getElementById('p-timer-num');
+      if (!tc) return;
+      tc.style.strokeDashoffset = total * (1 - frac);
+      tn.textContent = Math.max(s, 0);
+      const urgent = s <= 15 && s > 0;
+      tn.classList.toggle('urgent', urgent);
+      tc.style.stroke = urgent ? 'var(--red)' : 'var(--gold)';
+    }
+
+    // ════════════════════════════════════════════════════
+    // AWARD / PONTUAÇÃO
+    // ════════════════════════════════════════════════════
+    function abrirAwardModal() {
+      const pts = calcPts();
+      document.getElementById('award-pts-info').textContent =
+        `${state.dicasReveladas} dica${state.dicasReveladas > 1 ? 's' : ''} revelada${state.dicasReveladas > 1 ? 's' : ''} → vale ${pts} ponto${pts > 1 ? 's' : ''}`;
+
+      const container = document.getElementById('award-teams');
+      container.innerHTML = '';
+      state.teams.forEach((t, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'modal-team-btn';
+        btn.innerHTML = `<span>${t.nome}</span><span class="modal-team-pts">+${pts} → total: ${t.pts + pts}</span>`;
+        btn.onclick = () => atribuirPontos(i, pts);
+        container.appendChild(btn);
+      });
+
+      document.getElementById('award-modal').classList.add('open');
+      stopTimer();
+    }
+
+    function atribuirPontos(teamIdx, pts) {
+      state.teams[teamIdx].pts += pts;
+      document.getElementById(`pill-pts-${teamIdx}`).textContent = state.teams[teamIdx].pts;
+      closeModal('award-modal');
+      playBeep('correct');
+      revelarResposta(true);
+    }
+
+    function ninguemAcertou() {
+      closeModal('award-modal');
+      playBeep('wrong');
+      revelarResposta(false);
+    }
+
+    function addPts(idx, delta) {
+      state.teams[idx].pts = Math.max(0, state.teams[idx].pts + delta);
+      document.getElementById(`pill-pts-${idx}`).textContent = state.teams[idx].pts;
+      broadcastState({ type: 'SCORE_UPDATE', teams: state.teams });
+    }
+
+    function calcPts() {
+      const map = [5, 3, 2, 1];
+      return map[Math.min(state.dicasReveladas - 1, 3)];
+    }
+
+    function revelarResposta(acertou) {
+      const nome = state.gameData[state.currentIdx].nome;
+      marcarUsado(state.currentIdx);
+      broadcastState({ type: 'REVEAL_ANSWER', nome, acertou, teams: state.teams });
+      document.getElementById('p-idle').style.display = 'flex';
+      document.getElementById('p-active').style.display = 'none';
+      state.currentIdx = null;
+      document.querySelectorAll('.card-item').forEach(el => el.classList.remove('active'));
+    }
+
+    function pularConceito() {
+      stopTimer();
+      if (state.currentIdx !== null) marcarUsado(state.currentIdx);
+      broadcastState({ type: 'SKIP' });
+      document.getElementById('p-idle').style.display = 'flex';
+      document.getElementById('p-active').style.display = 'none';
+      state.currentIdx = null;
+      document.querySelectorAll('.card-item').forEach(el => el.classList.remove('active'));
+    }
+
+    function marcarUsado(idx) {
+      state.usedCards.add(idx);
+      const el = document.getElementById(`ci-${idx}`);
+      if (el) { el.classList.add('used'); el.classList.remove('active'); }
+    }
+
+    // ════════════════════════════════════════════════════
+    // END / NOVO JOGO
+    // ════════════════════════════════════════════════════
+    function showEndModal() {
+      const sorted = [...state.teams].sort((a, b) => b.pts - a.pts);
+      const medals = ['🥇', '🥈', '🥉'];
+      document.getElementById('end-scores').innerHTML = sorted.map((t, i) => `
+    <div class="end-score-card">
+      <div class="esc-name">${medals[i] || ''} ${t.nome}</div>
+      <div class="esc-pts">${t.pts}</div>
+    </div>
+  `).join('');
+      document.getElementById('end-modal').classList.add('open');
+    }
+
+    function confirmVoltarSetup() {
+      closeModal('end-modal');
+      stopTimer();
+      broadcastState({ type: 'GAME_RESET' });
+      goTo('setup');
+    }
+
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    // ════════════════════════════════════════════════════
+    // BROADCAST
+    // ════════════════════════════════════════════════════
+    function broadcastState(msg) {
+      try { CH.postMessage(msg); } catch (e) { }
+    }
+
+    CH.onmessage = (e) => {
+      const msg = e.data;
+      if (msg.type === 'REQUEST_STATE' && state.gameData) {
+        // Reenviar estado atual para o projetor recém-aberto
+        broadcastState({ type: 'GAME_START', teams: state.teams, tema: `${state.disciplina} · ${state.tema}` });
+      }
+    };
+
+    // ════════════════════════════════════════════════════
+    // PROJETOR — listener
+    // ════════════════════════════════════════════════════
+    function setupProjectorListener() {
+      const ptsCls = ['pdb5', 'pdb3', 'pdb2', 'pdb1'];
+      const ptsVals = [5, 3, 2, 1];
+      const ptsColors = ['var(--pts5-c)', 'var(--pts3-c)', 'var(--pts2-c)', 'var(--pts1-c)'];
+
+      function renderProjTeams(teams) {
+        const row = document.getElementById('proj-teams-row');
+        if (!row) return;
+        const maxPts = Math.max(...teams.map(t => t.pts));
+        row.innerHTML = teams.map(t => `
+      <div class="proj-team-chip ${t.pts === maxPts && t.pts > 0 ? 'leader' : ''}">
+        <span class="proj-team-name">${t.nome}</span>
+        <span class="proj-team-pts">${t.pts}</span>
+      </div>
+    `).join('');
+      }
+
+      function showProjPlaying(dicas, dicasReveladas) {
+        document.getElementById('proj-idle').style.display = 'none';
+        document.getElementById('proj-reveal').style.display = 'none';
+        const pp = document.getElementById('proj-playing');
+        pp.style.display = 'flex';
+
+        const grid = document.getElementById('proj-dicas');
+        grid.innerHTML = '';
+
+        dicas.forEach((txt, i) => {
+          const row = document.createElement('div');
+          row.className = 'proj-dica-item';
+
+          const badge = document.createElement('div');
+          badge.className = `proj-dica-badge ${ptsCls[i]}`;
+          badge.innerHTML = `${ptsVals[i]}<small>pts</small>`;
+
+          const textEl = document.createElement('div');
+          textEl.className = 'proj-dica-text';
+          textEl.textContent = txt;
+
+          row.appendChild(badge);
+          row.appendChild(textEl);
+          grid.appendChild(row);
+        });
+
+        // Info de dicas/pontos
+        const nextPtIdx = Math.min(dicasReveladas, 3);
+        document.getElementById('proj-dica-count').textContent = `Dica ${dicasReveladas} de 4`;
+        const ptsEl = document.getElementById('proj-pts-now');
+        ptsEl.textContent = `Vale ${ptsVals[Math.max(dicasReveladas - 1, 0)]} pts`;
+        ptsEl.style.color = ptsColors[Math.min(dicasReveladas - 1, 3)];
+      }
+
+      function updateProjTimer(sec) {
+        const frac = Math.max(sec, 0) / 90;
+        const total = 238.8;
+        const tc = document.getElementById('proj-timer-circle');
+        const tn = document.getElementById('proj-timer-num');
+        if (!tc) return;
+        tc.style.strokeDashoffset = total * (1 - frac);
+        tn.textContent = Math.max(sec, 0);
+        const urgent = sec <= 15 && sec > 0;
+        tn.classList.toggle('urgent', urgent);
+        tc.style.stroke = urgent ? 'var(--red)' : 'var(--gold)';
+      }
+
+      function showProjReveal(nome) {
+        document.getElementById('proj-playing').style.display = 'none';
+        document.getElementById('proj-idle').style.display = 'none';
+        document.getElementById('proj-reveal-word').textContent = nome;
+        document.getElementById('proj-reveal').style.display = 'flex';
+        spawnConfetti();
+        setTimeout(() => {
+          document.getElementById('proj-reveal').style.display = 'none';
+          document.getElementById('proj-idle').style.display = 'flex';
+        }, 4000);
+      }
+
+      CH.onmessage = (e) => {
+        const msg = e.data;
+        switch (msg.type) {
+          case 'GAME_START':
+            renderProjTeams(msg.teams);
+            break;
+          case 'CONCEITO_START':
+            showProjPlaying(msg.dicas, msg.dicasReveladas);
+            updateProjTimer(msg.timerSec);
+            break;
+          case 'DICA_REVEAL':
+            showProjPlaying(msg.dicas, msg.dicasReveladas);
+            break;
+          case 'TIMER_TICK':
+            updateProjTimer(msg.sec);
+            break;
+          case 'SCORE_UPDATE':
+          case 'REVEAL_ANSWER':
+            if (msg.teams) renderProjTeams(msg.teams);
+            if (msg.type === 'REVEAL_ANSWER') showProjReveal(msg.nome);
+            break;
+          case 'SKIP':
+            document.getElementById('proj-playing').style.display = 'none';
+            document.getElementById('proj-idle').style.display = 'flex';
+            break;
+          case 'GAME_RESET':
+            document.getElementById('proj-playing').style.display = 'none';
+            document.getElementById('proj-reveal').style.display = 'none';
+            document.getElementById('proj-idle').style.display = 'flex';
+            document.getElementById('proj-teams-row').innerHTML = '';
+            break;
+        }
+      };
+    }
+
+    // ════════════════════════════════════════════════════
+    // SONS
+    // ════════════════════════════════════════════════════
+    function playBeep(type) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'correct') {
+          osc.frequency.setValueAtTime(523, ctx.currentTime);
+          osc.frequency.setValueAtTime(659, ctx.currentTime + 0.12);
+          osc.frequency.setValueAtTime(784, ctx.currentTime + 0.24);
+          gain.gain.setValueAtTime(0.3, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+          osc.start(); osc.stop(ctx.currentTime + 0.5);
+        } else if (type === 'wrong') {
+          osc.frequency.setValueAtTime(220, ctx.currentTime);
+          osc.frequency.setValueAtTime(180, ctx.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.3, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+          osc.type = 'sawtooth';
+          osc.start(); osc.stop(ctx.currentTime + 0.4);
+        } else if (type === 'reveal') {
+          osc.frequency.setValueAtTime(440, ctx.currentTime);
+          osc.frequency.setValueAtTime(880, ctx.currentTime + 0.1);
+          gain.gain.setValueAtTime(0.2, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+          osc.start(); osc.stop(ctx.currentTime + 0.3);
+        } else if (type === 'timeout') {
+          osc.frequency.setValueAtTime(300, ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.6);
+          gain.gain.setValueAtTime(0.35, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+          osc.type = 'square';
+          osc.start(); osc.stop(ctx.currentTime + 0.6);
+        }
+      } catch (e) { }
+    }
+
+    // ════════════════════════════════════════════════════
+    // CONFETTI
+    // ════════════════════════════════════════════════════
+    function spawnConfetti() {
+      const wrap = document.getElementById('confetti-wrap');
+      if (!wrap) return;
+      wrap.innerHTML = '';
+      const colors = ['#f0b429', '#22d3ee', '#34d399', '#f87171', '#a78bfa', '#fcd34d'];
+      for (let i = 0; i < 80; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'confetti-dot';
+        dot.style.left = Math.random() * 100 + 'vw';
+        dot.style.top = '-10px';
+        dot.style.background = colors[Math.floor(Math.random() * colors.length)];
+        dot.style.width = (6 + Math.random() * 8) + 'px';
+        dot.style.height = (6 + Math.random() * 8) + 'px';
+        dot.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        dot.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+        dot.style.animationDelay = (Math.random() * 0.8) + 's';
+        wrap.appendChild(dot);
+      }
+      setTimeout(() => { wrap.innerHTML = ''; }, 4000);
+    }
+  </script>
+</body>
+
+</html>
