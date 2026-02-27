@@ -2113,6 +2113,7 @@ Formate a saída como uma tabela Markdown.
         setupProjectorListener();
         // Pedir estado atual ao professor
         CH.postMessage({ type: 'REQUEST_STATE' });
+        try { if (window.opener) window.opener.postMessage({ type: 'REQUEST_STATE' }, '*'); } catch (e) { }
       });
     }
 
@@ -2574,14 +2575,18 @@ Formate a saída como uma tabela Markdown.
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
     // ════════════════════════════════════════════════════
-    // BROADCAST
+    // BROADCAST / COMUNICAÇÃO
     // ════════════════════════════════════════════════════
     function broadcastState(msg) {
       try { CH.postMessage(msg); } catch (e) { }
+      try {
+        if (projWin && !projWin.closed) {
+          projWin.postMessage(msg, '*');
+        }
+      } catch (e) { }
     }
 
-    CH.onmessage = (e) => {
-      const msg = e.data;
+    function handleTeacherMessage(msg) {
       if (msg.type === 'REQUEST_STATE' && state.gameData) {
         // Reenviar estado atual para o projetor recém-aberto
         broadcastState({ type: 'GAME_START', teams: state.teams, tema: `${state.disciplina} · ${state.tema}` });
@@ -2599,7 +2604,12 @@ Formate a saída como uma tabela Markdown.
           });
         }
       }
-    };
+    }
+
+    CH.onmessage = (e) => handleTeacherMessage(e.data);
+    window.addEventListener('message', (e) => {
+      if (e.data && e.data.type) handleTeacherMessage(e.data);
+    });
 
     // ════════════════════════════════════════════════════
     // PROJETOR — listener
@@ -2680,8 +2690,7 @@ Formate a saída como uma tabela Markdown.
         }, 4000);
       }
 
-      CH.onmessage = (e) => {
-        const msg = e.data;
+      function handleProjectorMessage(msg) {
         switch (msg.type) {
           case 'GAME_START':
             renderProjTeams(msg.teams);
@@ -2712,7 +2721,12 @@ Formate a saída como uma tabela Markdown.
             document.getElementById('proj-teams-row').innerHTML = '';
             break;
         }
-      };
+      }
+
+      CH.onmessage = (e) => handleProjectorMessage(e.data);
+      window.addEventListener('message', (e) => {
+        if (e.data && e.data.type) handleProjectorMessage(e.data);
+      });
     }
 
     // ════════════════════════════════════════════════════
