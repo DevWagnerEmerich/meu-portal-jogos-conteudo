@@ -1,0 +1,2616 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cruzadinha Educativa 🔤</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap"
+    rel="stylesheet">
+  <!-- SheetJS para ler planilhas XLSX direto no navegador -->
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+  <style>
+    :root {
+      --bg: #0b0f1a;
+      --surf: #111827;
+      --card: #1a2235;
+      --border: #1f2f48;
+      --border2: #2d4060;
+      --teal: #2dd4bf;
+      --teal2: #99f6e4;
+      --amber: #fbbf24;
+      --green: #34d399;
+      --red: #f87171;
+      --purple: #a78bfa;
+      --text: #e2eaf5;
+      --muted: #4d6480;
+      --muted2: #7a9ab8;
+
+      --easy: #34d399;
+      --med: #fbbf24;
+      --hard: #f87171;
+
+      --cell-size: 36px;
+      --proj-cell: min(56px, 5.5vmin);
+    }
+
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── SCREENS ─────────────────────────────────────── */
+    .screen {
+      display: none;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* ── LANDING ─────────────────────────────────────── */
+    #landing {
+      align-items: center;
+      justify-content: center;
+      gap: 2.5rem;
+      padding: 2rem;
+      background:
+        radial-gradient(ellipse 70% 50% at 30% 20%, #0d2a3a55, transparent),
+        radial-gradient(ellipse 50% 40% at 80% 80%, #1a2d1a44, transparent);
+    }
+
+    .land-icon {
+      font-size: 4rem;
+      filter: drop-shadow(0 0 28px #2dd4bf66);
+      animation: bob 3s ease-in-out infinite;
+    }
+
+    @keyframes bob {
+
+      0%,
+      100% {
+        transform: translateY(0)
+      }
+
+      50% {
+        transform: translateY(-10px)
+      }
+    }
+
+    .land-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.02em;
+      text-align: center;
+      background: linear-gradient(135deg, var(--teal) 0%, var(--teal2) 40%, var(--amber) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .land-sub {
+      color: var(--muted2);
+      font-size: 0.88rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .mode-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      width: 100%;
+      max-width: 520px;
+    }
+
+    @media(max-width:480px) {
+      .mode-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .mode-card {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 1.75rem 1.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+      text-align: center;
+    }
+
+    .mode-card:hover {
+      border-color: var(--teal);
+      transform: translateY(-3px);
+      box-shadow: 0 16px 40px #2dd4bf18;
+    }
+
+    .mode-card.hi {
+      border-color: var(--teal);
+      background: linear-gradient(135deg, #2dd4bf12, var(--card));
+    }
+
+    .mc-ico {
+      font-size: 2.2rem;
+    }
+
+    .mc-ttl {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+    }
+
+    .mc-dsc {
+      font-size: 0.76rem;
+      color: var(--muted2);
+      line-height: 1.5;
+    }
+
+    .land-hint {
+      font-size: 0.74rem;
+      color: var(--muted);
+      text-align: center;
+      max-width: 420px;
+      line-height: 1.7;
+    }
+
+    /* ── SETUP ───────────────────────────────────────── */
+    #setup {
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      background: radial-gradient(ellipse 60% 40% at 50% 0%, #0d2a3a, transparent);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .setup-wrap {
+      width: 100%;
+      max-width: 620px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-height: 95vh;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    .btn-back {
+      align-self: flex-start;
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 0.6rem;
+      color: var(--muted2);
+      padding: 0.4rem 0.9rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: all 0.15s;
+    }
+
+    .btn-back:hover {
+      border-color: var(--border2);
+      color: var(--text);
+    }
+
+    .setup-hdr {
+      text-align: center;
+    }
+
+    .setup-hdr h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+    }
+
+    .setup-hdr p {
+      color: var(--muted2);
+      font-size: 0.85rem;
+      margin-top: 0.3rem;
+    }
+
+    .setup-panel {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .f-label {
+      display: block;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted2);
+      margin-bottom: 0.45rem;
+      font-weight: 600;
+    }
+
+    .f-input {
+      width: 100%;
+      background: var(--surf);
+      border: 1.5px solid var(--border);
+      border-radius: 0.6rem;
+      padding: 0.55rem 0.8rem;
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .f-input:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px #2dd4bf20;
+    }
+
+    .f-input::placeholder {
+      color: var(--muted);
+    }
+
+    textarea.f-input {
+      resize: none;
+      min-height: 120px;
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 0.8rem;
+      background: linear-gradient(135deg, var(--teal), var(--teal2));
+      color: #061012;
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 4px 24px #2dd4bf40;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px #2dd4bf55;
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .err-box {
+      background: #f8717118;
+      border: 1.5px solid #f87171;
+      border-radius: 0.7rem;
+      padding: 0.85rem 1rem;
+      color: #fca5a5;
+      font-size: 0.85rem;
+      display: none;
+    }
+
+    /* ── SETUP HELP ──────────────────────────────────── */
+    .setup-help {
+      margin-top: 0.4rem;
+      background: rgba(45, 212, 191, 0.05);
+      border: 1px solid rgba(45, 212, 191, 0.2);
+      border-radius: 0.8rem;
+    }
+
+    .help-toggle {
+      width: 100%;
+      padding: 0.6rem 1rem;
+      background: transparent;
+      border: none;
+      color: var(--teal);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .help-toggle:hover {
+      background: rgba(45, 212, 191, 0.1);
+    }
+
+    .help-content {
+      padding: 0 1rem 1rem 1rem;
+      font-size: 0.8rem;
+      color: var(--text);
+      line-height: 1.5;
+      display: none;
+    }
+
+    .help-content.open {
+      display: block;
+      animation: fadein 0.3s ease;
+    }
+
+    .prompt-box {
+      margin-top: 0.6rem;
+      background: #00000040;
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--teal2);
+      white-space: pre-wrap;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .btn-copy {
+      margin-top: 1rem;
+      width: 100%;
+      padding: 0.8rem;
+      border: 1.5px solid var(--teal);
+      border-radius: 0.8rem;
+      background: rgba(45, 212, 191, 0.1);
+      color: var(--teal);
+      font-family: 'Syne', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-copy:hover {
+      background: var(--teal);
+      color: #000;
+      box-shadow: 0 4px 15px rgba(45, 212, 191, 0.4);
+    }
+
+    /* ── LOADING ─────────────────────────────────────── */
+    #loading {
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      background: var(--bg);
+    }
+
+    .spin {
+      width: 52px;
+      height: 52px;
+      border: 3px solid var(--border);
+      border-top-color: var(--teal);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .load-txt {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem;
+      color: var(--muted2);
+      animation: breathe 1.6s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+
+      0%,
+      100% {
+        opacity: 0.3
+      }
+
+      50% {
+        opacity: 1
+      }
+    }
+
+    /* ── PROFESSOR PANEL ─────────────────────────────── */
+    #professor {
+      flex-direction: row !important;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .p-sidebar {
+      width: 280px;
+      min-width: 240px;
+      background: var(--surf);
+      border-right: 1.5px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .p-sidebar-top {
+      padding: 1rem;
+      border-bottom: 1.5px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .p-brand {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--teal), var(--amber));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .p-tema {
+      font-size: 0.72rem;
+      color: var(--muted2);
+    }
+
+    .btn-proj {
+      width: 100%;
+      padding: 0.6rem;
+      border: none;
+      border-radius: 0.6rem;
+      background: linear-gradient(90deg, var(--teal), var(--teal2));
+      color: #061012;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .btn-proj:hover {
+      opacity: 0.88;
+    }
+
+    .btn-gabarito {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1.5px solid var(--border);
+      border-radius: 0.6rem;
+      background: transparent;
+      color: var(--muted2);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-gabarito:hover {
+      border-color: var(--amber);
+      color: var(--amber);
+    }
+
+    .p-sidebar-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.75rem;
+    }
+
+    .p-sect-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0.6rem 0 0.3rem 0.2rem;
+    }
+
+    /* Pista item na sidebar */
+    .pista-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      padding: 0.55rem 0.65rem;
+      border-radius: 0.6rem;
+      border: 1.5px solid transparent;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-bottom: 0.3rem;
+      background: var(--card);
+    }
+
+    .pista-item:hover {
+      border-color: var(--border2);
+    }
+
+    .pista-item.active {
+      border-color: var(--teal);
+      background: #2dd4bf12;
+    }
+
+    .pista-item.revealed {
+      opacity: 0.45;
+    }
+
+    .pista-badge {
+      min-width: 32px;
+      height: 20px;
+      border-radius: 0.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .pb-h {
+      background: #2dd4bf22;
+      color: var(--teal);
+      border: 1px solid var(--teal);
+    }
+
+    .pb-v {
+      background: #fbbf2422;
+      color: var(--amber);
+      border: 1px solid var(--amber);
+    }
+
+    .pista-txt {
+      font-size: 0.78rem;
+      color: var(--muted2);
+      line-height: 1.45;
+    }
+
+    .pista-item.active .pista-txt {
+      color: var(--text);
+    }
+
+    .diff-star {
+      font-size: 0.65rem;
+    }
+
+    /* Main area */
+    .p-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .p-topbar {
+      background: var(--surf);
+      border-bottom: 1.5px solid var(--border);
+      padding: 0.65rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .p-topbar-label {
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-right: 0.2rem;
+    }
+
+    /* Progresso */
+    .progress-pill {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 2rem;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .progress-bar-wrap {
+      flex: 1;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      min-width: 80px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--teal), var(--teal2));
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+
+    .p-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      min-height: 0;
+    }
+
+    /* Grade professor */
+    .grid-wrap {
+      overflow: auto;
+      max-width: 100%;
+    }
+
+    .crossword-grid {
+      border-collapse: collapse;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .crossword-grid td {
+      width: var(--cell-size);
+      height: var(--cell-size);
+      border: 1px solid var(--border);
+      text-align: center;
+      vertical-align: middle;
+      font-size: 0.8rem;
+      font-weight: 700;
+      position: relative;
+      transition: background 0.2s;
+    }
+
+    .crossword-grid td.blk {
+      background: var(--surf);
+      border-color: var(--surf);
+    }
+
+    .crossword-grid td.empty {
+      background: var(--card);
+      color: transparent;
+    }
+
+    .crossword-grid td.filled {
+      background: var(--card);
+      color: var(--teal);
+    }
+
+    .crossword-grid td.revealed {
+      background: #2dd4bf18;
+      color: var(--teal2);
+    }
+
+    .crossword-grid td.highlight {
+      background: #fbbf2425;
+      color: var(--amber);
+    }
+
+    .crossword-grid td.active-cell {
+      background: #2dd4bf30;
+      color: #fff;
+      box-shadow: inset 0 0 0 2px var(--teal);
+    }
+
+    .cell-num {
+      position: absolute;
+      top: 1px;
+      left: 2px;
+      font-size: 0.5rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--muted2);
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    /* Pista ativa display */
+    .pista-ativa-box {
+      width: 100%;
+      max-width: 700px;
+      background: var(--card);
+      border: 2px solid var(--teal);
+      border-radius: 1rem;
+      padding: 1.2rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .pab-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--teal);
+      min-width: 60px;
+      text-align: center;
+    }
+
+    .pab-body {
+      flex: 1;
+    }
+
+    .pab-dir {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted2);
+      margin-bottom: 0.25rem;
+    }
+
+    .pab-texto {
+      font-size: 1rem;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .pab-diff {
+      font-size: 0.8rem;
+      margin-top: 0.3rem;
+    }
+
+    .pab-letras {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--muted2);
+      margin-top: 0.2rem;
+    }
+
+    .equipe-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.3rem 0.6rem;
+      border-radius: 0.4rem;
+      font-size: 0.75rem;
+      font-family: 'Syne', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .equipe-btn:hover {
+      background: rgba(45, 212, 191, 0.1);
+      border-color: var(--teal);
+      color: var(--teal);
+    }
+
+    .equipe-placar-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--teal);
+      background: rgba(45, 212, 191, 0.1);
+      padding: 0.25rem 0.6rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(45, 212, 191, 0.2);
+    }
+
+    .action-row {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 700px;
+    }
+
+    .btn-reveal-word {
+      flex: 1;
+      min-width: 140px;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 0.75rem;
+      background: linear-gradient(135deg, var(--teal), var(--teal2));
+      color: #061012;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 4px 16px #2dd4bf30;
+    }
+
+    .btn-reveal-word:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-reveal-word:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-next-pista {
+      padding: 0.8rem 1.2rem;
+      border: 1.5px solid var(--teal);
+      border-radius: 0.75rem;
+      background: transparent;
+      color: var(--teal);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-next-pista:hover {
+      background: #2dd4bf18;
+    }
+
+    .btn-novo {
+      padding: 0.8rem 1rem;
+      border: 1.5px solid var(--border);
+      border-radius: 0.75rem;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-novo:hover {
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    /* ── PROJECTOR ───────────────────────────────────── */
+    #projector {
+      background: #050912;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -10%, #0a2030, transparent 65%),
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: auto, 50px 50px, 50px 50px;
+      min-height: 100vh;
+    }
+
+    .proj-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 1.5rem 3vw;
+      gap: 1.5rem;
+      height: 100vh;
+      background: radial-gradient(ellipse 80% 80% at 50% 50%, transparent 30%, #050912f0);
+      overflow: hidden;
+    }
+
+    .proj-header {
+      width: 100%;
+      max-width: 1400px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .proj-logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .proj-progress {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 2rem;
+      padding: 0.3rem 0.9rem;
+    }
+
+    .proj-prog-txt {
+      font-size: 0.78rem;
+      color: var(--muted2);
+      font-weight: 600;
+    }
+
+    .proj-prog-bar {
+      width: 120px;
+      height: 5px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .proj-prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--teal), var(--teal2));
+      border-radius: 3px;
+      transition: width 0.5s ease;
+    }
+
+    .proj-content {
+      width: 100%;
+      max-width: 1600px;
+      display: flex;
+      gap: 3rem;
+      align-items: stretch;
+      flex: 1;
+      justify-content: center;
+      min-height: 0;
+      overflow: hidden;
+    }
+
+    /* Projector grid */
+    .proj-grid-wrap {
+      flex: 0 1 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 55%;
+      overflow: hidden;
+    }
+
+    .proj-grid {
+      border-collapse: collapse;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .proj-grid td {
+      width: var(--proj-cell);
+      height: var(--proj-cell);
+      min-width: 24px;
+      min-height: 24px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      text-align: center;
+      vertical-align: middle;
+      font-size: clamp(0.8rem, 2.5vmin, 1.8rem);
+      font-weight: 800;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 6px;
+    }
+
+    .proj-grid td.blk {
+      background: transparent;
+      border-color: transparent;
+    }
+
+    .proj-grid td.empty {
+      background: rgba(255, 255, 255, 0.1);
+      color: transparent;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.5);
+    }
+
+    .proj-grid td.revealed {
+      background: rgba(45, 212, 191, 0.15);
+      color: var(--teal2);
+      border-color: #2dd4bf;
+      animation: cellPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 0 15px rgba(45, 212, 191, 0.2), inset 0 0 10px rgba(45, 212, 191, 0.1);
+    }
+
+    @keyframes cellPop {
+      0% {
+        transform: scale(0.5);
+        opacity: 0
+      }
+
+      70% {
+        transform: scale(1.1)
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    .proj-grid td.highlight {
+      background: rgba(251, 191, 36, 0.15);
+      border-color: var(--amber);
+    }
+
+    .proj-grid td.active-proj {
+      background: rgba(45, 212, 191, 0.35);
+      border-color: var(--teal2);
+      transform: scale(1.05);
+      z-index: 10;
+      box-shadow: 0 0 20px rgba(45, 212, 191, 0.4);
+    }
+
+    .proj-cell-num {
+      position: absolute;
+      top: 3px;
+      left: 5px;
+      font-size: 0.8rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 800;
+      line-height: 1;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+
+    /* Pista projetada */
+    .proj-pista-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      min-width: 0;
+      justify-content: center;
+      overflow-y: auto;
+      padding-bottom: 0.5rem;
+    }
+
+    .proj-idle {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.2rem;
+      text-align: center;
+      height: 100%;
+    }
+
+    .proj-idle-icon {
+      font-size: 4rem;
+      filter: drop-shadow(0 0 30px #2dd4bf44);
+      animation: bob 3s ease-in-out infinite;
+    }
+
+    .proj-idle-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--teal), var(--amber));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .proj-idle-sub {
+      color: var(--muted2);
+      font-size: 0.9rem;
+    }
+
+    .proj-pista-active {
+      display: none;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .proj-pista-num-dir {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .proj-pista-num {
+      font-family: 'Syne', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--teal), var(--teal2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      filter: drop-shadow(0 2px 10px rgba(45, 212, 191, 0.3));
+    }
+
+    .proj-pista-dir-badge {
+      padding: 0.3rem 0.85rem;
+      border-radius: 2rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .dir-h {
+      background: #2dd4bf22;
+      color: var(--teal);
+      border: 1px solid var(--teal);
+    }
+
+    .dir-v {
+      background: #fbbf2422;
+      color: var(--amber);
+      border: 1px solid var(--amber);
+    }
+
+    .proj-pista-texto {
+      font-size: clamp(1.8rem, 3.5vw, 3.2rem);
+      line-height: 1.3;
+      color: #ffffff;
+      font-weight: 700;
+      animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      text-shadow: 0 4px 16px rgba(0, 0, 0, 0.9);
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .proj-pista-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .proj-pista-letras {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      color: var(--muted2);
+      letter-spacing: 0.2em;
+    }
+
+    .proj-pista-diff {
+      font-size: 0.85rem;
+    }
+
+    .proj-pista-resposta {
+      display: none;
+      flex-direction: column;
+      gap: 0.5rem;
+      animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .proj-resp-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--muted2);
+    }
+
+    .proj-resp-word {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--teal), var(--teal2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: 0.08em;
+      filter: drop-shadow(0 4px 20px rgba(45, 212, 191, 0.6));
+      word-break: break-all;
+    }
+
+    /* BNCC panel */
+    .proj-bncc {
+      margin-top: auto;
+      background: rgba(26, 34, 53, 0.6);
+      border: 1px solid rgba(45, 64, 96, 0.5);
+      border-radius: 1rem;
+      padding: 0.8rem 1rem;
+      backdrop-filter: blur(10px);
+      max-height: 25vh;
+      overflow-y: auto;
+    }
+
+    .proj-bncc-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--teal);
+      margin-bottom: 0.4rem;
+      font-weight: 700;
+    }
+
+    .proj-bncc-text {
+      font-size: 1rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    /* ── GAMEOVER PROJECTOR ── */
+    .proj-gameover {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(13, 42, 58, 0.95);
+      backdrop-filter: blur(8px);
+      z-index: 500;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 1s ease;
+      padding: 2rem;
+    }
+
+    .proj-gameover.show {
+      opacity: 1;
+    }
+
+    .go-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 5rem;
+      font-weight: 800;
+      color: var(--teal);
+      margin-bottom: 2.5rem;
+      text-align: center;
+      line-height: 1.1;
+      filter: drop-shadow(0 0 20px rgba(45, 212, 191, 0.5));
+    }
+
+    .setup-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Tabs Importação (Removido) */
+
+    .upload-box {
+      border: 2px dashed rgba(45, 212, 191, 0.3);
+      border-radius: 0.8rem;
+      padding: 2.5rem 1rem;
+      text-align: center;
+      background: rgba(13, 42, 58, 0.4);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .upload-box:hover,
+    .upload-box.dragover {
+      background: rgba(45, 212, 191, 0.1);
+      border-color: var(--teal);
+    }
+
+    .upload-box-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .upload-box-text {
+      font-size: 1rem;
+      color: var(--muted2);
+    }
+
+    .btn-template {
+      align-self: flex-start;
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--muted2);
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 0.5rem;
+    }
+
+    .btn-template:hover {
+      color: var(--text);
+      border-color: var(--teal);
+    }
+
+    .go-rank {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    .rank-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      padding: 1.5rem 2.5rem;
+      border-radius: 1rem;
+      border-left: 8px solid var(--border);
+    }
+
+    .rank-item.first {
+      border-left-color: var(--amber);
+      background: rgba(251, 191, 36, 0.1);
+      transform: scale(1.05);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .rk-pos {
+      font-size: 2.2rem;
+      font-weight: 800;
+      font-family: 'Syne', sans-serif;
+      min-width: 90px;
+    }
+
+    .rk-name {
+      font-size: 2.2rem;
+      font-weight: 700;
+      flex: 1;
+      text-align: left;
+      margin-left: 1.5rem;
+    }
+
+    .rk-pts {
+      font-size: 2.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 800;
+      color: var(--teal);
+    }
+
+    /* ── MODAL ───────────────────────────────────────── */
+    .modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #00000090;
+      backdrop-filter: blur(6px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .modal-bg.open {
+      display: flex;
+      animation: fadein 0.2s ease;
+    }
+
+    @keyframes fadein {
+      from {
+        opacity: 0
+      }
+
+      to {
+        opacity: 1
+      }
+    }
+
+    .modal-box {
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 1.25rem;
+      padding: 2rem;
+      width: 100%;
+      max-width: 560px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      animation: popin 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      overflow-y: auto;
+      max-height: 90vh;
+    }
+
+    @keyframes popin {
+      from {
+        transform: scale(0.88);
+        opacity: 0
+      }
+
+      to {
+        transform: scale(1);
+        opacity: 1
+      }
+    }
+
+    .modal-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 800;
+    }
+
+    .modal-close {
+      align-self: flex-end;
+      background: none;
+      border: 1.5px solid var(--border);
+      border-radius: 0.5rem;
+      color: var(--muted2);
+      padding: 0.3rem 0.7rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .modal-close:hover {
+      border-color: var(--border2);
+      color: var(--text);
+    }
+
+    /* Gabarito modal */
+    .gabarito-grid {
+      overflow: auto;
+    }
+
+    .gabarito-table {
+      border-collapse: collapse;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .gabarito-table td {
+      width: 28px;
+      height: 28px;
+      border: 1px solid var(--border);
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .gabarito-table td.blk {
+      background: var(--surf);
+      border-color: var(--surf);
+    }
+
+    .gabarito-table td.filled {
+      background: #2dd4bf18;
+      color: var(--teal);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--surf);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 2px;
+    }
+
+    @media(max-width:700px) {
+      .p-sidebar {
+        display: none;
+      }
+
+      .proj-content {
+        flex-direction: column;
+      }
+
+      .proj-grid-wrap {
+        order: 2;
+      }
+
+      .proj-pista-panel {
+        order: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══════════ LANDING ══════════ -->
+  <div id="landing" class="screen active">
+    <div class="land-icon">🔤</div>
+    <h1 class="land-title">Cruzadinha Educativa</h1>
+    <p class="land-sub">Jogo para Projetor · 5º ano ao Ensino Médio</p>
+    <div class="mode-grid">
+      <div class="mode-card hi" onclick="goTo('setup')">
+        <div class="mc-ico">🎛️</div>
+        <div class="mc-ttl">Painel do Professor</div>
+        <div class="mc-dsc">Configure, gere e controle as pistas. Abra no notebook.</div>
+      </div>
+      <div class="mode-card" onclick="abrirProjetor()">
+        <div class="mc-ico">📺</div>
+        <div class="mc-ttl">Tela do Aluno</div>
+        <div class="mc-dsc">Grade + pista atual. Abra no projetor.</div>
+      </div>
+    </div>
+    <p class="land-hint">💡 Abra o <strong>Painel do Professor</strong> nesta aba e clique em <strong>"Abrir
+        Projetor"</strong> para sincronizar as duas telas automaticamente.</p>
+  </div>
+
+  <!-- ══════════ SETUP ══════════ -->
+  <div id="setup" class="screen">
+    <div
+      style="flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;background:radial-gradient(ellipse 60% 40% at 50% 0%,#0d2a3a,transparent);">
+      <div class="setup-wrap">
+        <button class="btn-back" onclick="goTo('landing')">← Voltar</button>
+        <div class="setup-hdr">
+          <h2>⚙️ Configurar Cruzadinha</h2>
+          <p>Preencha os dados e cole o JSON com a grade e pistas</p>
+        </div>
+        <div class="setup-panel">
+          <div>
+            <label class="f-label">Disciplina</label>
+            <input id="s-disc" class="f-input" placeholder="Ex: Ciências, História, Matemática, Português…">
+          </div>
+          <div>
+            <label class="f-label">Tema da Cruzadinha</label>
+            <input id="s-tema" class="f-input" placeholder="Ex: Sistema Solar, Revolução Francesa, Frações…">
+          </div>
+          <div>
+            <label class="f-label">Equipes (opcional)</label>
+            <input id="s-equipes" class="f-input" placeholder="Ex: Equipe A, Equipe B"
+              title="Divida os nomes por vírgula">
+          </div>
+
+          <!-- IMPORTAR ARQUIVO DE PLANILHA -->
+          <div id="import-upload" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
+            <label class="f-label">Importar arquivo do Computador</label>
+            <div class="upload-box" id="drop-zone" onclick="document.getElementById('s-file').click()">
+              <input type="file" id="s-file" accept=".xlsx,.xls,.csv" style="display:none"
+                onchange="handleFileUpload(event)">
+              <div class="upload-box-icon">📁</div>
+              <div class="upload-box-text" id="upload-txt">Clique para escolher ou arraste seu arquivo .xlsx aqui</div>
+            </div>
+
+            <button class="btn-template" onclick="baixarModeloExcel()">📥 Baixar Planilha Modelo</button>
+          </div>
+
+          <div id="s-err" class="err-box"></div>
+          <button class="btn-primary" id="btn-gerar" onclick="processarFormulario()">✅ Iniciar Cruzadinha</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ══════════ PROFESSOR ══════════ -->
+  <div id="professor" class="screen">
+
+    <div class="p-sidebar">
+      <div class="p-sidebar-top">
+        <div class="p-brand">🔤 Cruzadinha</div>
+        <div class="p-tema" id="p-tema-label"></div>
+        <button class="btn-proj" onclick="abrirProjetor()">📺 Abrir Projetor</button>
+        <button class="btn-gabarito" onclick="abrirGabarito()">🔑 Ver Gabarito</button>
+      </div>
+      <div class="p-sidebar-body">
+        <div class="p-sect-label">→ Horizontais</div>
+        <div id="p-list-h"></div>
+        <div class="p-sect-label">↓ Verticais</div>
+        <div id="p-list-v"></div>
+      </div>
+    </div>
+
+    <div class="p-main">
+      <div class="p-topbar">
+        <span class="p-topbar-label">Progresso:</span>
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="prog-fill" style="width:0%"></div>
+        </div>
+        <span id="prog-txt" style="font-size:0.78rem;color:var(--muted2);font-weight:600;white-space:nowrap;">0 /
+          0</span>
+
+        <!-- Placar -->
+        <div id="p-placar" style="display:none; margin-left:1.5rem; gap:1rem; align-items:center;"></div>
+
+        <div style="margin-left:auto;display:flex;gap:0.5rem;">
+          <button onclick="goTo('setup')"
+            style="padding:0.3rem 0.7rem;border:1.5px solid var(--border);border-radius:0.5rem;background:transparent;color:var(--muted);font-size:0.75rem;font-weight:600;cursor:pointer;"
+            onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'"
+            onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">↩ Novo Jogo</button>
+        </div>
+      </div>
+
+      <div class="p-content" style="position:relative;">
+
+        <!-- Grade do professor -->
+        <div class="grid-wrap">
+          <table class="crossword-grid" id="p-grid"></table>
+        </div>
+
+        <!-- Pista ativa -->
+        <div class="pista-ativa-box" id="p-pista-box" style="display:none;">
+          <div class="pab-num" id="p-pab-num"></div>
+          <div class="pab-body">
+            <div class="pab-dir" id="p-pab-dir"></div>
+            <div class="pab-texto" id="p-pab-texto"></div>
+            <div style="display:flex; justify-content:space-between; align-items:end; width:100%;">
+              <div>
+                <div class="pab-diff" id="p-pab-diff"></div>
+                <div class="pab-letras" id="p-pab-letras"></div>
+              </div>
+              <div id="p-pab-equipes" style="display:none; gap:0.4rem;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ações -->
+        <div class="action-row" id="p-actions" style="display:none;">
+          <button class="btn-reveal-word" id="btn-revelar" onclick="revelarPalavra()">👁 Revelar Resposta</button>
+          <button class="btn-next-pista" onclick="proximaPista()">→ Próxima Pista</button>
+          <button class="btn-novo" onclick="goTo('setup')">↩ Novo Jogo</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ PROJECTOR ══════════ -->
+  <div id="projector" class="screen">
+    <div class="proj-wrap">
+
+      <div class="proj-header">
+        <div class="proj-logo">🔤 Cruzadinha Educativa</div>
+        <div class="proj-progress">
+          <span class="proj-prog-txt" id="proj-prog-txt">0 / 0</span>
+          <div class="proj-prog-bar">
+            <div class="proj-prog-fill" id="proj-prog-fill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="proj-content">
+
+        <!-- Grade projetada -->
+        <div class="proj-grid-wrap">
+          <table class="proj-grid" id="proj-grid"></table>
+        </div>
+
+        <!-- Painel de pista -->
+        <div class="proj-pista-panel">
+
+          <div class="proj-idle" id="proj-idle">
+            <div class="proj-idle-icon">📝</div>
+            <div class="proj-idle-title">Aguardando o Professor…</div>
+            <div class="proj-idle-sub">A cruzadinha começará em instantes</div>
+          </div>
+
+          <div class="proj-pista-active" id="proj-pista-active">
+            <div class="proj-pista-num-dir">
+              <div class="proj-pista-num" id="proj-num"></div>
+              <div class="proj-pista-dir-badge" id="proj-dir-badge"></div>
+            </div>
+            <div class="proj-pista-texto" id="proj-texto"></div>
+            <div class="proj-pista-meta">
+              <div class="proj-pista-letras" id="proj-letras"></div>
+              <div class="proj-pista-diff" id="proj-diff"></div>
+            </div>
+            <div class="proj-pista-resposta" id="proj-resposta">
+              <div class="proj-resp-label">Resposta</div>
+              <div class="proj-resp-word" id="proj-resp-word"></div>
+            </div>
+          </div>
+
+          <div class="proj-bncc" id="proj-bncc" style="display:none;">
+            <div class="proj-bncc-label">Conexão BNCC</div>
+            <div class="proj-bncc-text" id="proj-bncc-text"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Tela de Game Over Projetor -->
+      <div id="proj-gameover" class="proj-gameover">
+        <div class="go-title" id="go-title">Parabéns! 🏆</div>
+        <div class="go-rank" id="go-rank"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════ GABARITO MODAL ══════════ -->
+  <div class="modal-bg" id="gabarito-modal">
+    <div class="modal-box" style="max-width:700px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div class="modal-title">🔑 Gabarito</div>
+        <button class="modal-close" onclick="closeModal('gabarito-modal')">✕ Fechar</button>
+      </div>
+      <div class="gabarito-grid" id="gabarito-grid"></div>
+      <div style="display:flex;flex-direction:column;gap:0.5rem;" id="gabarito-lista"></div>
+    </div>
+  </div>
+
+  <!-- ══════════ MODAL PROMPT ══════════ -->
+  <div id="modal-prompt" class="modal-bg"
+    onclick="if(event.target===this) document.getElementById('modal-prompt').classList.remove('open')">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 class="modal-title">💡 Como Gerar o JSON</h3>
+        <button class="modal-close"
+          onclick="document.getElementById('modal-prompt').classList.remove('open')">✕</button>
+      </div>
+      <p style="font-size:0.9rem; color:var(--muted2); line-height:1.5;">
+        Copie o texto base abaixo, cole no seu assistente de Inteligência Artificial favorito (ChatGPT ou Claude),
+        altere as informações entre colchetes <code>[ ]</code> para a sua disciplina atual e copie a resposta dele.
+      </p>
+      <div class="prompt-box" id="texto-prompt">Você é um especialista em educação básica brasileira.
+        Crie uma cruzadinha educativa e retorne SOMENTE um JSON válido.
+
+        Disciplina: [Biologia]
+        Tema: [Corpo Humano e Órgãos]
+        Número de palavras: [15]
+
+        REGRAS CRÍTICAS:
+        1. Retornar SÓ o JSON, sem markdown.
+        2. Todas as palavras devem vir em MAIÚSCULAS, sem acentos e DEVEM obrigatoriamente se cruzar.
+        3. Diff (Dificuldade da pista): 1=fácil, 2=médio, 3=difícil.
+
+        {"rows":15,"cols":15,"palavras":[{"palavra":"CEREBRO","dir":"H","row":0,"col":0,"num":1,"pista":"Centro do
+        sistema nervoso central.","diff":2}],"bncc":"Insira a Habilidade BNCC correspondente aqui..."}</div>
+      <button class="btn-copy" id="btn-copiar" onclick="copiarPrompt()">📋 Copiar Prompt de Exemplo</button>
+    </div>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════════
+    // BROADCAST
+    // ═══════════════════════════════════════════════════
+    const CH = new BroadcastChannel('cruzadinha_edu_v1');
+    let projWin = null;
+
+    // ═══════════════════════════════════════════════════
+    // STATE
+    // ═══════════════════════════════════════════════════
+    let G = {
+      grade: [],        // grade[row][col] = { letter|'#', num, isBlack }
+      pistas: [],       // { id, num, dir:'H'|'V', texto, palavra, diff, row, col, length }
+      bncc: '',
+      pistaAtual: null, // índice em G.pistas
+      reveladas: new Set(),
+      rows: 0, cols: 0,
+      disciplina: '', tema: '',
+      equipes: [],      // { nome: string, pontos: number }
+      uploadData: null
+    };
+
+    // ═══════════════════════════════════════════════════
+    // MODO DE IMPORTAÇÃO (TABS) E UPLOAD
+    // ═══════════════════════════════════════════════════
+
+    // Tabs removidas - Modo único "Arquivo"
+
+    function handleFileUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      document.getElementById('upload-txt').innerHTML = `Arquivo: <b style="color:var(--teal)">${file.name}</b>`;
+
+      const reader = new FileReader();
+      reader.onload = function (evt) {
+        try {
+          // SheetJS nativo via CDN
+          const bstr = evt.target.result;
+          const wb = XLSX.read(bstr, { type: 'binary' });
+          const wsname = wb.SheetNames[0];
+          const ws = wb.Sheets[wsname];
+          // Converte para Array de Arrays
+          const data = XLSX.utils.sheet_to_json(ws, { header: 1 });
+
+          let palavrasParse = [];
+          // Assume linha 0 como cabeçalho ou dado real (varrendo tudo)
+          for (let i = 0; i < data.length; i++) {
+            let row = data[i];
+            if (!row || !row[0]) continue;
+            let pal = String(row[0]).trim();
+            if (pal.length < 2 || pal.toUpperCase() === "PALAVRA") continue; // Pula cabeçalhos obvios
+            let psta = row[1] ? String(row[1]).trim() : `Pista da palavra ${pal} não informada.`;
+            let diff = row[2] ? parseInt(row[2]) : 2;
+            if (isNaN(diff)) diff = 1;
+
+            palavrasParse.push({ palavra: pal, texto: psta, diff });
+          }
+          G.uploadData = palavrasParse;
+
+        } catch (err) {
+          alert('Erro ao ler XLSX: ' + err.message);
+        }
+      };
+      reader.readAsBinaryString(file);
+    }
+
+    function baixarModeloExcel() {
+      // Cria a estrutura padrão da Cruzadinha
+      const dados = [
+        ["PALAVRA", "PISTA (Dica do Professor)", "DIFICULDADE (1, 2 ou 3)"],
+        ["SISTEMA", "Conjunto de órgãos com mesma função primária", 1],
+        ["MEMBRANA", "Envoltório de uma célula animal", 2],
+        ["NÚCLEO", "Onde o material genético fica guardado", 1],
+        ["", "", ""], // Linha em branco de dica
+        ["DICA DE USO:", "Apague estes exemplos e digite as suas própias palavras listadas para baixo.", ""]
+      ];
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(dados);
+
+      // Auto tamanho para as colunas ficarem confortáveis
+      const wscols = [{ wch: 25 }, { wch: 65 }, { wch: 25 }];
+      ws['!cols'] = wscols;
+
+      XLSX.utils.book_append_sheet(wb, ws, "Cruzadinha");
+
+      // Força o download nativo com SheetJS
+      XLSX.writeFile(wb, "Modelo_Cruzadinha_Educativa.xlsx");
+    }
+
+    // ═══════════════════════════════════════════════════
+    // NAVEGAÇÃO
+    // ═══════════════════════════════════════════════════
+    function goTo(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    function abrirProjetor() {
+      if (projWin && !projWin.closed) { projWin.focus(); return; }
+      projWin = window.open(location.href + '#projector', 'CruzadinhaProjetor',
+        'width=1280,height=720,menubar=no,toolbar=no,location=no,status=no');
+    }
+
+    if (location.hash === '#projector') {
+      document.addEventListener('DOMContentLoaded', () => {
+        goTo('projector');
+        setupProjListener();
+        CH.postMessage({ type: 'REQUEST_STATE' });
+      });
+    }
+
+    // ═══════════════════════════════════════════════════
+    // GERAÇÃO NATIVA E ALGORITMO DE CRUZAMENTO
+    // ═══════════════════════════════════════════════════
+
+    /**
+     * Algoritmo inteligente que desenha uma cruzadinha ortogonal
+     * @param {Array} lista - [{palavra: "ABC", texto: "...", diff: 1}, ...]
+     * @returns {Object} - {rows, cols, palavras: [{palavra, dir, row, col, num, pista, diff}...]}
+     */
+    function gerarLayoutCruzadinha(lista) {
+      if (!lista || lista.length === 0) throw new Error("Lista de palavras vazia.");
+
+      // Limpar e ordernar da maior para a menor (facilita ser a palavra eixo central)
+      let words = lista.map(w => ({
+        ...w,
+        palavra: w.palavra.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ]/g, '').toUpperCase()
+      })).filter(w => w.palavra.length >= 2);
+
+      words.sort((a, b) => b.palavra.length - a.palavra.length);
+
+      // Grid virtual "infinito": objeto chaveado por "row,col" -> char
+      let vgrid = {};
+      // Rastrear palavras inseridas para não as sobrepor erradamente
+      let wPlaced = [];
+
+      // Funções auxiliares do Grid Virtual
+      const getLetter = (r, c) => vgrid[`${r},${c}`] || null;
+      const setLetter = (r, c, char) => { vgrid[`${r},${c}`] = char; };
+
+      // Verifica se a palavra pode ser inserida em (r, c) na direção dire (H = Horizontal, V = Vertical)
+      function canPlace(palavra, r, c, dir) {
+        let intersectionCount = 0;
+        const len = palavra.length;
+
+        // Checar os "caps" (célula antes e depois da palavra precisa ser vazia)
+        if (dir === 'H') {
+          if (getLetter(r, c - 1) !== null) return -1;
+          if (getLetter(r, c + len) !== null) return -1;
+        } else {
+          if (getLetter(r - 1, c) !== null) return -1;
+          if (getLetter(r + len, c) !== null) return -1;
+        }
+
+        for (let i = 0; i < len; i++) {
+          let currR = dir === 'H' ? r : r + i;
+          let currC = dir === 'H' ? c + i : c;
+          let charThere = getLetter(currR, currC);
+
+          if (charThere === palavra[i]) {
+            intersectionCount++;
+          } else if (charThere !== null) {
+            return -1; // Conflito direto
+          } else {
+            // Verificar vizinhos laterais (não pode colar com outra palavra paralela)
+            if (dir === 'H') {
+              if (getLetter(currR - 1, currC) !== null || getLetter(currR + 1, currC) !== null) return -1;
+            } else {
+              if (getLetter(currR, currC - 1) !== null || getLetter(currR, currC + 1) !== null) return -1;
+            }
+          }
+        }
+        return intersectionCount;
+      }
+
+      // Colocar primeira palavra (O Eixo) fixada no 0,0 Horizontalmente
+      const first = words[0];
+      for (let i = 0; i < first.palavra.length; i++) setLetter(0, i, first.palavra[i]);
+      wPlaced.push({
+        palavra: first.palavra, dir: 'H', row: 0, col: 0,
+        pista: first.texto, diff: first.diff || 1
+      });
+
+      // Tentar colocar o resto
+      let failedWords = [];
+      for (let i = 1; i < words.length; i++) {
+        let currentWord = words[i];
+        let bestMatch = null;
+        let maxIntersections = -1;
+
+        // Varre cada palavra já inserida, tentando cruzar com a nova
+        for (let p of wPlaced) {
+          for (let pIdx = 0; pIdx < p.palavra.length; pIdx++) {
+            let placedChar = p.palavra[pIdx];
+            for (let cIdx = 0; cIdx < currentWord.palavra.length; cIdx++) {
+              let currentChar = currentWord.palavra[cIdx];
+
+              // Se tiver letras compatíveis, tenta encaixar cruzando (H -> V ou V -> H)
+              if (placedChar === currentChar) {
+                let testDir = p.dir === 'H' ? 'V' : 'H';
+                let testRow = p.dir === 'H' ? p.row - cIdx : p.row + pIdx;
+                let testCol = p.dir === 'H' ? p.col + pIdx : p.col - cIdx;
+
+                let score = canPlace(currentWord.palavra, testRow, testCol, testDir);
+                // Evitar justapor ou criar loops malfeitos demais. Score 1 (um cruzamento) é o ideal básico.
+                if (score > maxIntersections) {
+                  maxIntersections = score;
+                  bestMatch = { r: testRow, c: testCol, dir: testDir };
+                }
+              }
+            }
+          }
+        }
+
+        if (bestMatch) {
+          // Aplica fisicamente no grid virtual
+          for (let k = 0; k < currentWord.palavra.length; k++) {
+            let r = bestMatch.dir === 'H' ? bestMatch.r : bestMatch.r + k;
+            let c = bestMatch.dir === 'H' ? bestMatch.c + k : bestMatch.c;
+            setLetter(r, c, currentWord.palavra[k]);
+          }
+          wPlaced.push({
+            palavra: currentWord.palavra, dir: bestMatch.dir, row: bestMatch.r, col: bestMatch.c,
+            pista: currentWord.texto, diff: currentWord.diff || 1
+          });
+        } else {
+          failedWords.push(currentWord.palavra);
+        }
+      }
+
+      // Descobrir as dimensões finais e deslocar tudo pro zero
+      let minR = Infinity, maxR = -Infinity;
+      let minC = Infinity, maxC = -Infinity;
+
+      wPlaced.forEach(w => {
+        let wr2 = w.dir === 'V' ? w.row + w.palavra.length - 1 : w.row;
+        let wc2 = w.dir === 'H' ? w.col + w.palavra.length - 1 : w.col;
+        if (w.row < minR) minR = w.row;
+        if (w.col < minC) minC = w.col;
+        if (wr2 > maxR) maxR = wr2;
+        if (wc2 > maxC) maxC = wc2;
+      });
+
+      let finalRows = maxR - minR + 1;
+      let finalCols = maxC - minC + 1;
+
+      // Re-organiza o grid final somando o Offset pra não existir linha/coluna negativa
+      let finalPalavras = wPlaced.map((w, index) => ({
+        ...w,
+        row: w.row - minR,
+        col: w.col - minC,
+        num: index + 1
+      }));
+
+      // Avisar se teve skips
+      if (failedWords.length > 0) {
+        console.warn('Palavras ignoradas pelo gerador (não achou cruzamento):', failedWords);
+        // Pode injetar um toast futuro aqui se o usuário preferir
+      }
+
+      return {
+        rows: finalRows + 2, // Margem de respiro estética
+        cols: finalCols + 2,
+        palavras: finalPalavras.map(fw => ({ ...fw, row: fw.row + 1, col: fw.col + 1 }))
+      };
+    }
+
+    // ═══════════════════════════════════════════════════
+    // GERAÇÃO E MODAIS DE SETUP
+    // ═══════════════════════════════════════════════════
+
+    function abrirModalPrompt() {
+      document.getElementById('modal-prompt').classList.add('open');
+    }
+
+    function copiarPrompt() {
+      const texto = document.getElementById("texto-prompt").innerText;
+      navigator.clipboard.writeText(texto).then(() => {
+        const btn = document.getElementById("btn-copiar");
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "✅ Copiado com sucesso!";
+        btn.style.background = "var(--teal)";
+        btn.style.color = "#000";
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.style.background = "";
+          btn.style.color = "";
+        }, 2000);
+      });
+    }
+
+    // ═══════════════════════════════════════════════════
+    // PROCESSAMENTO E INÍCIO DE JOGO
+    // ═══════════════════════════════════════════════════
+
+    async function processarFormulario() {
+      const disc = document.getElementById('s-disc').value.trim();
+      const tema = document.getElementById('s-tema').value.trim();
+      const equipesRaw = document.getElementById('s-equipes').value.trim();
+      const errEl = document.getElementById('s-err');
+      errEl.style.display = 'none';
+
+      if (!disc || !tema) {
+        errEl.textContent = 'Preencha disciplina e tema antes de continuar.';
+        errEl.style.display = 'block'; return;
+      }
+
+      try {
+        let parsedJSON = null; // Guardará o modelo final {rows, cols, palavras, bncc?}
+
+        // ── FLUXO: ARQUIVO (UPLOAD) ──
+        if (!G.uploadData || G.uploadData.length === 0) {
+          throw new Error("Por favor, importe um arquivo .xlsx válido e não vazio.");
+        }
+        parsedJSON = gerarLayoutCruzadinha(G.uploadData);
+
+        // ── CONFIGURA GRADES GLOBAIS ──
+        montarGrade(parsedJSON);
+        G.bncc = parsedJSON.bncc || '';
+        G.disciplina = disc;
+        G.tema = tema;
+
+        // Parse equipes
+        G.equipes = [];
+        if (equipesRaw) {
+          const names = equipesRaw.split(',').map(n => n.trim()).filter(n => n);
+          names.forEach(n => G.equipes.push({ nome: n, pontos: 0 }));
+        }
+
+        iniciarPainel();
+
+      } catch (err) {
+        errEl.textContent = '⚠️ Erro: ' + err.message;
+        errEl.style.display = 'block';
+      }
+    }
+
+    // ═══════════════════════════════════════════════════
+    // MONTAR GRADE
+    // ═══════════════════════════════════════════════════
+    function montarGrade(data) {
+      const rows = data.rows || 15;
+      const cols = data.cols || 15;
+      G.rows = rows; G.cols = cols;
+      G.reveladas = new Set();
+      G.pistaAtual = null;
+
+      // Inicializa grade com células pretas
+      G.grade = Array.from({ length: rows }, () =>
+        Array.from({ length: cols }, () => ({ letter: '#', isBlack: true, num: null }))
+      );
+
+      // Coloca as palavras
+      G.pistas = [];
+      data.palavras.forEach((p, i) => {
+        const palavra = (p.palavra || '').toUpperCase().replace(/[^A-Z]/g, '');
+        if (!palavra) return;
+        const dir = (p.dir || 'H').toUpperCase();
+        let r = parseInt(p.row) || 0, c = parseInt(p.col) || 0;
+        // Bounds check
+        r = Math.max(0, Math.min(r, rows - 1));
+        c = Math.max(0, Math.min(c, cols - 1));
+        const len = palavra.length;
+
+        // Coloca letras na grade
+        for (let k = 0; k < len; k++) {
+          const rk = dir === 'H' ? r : r + k;
+          const ck = dir === 'H' ? c + k : c;
+          if (rk >= rows || ck >= cols) break;
+          G.grade[rk][ck] = { letter: palavra[k], isBlack: false, num: null };
+        }
+
+        G.pistas.push({
+          id: i,
+          num: p.num || (i + 1),
+          dir,
+          texto: p.pista || `Palavra ${i + 1}`,
+          palavra,
+          diff: parseInt(p.diff) || 1,
+          row: r, col: c,
+          length: len,
+        });
+      });
+
+      // Numera células (primeira célula de cada pista)
+      G.pistas.forEach(p => {
+        if (G.grade[p.row] && G.grade[p.row][p.col]) {
+          G.grade[p.row][p.col].num = p.num;
+        }
+      });
+    }
+
+    // ═══════════════════════════════════════════════════
+    // INICIAR PAINEL
+    // ═══════════════════════════════════════════════════
+    function iniciarPainel() {
+      goTo('professor');
+      document.getElementById('p-tema-label').textContent = `${G.disciplina} · ${G.tema}`;
+      renderGrade('p-grid', 'p');
+      renderSidebar();
+      atualizarProgresso();
+      atualizarPlacar();
+      broadcastAll({ type: 'GAME_START', grade: G.grade, pistas: G.pistas, bncc: G.bncc, rows: G.rows, cols: G.cols });
+    }
+
+    function atualizarPlacar() {
+      const placar = document.getElementById('p-placar');
+      if (!G.equipes || G.equipes.length === 0) {
+        placar.style.display = 'none';
+        return;
+      }
+      placar.style.display = 'flex';
+      placar.innerHTML = G.equipes.map((eq, i) =>
+        `<div class="equipe-placar-item"><span>${eq.nome}</span> <span style="color:#fff">${eq.pontos}</span></div>`
+      ).join('');
+    }
+
+    function pontuarEquipe(eqIndex) {
+      if (G.pistaAtual === null || !G.equipes[eqIndex]) return;
+      G.equipes[eqIndex].pontos += 10; // 10 points per word
+      atualizarPlacar();
+      revelarPalavra(); // Auto reveal word if clicked team points
+    }
+
+    // ═══════════════════════════════════════════════════
+    // RENDERIZAR GRADE
+    // ═══════════════════════════════════════════════════
+    function renderGrade(tableId, mode) {
+      const tbl = document.getElementById(tableId);
+      if (!tbl) return;
+      tbl.innerHTML = '';
+      for (let r = 0; r < G.rows; r++) {
+        const tr = tbl.insertRow();
+        for (let c = 0; c < G.cols; c++) {
+          const td = tr.insertCell();
+          const cell = G.grade[r][c];
+          if (cell.isBlack) {
+            td.className = 'blk';
+          } else {
+            td.className = G.reveladas.has(cellKey(r, c)) ? 'revealed' : 'empty';
+            const letter = G.reveladas.has(cellKey(r, c)) ? cell.letter : '';
+            td.textContent = letter;
+            if (cell.num) {
+              const n = document.createElement('span');
+              n.className = mode === 'proj' ? 'proj-cell-num' : 'cell-num';
+              n.textContent = cell.num;
+              td.appendChild(n);
+            }
+          }
+        }
+      }
+    }
+
+    function cellKey(r, c) { return `${r},${c}`; }
+
+    // ═══════════════════════════════════════════════════
+    // SIDEBAR
+    // ═══════════════════════════════════════════════════
+    function renderSidebar() {
+      const listH = document.getElementById('p-list-h');
+      const listV = document.getElementById('p-list-v');
+      listH.innerHTML = ''; listV.innerHTML = '';
+
+      const diffLabel = ['', '☆ Fácil', '☆☆ Médio', '☆☆☆ Difícil'];
+      G.pistas.forEach((p, i) => {
+        const div = document.createElement('div');
+        div.className = 'pista-item' + (G.reveladas.has(`pista-${i}`) ? ' revealed' : '');
+        div.id = `pitem-${i}`;
+        div.onclick = () => selecionarPista(i);
+        div.innerHTML = `
+      <span class="pista-badge ${p.dir === 'H' ? 'pb-h' : 'pb-v'}">${p.num}${p.dir}</span>
+      <div>
+        <div class="pista-txt">${p.texto}</div>
+        <div class="diff-star" style="color:${p.diff === 1 ? 'var(--easy)' : p.diff === 2 ? 'var(--med)' : 'var(--hard)'};font-size:0.65rem;margin-top:2px;">${diffLabel[p.diff] || ''}</div>
+      </div>`;
+        if (p.dir === 'H') listH.appendChild(div);
+        else listV.appendChild(div);
+      });
+    }
+
+    // ═══════════════════════════════════════════════════
+    // SELECIONAR PISTA
+    // ═══════════════════════════════════════════════════
+    function selecionarPista(idx) {
+      G.pistaAtual = idx;
+      const p = G.pistas[idx];
+
+      document.querySelectorAll('.pista-item').forEach((el, i) => el.classList.toggle('active', i === idx));
+
+      const diffLabel = ['', '☆ Fácil', '☆☆ Médio', '☆☆☆ Difícil'];
+      const diffColor = ['', 'var(--easy)', 'var(--med)', 'var(--hard)'];
+      const underscores = '_'.repeat(p.length) + ` (${p.length} letras)`;
+
+      document.getElementById('p-pab-num').textContent = `${p.num}${p.dir}`;
+      document.getElementById('p-pab-dir').textContent = p.dir === 'H' ? '→ HORIZONTAL' : '↓ VERTICAL';
+      document.getElementById('p-pab-texto').textContent = p.texto;
+      document.getElementById('p-pab-diff').innerHTML = `<span style="color:${diffColor[p.diff]}">${diffLabel[p.diff] || ''}</span>`;
+      document.getElementById('p-pab-letras').textContent = underscores;
+
+      // Renderiza botões de pontos das equipes
+      const eqContainer = document.getElementById('p-pab-equipes');
+      if (G.equipes && G.equipes.length > 0) {
+        eqContainer.style.display = 'flex';
+        eqContainer.innerHTML = G.equipes.map((eq, idx) =>
+          `<button class="equipe-btn" ${G.reveladas.has(`pista-${G.pistaAtual}`) ? 'disabled style="opacity:0.3;cursor:not-allowed;"' : `onclick="pontuarEquipe(${idx})"`}>+10 ${eq.nome}</button>`
+        ).join('');
+      } else {
+        eqContainer.style.display = 'none';
+      }
+
+      document.getElementById('p-pista-box').style.display = 'flex';
+      document.getElementById('p-actions').style.display = 'flex';
+      document.getElementById('btn-revelar').disabled = G.reveladas.has(`pista-${idx}`);
+
+      // Destaca células na grade professor
+      highlightCells('p-grid', p);
+
+      // Broadcast para projetor
+      broadcastAll({
+        type: 'PISTA_SELECT',
+        pistaIdx: idx,
+        revealed: G.reveladas.has(`pista-${idx}`),
+      });
+
+      playBeep('select');
+    }
+
+    function highlightCells(tableId, pista) {
+      const tbl = document.getElementById(tableId);
+      if (!tbl) return;
+      const isProj = tableId === 'proj-grid';
+
+      // Reset all non-black cells
+      tbl.querySelectorAll('td:not(.blk)').forEach(td => {
+        if (G.reveladas.has(getCellKeyFromTd(tbl, td))) td.className = 'revealed';
+        else td.className = 'empty';
+      });
+
+      // Highlight current pista cells
+      for (let k = 0; k < pista.length; k++) {
+        const r = pista.dir === 'H' ? pista.row : pista.row + k;
+        const c = pista.dir === 'H' ? pista.col + k : pista.col;
+        if (r >= G.rows || c >= G.cols) break;
+        const tr = tbl.rows[r]; if (!tr) continue;
+        const td = tr.cells[c]; if (!td) continue;
+        td.className = G.reveladas.has(cellKey(r, c)) ? 'revealed' : (isProj ? 'active-proj' : 'active-cell');
+        // Re-add cell number if needed
+        if (G.grade[r][c].num && !td.querySelector(isProj ? '.proj-cell-num' : '.cell-num')) {
+          const n = document.createElement('span');
+          n.className = isProj ? 'proj-cell-num' : 'cell-num';
+          n.textContent = G.grade[r][c].num;
+          td.appendChild(n);
+        }
+      }
+    }
+
+    function getCellKeyFromTd(tbl, td) {
+      const r = td.parentNode.rowIndex;
+      const c = td.cellIndex;
+      return cellKey(r, c);
+    }
+
+    // ═══════════════════════════════════════════════════
+    // REVELAR PALAVRA E AUTO-DISABLE
+    // ═══════════════════════════════════════════════════
+    function revelarPalavra() {
+      if (G.pistaAtual === null) return;
+
+      // Desabilita botões de equipes instantaneamente se existirem na pista
+      const bts = document.querySelectorAll('#p-pab-equipes .equipe-btn');
+      bts.forEach(b => {
+        b.disabled = true;
+        b.style.opacity = '0.3';
+        b.style.cursor = 'not-allowed';
+      });
+
+      const p = G.pistas[G.pistaAtual];
+
+      // Marca células como reveladas
+      for (let k = 0; k < p.length; k++) {
+        const r = p.dir === 'H' ? p.row : p.row + k;
+        const c = p.dir === 'H' ? p.col + k : p.col;
+        if (r < G.rows && c < G.cols) G.reveladas.add(cellKey(r, c));
+      }
+      G.reveladas.add(`pista-${G.pistaAtual}`);
+
+      // Atualiza grade e sidebar
+      renderGrade('p-grid', 'p');
+      highlightCells('p-grid', p);
+      document.getElementById(`pitem-${G.pistaAtual}`)?.classList.add('revealed');
+      document.getElementById('btn-revelar').disabled = true;
+      atualizarProgresso();
+
+      broadcastAll({ type: 'REVEAL_WORD', pistaIdx: G.pistaAtual });
+      playBeep('reveal');
+    }
+
+    // ═══════════════════════════════════════════════════
+    // PRÓXIMA PISTA
+    // ═══════════════════════════════════════════════════
+    function proximaPista() {
+      let next = (G.pistaAtual === null) ? 0 : G.pistaAtual + 1;
+      // Pula já reveladas
+      while (next < G.pistas.length && G.reveladas.has(`pista-${next}`)) next++;
+      if (next < G.pistas.length) selecionarPista(next);
+    }
+
+    // ═══════════════════════════════════════════════════
+    // PROGRESSO
+    // ═══════════════════════════════════════════════════
+    function atualizarProgresso() {
+      const total = G.pistas.length;
+      const done = G.pistas.filter((_, i) => G.reveladas.has(`pista-${i}`)).length;
+      const pct = total ? Math.round(done / total * 100) : 0;
+      document.getElementById('prog-fill').style.width = pct + '%';
+      document.getElementById('prog-txt').textContent = `${done} / ${total}`;
+      broadcastAll({ type: 'PROGRESS', done, total });
+
+      if (done === total && total > 0) {
+        setTimeout(() => {
+          broadcastAll({ type: 'GAME_OVER', equipes: G.equipes });
+        }, 1500);
+      }
+    }
+
+    // ═══════════════════════════════════════════════════
+    // GABARITO
+    // ═══════════════════════════════════════════════════
+    function abrirGabarito() {
+      // Grade completa
+      const gGrid = document.getElementById('gabarito-grid');
+      const tbl = document.createElement('table');
+      tbl.className = 'gabarito-table';
+      for (let r = 0; r < G.rows; r++) {
+        const tr = tbl.insertRow();
+        for (let c = 0; c < G.cols; c++) {
+          const td = tr.insertCell();
+          const cell = G.grade[r][c];
+          td.className = cell.isBlack ? 'blk' : 'filled';
+          if (!cell.isBlack) td.textContent = cell.letter;
+        }
+      }
+      gGrid.innerHTML = ''; gGrid.appendChild(tbl);
+
+      // Lista de respostas
+      const lista = document.getElementById('gabarito-lista');
+      lista.innerHTML = `<div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.12em;color:var(--muted2);margin-top:0.5rem;">Respostas</div>` +
+        G.pistas.map(p => `<div style="font-size:0.82rem;padding:0.3rem 0;border-bottom:1px solid var(--border);display:flex;gap:0.75rem;">
+      <span style="font-family:'JetBrains Mono',monospace;color:var(--teal);font-size:0.78rem;min-width:40px;">${p.num}${p.dir}</span>
+      <span style="color:var(--teal2);font-weight:700;font-family:'JetBrains Mono',monospace;">${p.palavra}</span>
+      <span style="color:var(--muted2);font-size:0.75rem;">— ${p.texto}</span>
+    </div>`).join('');
+
+      document.getElementById('gabarito-modal').classList.add('open');
+    }
+
+    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+    // ═══════════════════════════════════════════════════
+    // BROADCAST
+    // ═══════════════════════════════════════════════════
+    function broadcastAll(msg) {
+      try { CH.postMessage(msg); } catch (e) { }
+    }
+
+    CH.onmessage = (e) => {
+      if (e.data.type === 'REQUEST_STATE' && G.grade.length) {
+        broadcastAll({ type: 'GAME_START', grade: G.grade, pistas: G.pistas, bncc: G.bncc, rows: G.rows, cols: G.cols });
+        if (G.pistaAtual !== null) {
+          broadcastAll({ type: 'PISTA_SELECT', pistaIdx: G.pistaAtual, revealed: G.reveladas.has(`pista-${G.pistaAtual}`) });
+        }
+      }
+    };
+
+    // ═══════════════════════════════════════════════════
+    // PROJECTOR LISTENER
+    // ═══════════════════════════════════════════════════
+    function setupProjListener() {
+
+      function buildProjGrid(grade, rows, cols, reveladas) {
+        const tbl = document.getElementById('proj-grid');
+        if (!tbl) return;
+        tbl.innerHTML = '';
+        for (let r = 0; r < rows; r++) {
+          const tr = tbl.insertRow();
+          for (let c = 0; c < cols; c++) {
+            const td = tr.insertCell();
+            const cell = grade[r][c];
+            if (cell.isBlack) {
+              td.className = 'blk';
+            } else {
+              const revealed = reveladas && reveladas.includes(cellKey(r, c));
+              td.className = revealed ? 'revealed' : 'empty';
+              td.textContent = revealed ? cell.letter : '';
+              if (cell.num) {
+                const n = document.createElement('span');
+                n.className = 'proj-cell-num';
+                n.textContent = cell.num;
+                td.appendChild(n);
+              }
+            }
+          }
+        }
+      }
+
+      function highlightProjCells(pista, grade, rows, cols, reveladas) {
+        const tbl = document.getElementById('proj-grid');
+        if (!tbl) return;
+        // Reset
+        tbl.querySelectorAll('td:not(.blk)').forEach(td => {
+          const r = td.parentNode.rowIndex, c = td.cellIndex;
+          const cell = grade[r]?.[c];
+          if (!cell || cell.isBlack) return;
+          const rev = reveladas && reveladas.includes(cellKey(r, c));
+          td.className = rev ? 'revealed' : 'empty';
+          td.textContent = rev ? cell.letter : '';
+          if (cell.num && !td.querySelector('.proj-cell-num')) {
+            const n = document.createElement('span'); n.className = 'proj-cell-num'; n.textContent = cell.num; td.appendChild(n);
+          }
+        });
+        // Highlight
+        for (let k = 0; k < pista.length; k++) {
+          const r = pista.dir === 'H' ? pista.row : pista.row + k;
+          const c = pista.dir === 'H' ? pista.col + k : pista.col;
+          if (r >= rows || c >= cols) break;
+          const td = tbl.rows[r]?.cells[c]; if (!td) continue;
+          const rev = reveladas && reveladas.includes(cellKey(r, c));
+          td.className = rev ? 'revealed' : 'active-proj';
+          td.textContent = rev ? grade[r][c].letter : '';
+          if (grade[r][c].num && !td.querySelector('.proj-cell-num')) {
+            const n = document.createElement('span'); n.className = 'proj-cell-num'; n.textContent = grade[r][c].num; td.appendChild(n);
+          }
+        }
+      }
+
+      let projGrade = [], projPistas = [], projRows = 0, projCols = 0, projReveladas = [];
+
+      const diffLabel = ['', '☆ Fácil', '☆☆ Médio', '☆☆☆ Difícil'];
+      const diffColor = ['', 'var(--easy)', 'var(--med)', 'var(--hard)'];
+
+      CH.onmessage = (e) => {
+        const msg = e.data;
+
+        switch (msg.type) {
+
+          case 'GAME_START':
+            document.getElementById('proj-gameover').style.display = 'none';
+            document.getElementById('proj-gameover').classList.remove('show');
+            projGrade = msg.grade;
+            projPistas = msg.pistas;
+            projRows = msg.rows;
+            projCols = msg.cols;
+            projReveladas = [];
+            buildProjGrid(projGrade, projRows, projCols, projReveladas);
+            if (msg.bncc) {
+              document.getElementById('proj-bncc').style.display = 'block';
+              document.getElementById('proj-bncc-text').textContent = msg.bncc;
+            }
+            break;
+
+          case 'PISTA_SELECT': {
+            const p = projPistas[msg.pistaIdx];
+            if (!p) break;
+            document.getElementById('proj-idle').style.display = 'none';
+            document.getElementById('proj-pista-active').style.display = 'flex';
+
+            document.getElementById('proj-num').textContent = `${p.num}`;
+            const badge = document.getElementById('proj-dir-badge');
+            badge.textContent = p.dir === 'H' ? '→ Horizontal' : '↓ Vertical';
+            badge.className = `proj-pista-dir-badge ${p.dir === 'H' ? 'dir-h' : 'dir-v'}`;
+            document.getElementById('proj-texto').textContent = p.texto;
+            document.getElementById('proj-letras').textContent = `${'_ '.repeat(p.length).trim()} (${p.length} letras)`;
+            document.getElementById('proj-diff').innerHTML = `<span style="color:${diffColor[p.diff]}">${diffLabel[p.diff] || ''}</span>`;
+            document.getElementById('proj-resposta').style.display = msg.revealed ? 'flex' : 'none';
+            if (msg.revealed) document.getElementById('proj-resp-word').textContent = p.palavra;
+
+            highlightProjCells(p, projGrade, projRows, projCols, projReveladas);
+            break;
+          }
+
+          case 'REVEAL_WORD': {
+            const p = projPistas[msg.pistaIdx];
+            if (!p) break;
+            for (let k = 0; k < p.length; k++) {
+              const r = p.dir === 'H' ? p.row : p.row + k;
+              const c = p.dir === 'H' ? p.col + k : p.col;
+              const key = cellKey(r, c);
+              if (!projReveladas.includes(key)) projReveladas.push(key);
+            }
+            buildProjGrid(projGrade, projRows, projCols, projReveladas);
+            highlightProjCells(p, projGrade, projRows, projCols, projReveladas);
+            document.getElementById('proj-resp-word').textContent = p.palavra;
+            document.getElementById('proj-resposta').style.display = 'flex';
+            break;
+          }
+
+          case 'PROGRESS':
+            const pct2 = msg.total ? Math.round(msg.done / msg.total * 100) : 0;
+            document.getElementById('proj-prog-fill').style.width = pct2 + '%';
+            document.getElementById('proj-prog-txt').textContent = `${msg.done} / ${msg.total}`;
+            break;
+
+          case 'GAME_OVER': {
+            const goDiv = document.getElementById('proj-gameover');
+            const rankDiv = document.getElementById('go-rank');
+            if (goDiv && rankDiv) {
+              const eq = msg.equipes || [];
+              const sorted = [...eq].sort((a, b) => b.pontos - a.pontos);
+
+              let html = '';
+              if (sorted.length > 0) {
+                sorted.forEach((e, i) => {
+                  let medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '👏';
+                  html += `<div class="rank-item ${i === 0 ? 'first' : ''}">
+                    <span class="rk-pos">${i + 1}º ${medal}</span>
+                    <span class="rk-name">${e.nome}</span>
+                    <span class="rk-pts">${e.pontos}</span>
+                  </div>`;
+                });
+              } else {
+                html = '<div style="font-size:2.5rem; color:var(--teal2); text-align:center; margin-top:2rem;">Vocês completaram a Cruzadinha!</div>';
+              }
+              rankDiv.innerHTML = html;
+              goDiv.style.display = 'flex';
+              setTimeout(() => goDiv.classList.add('show'), 50);
+            }
+            break;
+          }
+        }
+      };
+    }
+
+    // ═══════════════════════════════════════════════════
+    // SONS
+    // ═══════════════════════════════════════════════════
+    function playBeep(type) {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        if (type === 'select') {
+          osc.frequency.setValueAtTime(660, ctx.currentTime);
+          gain.gain.setValueAtTime(0.15, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18);
+          osc.start(); osc.stop(ctx.currentTime + 0.18);
+        } else if (type === 'reveal') {
+          osc.frequency.setValueAtTime(440, ctx.currentTime);
+          osc.frequency.setValueAtTime(550, ctx.currentTime + 0.1);
+          osc.frequency.setValueAtTime(660, ctx.currentTime + 0.2);
+          gain.gain.setValueAtTime(0.25, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+          osc.start(); osc.stop(ctx.currentTime + 0.4);
+        }
+      } catch (e) { }
+    }
+  </script>
+</body>
+
+</html>
