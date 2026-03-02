@@ -1880,7 +1880,7 @@
       // Limpar e ordernar da maior para a menor (facilita ser a palavra eixo central)
       let words = lista.map(w => ({
         ...w,
-        palavra: w.palavra.replace(/[^A-Za-zÀ-ÖØ-öø-ÿ]/g, '').toUpperCase()
+        palavra: String(w.palavra || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z]/g, '').toUpperCase()
       })).filter(w => w.palavra.length >= 2);
 
       words.sort((a, b) => b.palavra.length - a.palavra.length);
@@ -2109,7 +2109,7 @@
       // Coloca as palavras
       G.pistas = [];
       data.palavras.forEach((p, i) => {
-        const palavra = (p.palavra || '').toUpperCase().replace(/[^A-Z]/g, '');
+        const palavra = String(p.palavra || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z]/g, '');
         if (!palavra) return;
         const dir = (p.dir || 'H').toUpperCase();
         let r = parseInt(p.row) || 0, c = parseInt(p.col) || 0;
