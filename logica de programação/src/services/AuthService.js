@@ -18,6 +18,26 @@ class AuthService {
         this.#auth = null;
         this.#player = new Player();
         this.#unsubscribe = null;
+
+        // Register SSO Handshake listener synchronously at boot, bypassing Firebase script download delays
+        window.addEventListener('message', (event) => {
+            if (event.data && event.data.type === 'BRINCABYTES_LOGIN') {
+                const user = event.data.user;
+                if (user && user.uid) {
+                    this.#isBrincaBytesUser = true;
+
+                    this.#player.setProfile({
+                        uid: user.uid,
+                        nome: user.nome || 'Programador',
+                        email: user.email || '',
+                        avatar: user.avatar || this.#getInitialsAvatar(user.nome || 'P'),
+                    });
+
+                    // We dispatch loggedIn, simulating a successful Firebase connection
+                    EventBus.emit('auth:loggedIn', { player: this.#player.toPublic() });
+                }
+            }
+        });
     }
 
     /**
@@ -43,28 +63,6 @@ class AuthService {
             } else {
                 this.#player = this.#loadGuestPlayer();
                 EventBus.emit('auth:loggedOut', {});
-            }
-        });
-
-        // Listen for iframe postMessage from BrincaBytes SSO
-        window.addEventListener('message', (event) => {
-            // Securely listens for the login payload sent via postMessage from the parent window
-            if (event.data && event.data.type === 'BRINCABYTES_LOGIN') {
-                const user = event.data.user;
-                if (user && user.uid) {
-                    this.#isBrincaBytesUser = true;
-
-                    this.#player.setProfile({
-                        uid: user.uid,
-                        nome: user.nome || 'Programador',
-                        email: user.email || '',
-                        avatar: user.avatar || this.#getInitialsAvatar(user.nome || 'P'),
-                    });
-
-                    // We dispatch loggedIn, simulating a successful Firebase connection
-                    // allowing ProgressService to save state under this specific BrincaBytes UID
-                    EventBus.emit('auth:loggedIn', { player: this.#player.toPublic() });
-                }
             }
         });
     }
