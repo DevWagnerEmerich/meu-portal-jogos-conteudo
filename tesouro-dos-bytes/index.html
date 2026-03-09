@@ -14,6 +14,9 @@
 
   <header id="cab">
     <div id="titulo-jogo">🎮 TESOURO<br>DOS BYTES</div>
+    <div id="nome-jogador-cab"
+      style="font-family:var(--px);font-size:0.55rem;color:var(--cyan);padding:0.4rem 0.9rem;background:#080818;border:0.2rem solid var(--cyan);border-radius:0.8rem;display:none">
+      🎮 <span id="txt-nome-jogador"></span></div>
     <div id="placar-wrap">
       <button id="btn-home" onclick="voltarInicio()">🏠 INÍCIO</button>
       <button id="btn-loja-cab" onclick="abrirLoja()">🛒 LOJA</button>
@@ -21,6 +24,32 @@
       <div class="pi ouro"><span class="coin-spin-off">💰</span><span id="val-moedas">0 BM</span></div>
     </div>
   </header>
+
+  <!-- ══ MODAL BOAS-VINDAS (aparece na primeira vez) ══ -->
+  <div id="modal-bv"
+    style="display:none;position:fixed;inset:0;z-index:999;background:rgba(7,7,20,.97);backdrop-filter:blur(8px);align-items:center;justify-content:center">
+    <div
+      style="background:var(--panel);border:0.2rem solid var(--purple);border-radius:2rem;padding:2.5rem;max-width:50rem;width:90%;text-align:center;box-shadow:0 0 4rem rgba(192,132,252,.3),0.4rem 0.4rem 0 #000">
+      <div style="font-size:4rem;margin-bottom:0.8rem">🎮</div>
+      <h2
+        style="font-family:var(--px);font-size:1rem;color:var(--gold);text-shadow:0.2rem 0.2rem 0 var(--gold-dk);margin-bottom:0.5rem">
+        BEM-VINDO AO<br>TESOURO DOS BYTES!</h2>
+      <p style="font-size:1.3rem;color:var(--muted);margin-bottom:2rem">Responda, colecione e divirta-se aprendendo!</p>
+      <label style="font-family:var(--px);font-size:0.55rem;color:var(--cyan);display:block;margin-bottom:0.5rem">👤
+        QUAL O SEU NOME?</label>
+      <input id="bv-nome" type="text" maxlength="20" placeholder="Seu nome aqui..." autocomplete="off"
+        style="width:100%;padding:0.9rem 1.2rem;font-family:var(--px);font-size:0.7rem;background:#080818;border:0.2rem solid var(--purple);border-radius:0.8rem;color:var(--text);outline:none;margin-bottom:1.5rem;text-align:center;box-sizing:border-box" />
+      <label style="font-family:var(--px);font-size:0.55rem;color:var(--purple);display:block;margin-bottom:0.8rem">🎙️
+        ESCOLHA SEU APRESENTADOR</label>
+      <div id="bv-pets" style="display:flex;flex-wrap:wrap;gap:0.6rem;justify-content:center;margin-bottom:1.8rem">
+      </div>
+      <button onclick="confirmarBoasVindas()"
+        style="font-family:var(--px);font-size:0.7rem;padding:1rem 2.5rem;background:var(--gold);border:0.2rem solid var(--gold-dk);border-radius:0.8rem;color:#000;cursor:pointer;width:100%;transition:transform .15s"
+        onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+        🚀 VAMOS COMEÇAR!
+      </button>
+    </div>
+  </div>
 
   <!-- ══ TELA INICIAL ══ -->
   <div id="tela-inicio" class="tela ativo">
