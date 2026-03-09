@@ -1,0 +1,12 @@
+# Sistema
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Python temporários
+*.py
+__pycache__/
+
+# Editor
+.vscode/
+*.swp
