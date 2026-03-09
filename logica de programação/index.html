@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#020815">
+    <meta name="description"
+        content="Code Chain — Jogo educativo de lógica de programação. Aprenda VisualG, Python e JavaScript ordenando linhas de código. Integrado ao portal BrincaBytes.">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <title>💻 Code Chain — BrincaBytes</title>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/components.css">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Code Chain — Aprenda Programação Jogando">
+    <meta property="og:description"
+        content="Ordene linhas de código e aprenda VisualG, Python e JavaScript do zero ao avançado!">
+    <meta property="og:type" content="website">
+</head>
+
+<body>
+
+    <!-- ── Background Particle Canvas ── -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- ══ TELA: SELEÇÃO DE LINGUAGEM ══ -->
+    <div id="lang-pick" class="view ativa">
+        <div class="lang-pick-wrap">
+            <div class="lang-pick-eyebrow">💻 Code Chain — BrincaBytes</div>
+            <div class="lang-pick-title">Ordene o Código.<br>Aprenda de Verdade.</div>
+            <div class="lang-pick-sub">Escolha sua linguagem e comece a programar!</div>
+
+            <div class="lang-cards" id="langCards">
+                <div class="lang-card" data-lang="visualg" onclick="appChooseLang('visualg')">
+                    <div class="lang-logo vg">VG</div>
+                    <div class="lang-name" style="color:var(--green)">VisualG</div>
+                    <div class="lang-desc">Pseudocódigo em português. Ideal para iniciantes!</div>
+                    <div class="lang-stars" id="visualg-stars">○○○</div>
+                    <div class="lang-prog-bar">
+                        <div class="lang-prog-fill" id="visualg-prog" style="width:0%;background:var(--green)"></div>
+                    </div>
+                    <div class="lang-stats" id="visualg-stats">0 questões concluídas</div>
+                </div>
+
+                <div class="lang-card" data-lang="python" onclick="appChooseLang('python')">
+                    <div class="lang-logo py">🐍</div>
+                    <div class="lang-name" style="color:var(--blue)">Python</div>
+                    <div class="lang-desc">Sintaxe limpa e poderosa. A linguagem do futuro!</div>
+                    <div class="lang-stars" id="python-stars">○○○</div>
+                    <div class="lang-prog-bar">
+                        <div class="lang-prog-fill" id="python-prog" style="width:0%;background:var(--blue)"></div>
+                    </div>
+                    <div class="lang-stats" id="python-stats">0 questões concluídas</div>
+                </div>
+
+                <div class="lang-card" data-lang="js" onclick="appChooseLang('js')">
+                    <div class="lang-logo js">JS</div>
+                    <div class="lang-name" style="color:var(--yellow)">JavaScript</div>
+                    <div class="lang-desc">A linguagem da web. Roda em qualquer navegador!</div>
+                    <div class="lang-stars" id="js-stars">○○○</div>
+                    <div class="lang-prog-bar">
+                        <div class="lang-prog-fill" id="js-prog" style="width:0%;background:var(--yellow)"></div>
+                    </div>
+                    <div class="lang-stats" id="js-stats">0 questões concluídas</div>
+                </div>
+            </div>
+
+            <div class="lang-pick-actions">
+                <button class="btn-ranking-top" onclick="appGoRanking()">🏆 Ver Ranking Global</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ TELA: MENU DA LINGUAGEM ══ -->
+    <div id="menu" class="view">
+        <div class="menu-topbar">
+            <button class="btn-lang-back" onclick="appGoLangPick()">← Linguagens</button>
+            <div class="active-lang-badge" id="activeLangBadge"></div>
+            <button class="btn-ranking-top" onclick="appGoRanking()">🏆 Ranking</button>
+        </div>
+
+        <div class="menu-hero">
+            <h1 id="menuHeroTitle"></h1>
+            <p id="menuHeroSub"></p>
+        </div>
+
+        <div class="stats-strip" id="statsStrip"></div>
+
+        <div class="cat-filtro" id="catFiltro">
+            <button class="cat-btn ativo" data-cat="todos" onclick="appCatFilter(this)">🌐 Todos</button>
+            <button class="cat-btn" data-cat="variaveis" onclick="appCatFilter(this)">📦 Variáveis</button>
+            <button class="cat-btn" data-cat="io" onclick="appCatFilter(this)">📥 Ent/Saída</button>
+            <button class="cat-btn" data-cat="operacoes" onclick="appCatFilter(this)">➗ Operações</button>
+            <button class="cat-btn" data-cat="condicionais" onclick="appCatFilter(this)">🔀 Condicionais</button>
+            <button class="cat-btn" data-cat="lacos" onclick="appCatFilter(this)">🔄 Laços</button>
+            <button class="cat-btn" data-cat="funcoes" onclick="appCatFilter(this)">🔧 Funções</button>
+            <button class="cat-btn" data-cat="vetores" onclick="appCatFilter(this)">📋 Vetores</button>
+            <button class="cat-btn" data-cat="algoritmos" onclick="appCatFilter(this)">⚙️ Algoritmos</button>
+        </div>
+
+        <div class="modulos-grid" id="modulosGrid"></div>
+    </div>
+
+    <!-- ══ TELA: JOGO ══ -->
+    <div id="jogo" class="view">
+        <div class="jogo-header">
+            <button class="btn-jback" onclick="appGoMenu()">← Menu</button>
+            <div class="j-prog">
+                <div class="j-prog-bar">
+                    <div class="j-prog-fill" id="jProgFill" style="width:0%"></div>
+                </div>
+                <div class="j-prog-lbl" id="jProgLbl"></div>
+            </div>
+            <div class="j-timer">⏱<span class="j-timer-num" id="jTimerNum">0:00</span></div>
+        </div>
+
+        <div class="questao-ctx">
+            <div class="qctx-top">
+                <div class="qctx-num" id="qctxNum"></div>
+                <div class="qctx-info">
+                    <div class="qctx-badge" id="qctxBadge"></div>
+                    <div class="qctx-nome" id="qctxNome"></div>
+                </div>
+            </div>
+            <div class="enunciado" id="enunciado"></div>
+        </div>
+
+        <div class="instrucao-drag">
+            <span>🖱️</span>
+            <span>Arraste as linhas para a <strong>ordem correta</strong>. Clique em <strong
+                    style="color:var(--lang-color)">▶ EXECUTAR</strong> quando terminar!</span>
+        </div>
+
+        <div class="zona-codigo" id="zonaCodigo"></div>
+
+        <div class="dica-box" id="dicaBox"></div>
+        <div class="fb-erro" id="fbErro">⚠️ Ordem incorreta — alguma linha está fora do lugar. Tente novamente!</div>
+
+        <div class="acoes">
+            <button class="btn-ac btn-run" id="btnRun" onclick="appVerify()">▶ EXECUTAR</button>
+            <button class="btn-ac btn-hint" onclick="appHint()">💡 Dica</button>
+            <button class="btn-ac btn-mix" onclick="appShuffle()">⟳ Misturar</button>
+        </div>
+    </div>
+
+    <!-- ══ TELA: RANKING ══ -->
+    <div id="ranking" class="view">
+        <div class="rk-header">
+            <button class="btn-jback" onclick="appGoLangPick()">← Voltar</button>
+            <div class="rk-title">🏆 Ranking Global</div>
+            <button class="btn-ac btn-hint" style="flex:0;padding:9px 13px;font-size:0.82rem;min-width:auto"
+                onclick="appClearRank()">🗑️</button>
+        </div>
+        <div class="rk-lista" id="rkLista">
+            <div class="rk-loading">⏳ Carregando...</div>
+        </div>
+    </div>
+
+    <!-- ══ MODAL: CELEBRAÇÃO ══ -->
+    <div class="overlay" id="overlay">
+        <div class="modal-cel" id="modalCel">
+            <span class="cel-emoji" id="celEmoji"></span>
+            <div class="cel-title" id="celTitle"></div>
+            <div class="cel-msg" id="celMsg"></div>
+            <div class="cel-stars" id="celStars"></div>
+            <div class="cel-time" id="celTime"></div>
+            <div class="cel-pts" id="celPts"></div>
+            <div class="cel-code">
+                <div class="cel-code-header" id="celCodeHeader">✅ Código correto:</div>
+                <div class="cel-code-body" id="celCodeBody"></div>
+            </div>
+            <div class="cel-btns">
+                <button class="btn-cel btn-next-c" id="btnNext" onclick="appNextQuestion()">Próxima ▶</button>
+                <button class="btn-cel btn-menu-c" onclick="appGoMenu()">📋 Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ MODAL: NOME/AUTH ══ -->
+    <div class="overlay-nome" id="overlayNome">
+        <div class="modal-nome">
+            <h2>// novo_aluno</h2>
+            <p>Digite seu nome para aparecer no ranking de programadores!</p>
+            <input class="input-nome" id="inputNome" type="text" maxlength="18" placeholder="seu_nome"
+                autocomplete="off">
+            <button class="btn-entrar" onclick="appSaveName()">🚀 Entrar no Code Chain!</button>
+        </div>
+    </div>
+
+    <!-- ── Offline Banner ── -->
+    <div class="offline-banner" id="offlineBanner">
+        ⚡ Modo offline — ranking local apenas. Configure Firebase para sincronizar com BrincaBytes.
+    </div>
+
+    <!-- ── Background Canvas Script ── -->
+    <script>
+        (function () {
+            const c = document.getElementById('bgCanvas');
+            const ctx = c.getContext('2d');
+
+            // --- Particle State ---
+            let pts = [];
+            const cols = ['rgba(0,255,163,', 'rgba(56,190,255,', 'rgba(255,224,61,', 'rgba(167,139,250,'];
+
+            // --- States ---
+            let bgMode = 'default';
+
+            let stars = [];
+            let nodes = [];
+            let hexas = [];
+
+            window.appSetBgMode = function (mode) {
+                bgMode = mode;
+                if (mode === 'bg_space' && stars.length === 0) {
+                    for (let i = 0; i < 150; i++) stars.push({ x: Math.random() * c.width, y: Math.random() * c.height, z: Math.random() * c.width });
+                }
+                if (mode === 'bg_matrix' && nodes.length === 0) {
+                    for (let i = 0; i < 70; i++) nodes.push({ x: Math.random() * c.width, y: Math.random() * c.height, vx: (Math.random() - 0.5) * 1.2, vy: (Math.random() - 0.5) * 1.2 });
+                }
+                if (mode === 'bg_cyber' && hexas.length === 0) {
+                    for (let i = 0; i < 25; i++) hexas.push({ x: Math.random() * c.width, y: Math.random() * c.height, size: Math.random() * 30 + 15, vx: (Math.random() - 0.5) * 0.8, vy: (Math.random() - 0.5) * 0.8, rot: Math.random() * Math.PI, rV: (Math.random() - 0.5) * 0.03 });
+                }
+            };
+
+            function resize() {
+                c.width = innerWidth;
+                c.height = innerHeight;
+                stars = []; nodes = []; hexas = []; // reset bounds
+                window.appSetBgMode(bgMode); // trigger re-init based on current active
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            for (let i = 0; i < 60; i++) {
+                pts.push({
+                    x: Math.random() * innerWidth, y: Math.random() * innerHeight,
+                    r: Math.random() * 1.2 + 0.3,
+                    vx: (Math.random() - .5) * .18, vy: (Math.random() - .5) * .18,
+                    a: Math.random(), da: (Math.random() - .5) * .002,
+                    col: cols[~~(Math.random() * cols.length)]
+                });
+            }
+
+            function drawParticles() {
+                ctx.clearRect(0, 0, c.width, c.height);
+                pts.forEach(p => {
+                    p.x += p.vx; p.y += p.vy; p.a += p.da;
+                    if (p.a < 0) { p.a = 0; p.da *= -1; }
+                    if (p.a > 1) { p.a = 1; p.da *= -1; }
+                    if (p.x < 0) p.x = c.width; if (p.x > c.width) p.x = 0;
+                    if (p.y < 0) p.y = c.height; if (p.y > c.height) p.y = 0;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `${p.col}${p.a * 0.25})`;
+                    ctx.fill();
+                });
+            }
+
+            function drawNodes() {
+                ctx.clearRect(0, 0, c.width, c.height);
+                ctx.fillStyle = "rgba(0, 255, 163, 0.8)";
+                nodes.forEach(n => {
+                    n.x += n.vx; n.y += n.vy;
+                    if (n.x < 0 || n.x > c.width) n.vx *= -1;
+                    if (n.y < 0 || n.y > c.height) n.vy *= -1;
+                    ctx.beginPath(); ctx.arc(n.x, n.y, 2, 0, Math.PI * 2); ctx.fill();
+                });
+
+                ctx.strokeStyle = "rgba(0, 255, 163, 0.12)";
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for (let i = 0; i < nodes.length; i++) {
+                    for (let j = i + 1; j < nodes.length; j++) {
+                        let dx = nodes[i].x - nodes[j].x;
+                        let dy = nodes[i].y - nodes[j].y;
+                        if (dx * dx + dy * dy < 14000) {
+                            ctx.moveTo(nodes[i].x, nodes[i].y);
+                            ctx.lineTo(nodes[j].x, nodes[j].y);
+                        }
+                    }
+                }
+                ctx.stroke();
+            }
+
+            function drawSpace() {
+                ctx.clearRect(0, 0, c.width, c.height);
+                ctx.fillStyle = 'rgba(255,255,255,0.8)';
+                stars.forEach(s => {
+                    s.z -= 0.8;
+                    if (s.z <= 0) { s.z = c.width; s.x = Math.random() * c.width; s.y = Math.random() * c.height; }
+                    let x = (s.x - c.width / 2) * (c.width / s.z) + c.width / 2;
+                    let y = (s.y - c.height / 2) * (c.width / s.z) + c.height / 2;
+                    let r = Math.max(0.1, 1.5 * (c.width / s.z));
+                    ctx.beginPath();
+                    ctx.arc(x, y, r, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            }
+
+            function drawCyber() {
+                ctx.clearRect(0, 0, c.width, c.height);
+                ctx.strokeStyle = "rgba(167, 139, 250, 0.25)";
+                ctx.lineWidth = 1.8;
+
+                hexas.forEach(h => {
+                    h.x += h.vx; h.y += h.vy; h.rot += h.rV;
+                    if (h.x < -h.size) h.x = c.width + h.size;
+                    if (h.x > c.width + h.size) h.x = -h.size;
+                    if (h.y < -h.size) h.y = c.height + h.size;
+                    if (h.y > c.height + h.size) h.y = -h.size;
+
+                    ctx.beginPath();
+                    for (let i = 0; i < 6; i++) {
+                        let a = h.rot + (i * Math.PI / 3);
+                        let px = h.x + h.size * Math.cos(a);
+                        let py = h.y + h.size * Math.sin(a);
+                        if (i === 0) ctx.moveTo(px, py);
+                        else ctx.lineTo(px, py);
+                    }
+                    ctx.closePath();
+                    ctx.stroke();
+                });
+            }
+
+            function frame(currentTime) {
+                if (bgMode === 'bg_matrix') {
+                    drawNodes();
+                } else if (bgMode === 'bg_space') {
+                    drawSpace();
+                } else if (bgMode === 'bg_cyber') {
+                    drawCyber();
+                } else {
+                    drawParticles();
+                }
+                requestAnimationFrame(frame);
+            }
+            requestAnimationFrame(frame);
+        })();
+    </script>
+
+    <!-- ── App Entry Point (ES Module) ── -->
+    <script type="module" src="src/app.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,195 @@
+/* ══════════════════════════════════════════════════════════
+   base.css — Design Tokens, Reset, Typography
+   Mobile-first: base = 375px
+   ══════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700;800&family=Space+Grotesk:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* ── Core Palette ── */
+  --bg: #020815;
+  --bg2: #050C1A;
+  --panel: #080F1E;
+  --panel2: #0D1628;
+  --glass: rgba(8, 15, 30, 0.75);
+  --border: rgba(255, 255, 255, 0.06);
+  --border2: rgba(255, 255, 255, 0.13);
+  --text: #E8F0FF;
+  --muted: #4A5A7A;
+
+  /* ── Brand Colors ── */
+  --green: #00FFA3;
+  --blue: #38BEFF;
+  --yellow: #FFE03D;
+  --purple: #A78BFA;
+  --coral: #FF6B6B;
+  --teal: #00E5CC;
+  --pink: #FF6B9D;
+  --ouro: #FFD700;
+
+  /* ── Glow Shadows ── */
+  --glow-g: 0 0 40px rgba(0, 255, 163, 0.18);
+  --glow-b: 0 0 40px rgba(56, 190, 255, 0.18);
+  --glow-y: 0 0 40px rgba(255, 224, 61, 0.18);
+  --glow-p: 0 0 40px rgba(167, 139, 250, 0.18);
+
+  /* ── Lang-driven (set by JS) ── */
+  --lang-color: var(--green);
+  --lang-glow: var(--glow-g);
+
+  /* ── Syntax Highlight ── */
+  --syn-kw: #FF79C6;
+  --syn-fn: #00FFA3;
+  --syn-str: #FFE03D;
+  --syn-num: #C084FC;
+  --syn-cmt: #4A5A7A;
+  --syn-op: #FF79C6;
+  --syn-var: #38BEFF;
+  --syn-type: #FFB86C;
+
+  /* ── Spacing (8pt grid) ── */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+  --sp-12: 48px;
+
+  /* ── Typography ── */
+  --font-ui: 'Outfit', sans-serif;
+  --font-head: 'Space Grotesk', sans-serif;
+  --font-code: 'JetBrains Mono', monospace;
+
+  /* ── Radius ── */
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-xl: 28px;
+  --r-pill: 999px;
+
+  /* ── Transitions ── */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* ── Reset ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-ui);
+  background: var(--app-bg, var(--bg));
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  background-image: var(--app-bg-img,
+      radial-gradient(ellipse 80% 60% at 15% 10%, rgba(0, 255, 163, 0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 85% 85%, rgba(56, 190, 255, 0.05) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 50% 50%, rgba(167, 139, 250, 0.03) 0%, transparent 60%));
+  background-attachment: fixed;
+}
+
+/* Scanlines effect */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 2px,
+      rgba(0, 0, 0, 0.05) 2px, rgba(0, 0, 0, 0.05) 4px);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: var(--font-ui);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+input,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Custom scrollbar ── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* ── Syntax classes ── */
+.kw {
+  color: var(--syn-kw);
+  font-weight: 700;
+}
+
+.fn {
+  color: var(--syn-fn);
+}
+
+.str {
+  color: var(--syn-str);
+}
+
+.num {
+  color: var(--syn-num);
+}
+
+.cmt {
+  color: var(--syn-cmt);
+  font-style: italic;
+}
+
+.op {
+  color: var(--syn-op);
+}
+
+.var {
+  color: var(--syn-var);
+}
+
+.tp {
+  color: var(--syn-type);
+}
+
+/* ── Background canvas ── */
+#bgCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
