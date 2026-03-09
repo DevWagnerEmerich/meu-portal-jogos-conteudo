@@ -9,9 +9,16 @@ import { Player } from '../entities/Player.js';
 import EventBus from '../core/EventBus.js';
 
 class AuthService {
-    #auth = null;   // Firebase Auth instance
-    #player = new Player(); // Guest player by default
-    #unsubscribe = null;
+    #auth;   // Firebase Auth instance
+    #player; // Guest player by default
+    #unsubscribe;
+    #isBrincaBytesUser = false;
+
+    constructor() {
+        this.#auth = null;
+        this.#player = new Player();
+        this.#unsubscribe = null;
+    }
 
     /**
      * Initialize with Firebase Auth instance.
@@ -22,6 +29,9 @@ class AuthService {
 
         // Listen for auth state changes
         this.#unsubscribe = firebaseAuth.onAuthStateChanged(async user => {
+            // Ignore Firebase native logout events if we are running hybrid BrincaBytes SSO
+            if (this.#isBrincaBytesUser) return;
+
             if (user) {
                 this.#player.setProfile({
                     uid: user.uid,
@@ -42,6 +52,8 @@ class AuthService {
             if (event.data && event.data.type === 'BRINCABYTES_LOGIN') {
                 const user = event.data.user;
                 if (user && user.uid) {
+                    this.#isBrincaBytesUser = true;
+
                     this.#player.setProfile({
                         uid: user.uid,
                         nome: user.nome || 'Programador',

@@ -414,6 +414,11 @@ EventBus.on('auth:loggedOut', () => {
     if (!AuthService.player.nome) showAuthModal();
 });
 
+EventBus.on('auth:loggedIn', () => {
+    document.getElementById('overlayNome')?.classList.remove('on');
+    renderLangPick();
+});
+
 // ── Global Onclick Bindings (legacy HTML onclick compatibility) ──
 window.appGoLangPick = () => GameController.goToLangPick();
 window.appGoMenu = () => GameController.goToMenu();
