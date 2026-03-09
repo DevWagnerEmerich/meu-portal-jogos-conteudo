@@ -1,5 +1,6 @@
-html {
-  font-size: 10px;
+html,
+:host {
+  font-size: 10px !important;
 }
 
 /* Mobile / Default - mantendo as proporções originais do jogo */
@@ -254,6 +255,8 @@ body {
 .hero-robo-wrap svg {
   width: 7rem;
   height: 7rem;
+  max-width: 7rem;
+  max-height: 7rem;
   image-rendering: pixelated;
   filter: drop-shadow(0 0 1.20rem rgba(91, 203, 255, .6));
   animation: roboIdle 2.6s ease-in-out infinite
