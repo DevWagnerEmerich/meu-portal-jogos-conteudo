@@ -505,6 +505,14 @@
     transition: border-color 0.2s;
 }
 
+@media (max-width: 600px) {
+    .stat-pill {
+        flex-direction: column;
+        padding: 8px 10px;
+        gap: 2px;
+    }
+}
+
 .stat-pill:hover {
     border-color: var(--border2);
 }
@@ -513,6 +521,20 @@
     font-family: var(--font-code);
     font-weight: 700;
     font-size: 1.1rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+@media (max-width: 600px) {
+    .stat-pill .sv {
+        font-size: 1.0rem;
+    }
+
+    .stat-pill .sl {
+        font-size: 0.55rem;
+    }
 }
 
 .stat-pill .sl {
@@ -1674,10 +1696,25 @@
 
 .shop-header {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 35px;
     width: 100%;
+}
+
+@media (max-width: 600px) {
+    .shop-header {
+        gap: 15px;
+    }
+
+    .shop-header h2 {
+        width: 100%;
+        order: 3;
+        justify-content: center;
+        text-align: center;
+        font-size: 1.5rem !important;
+    }
 }
 
 .wallet-badge {

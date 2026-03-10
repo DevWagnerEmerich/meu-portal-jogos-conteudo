@@ -375,12 +375,13 @@ function showResult(stars, pts, coins) {
     document.getElementById('celTime').textContent = `⏱️ Tempo: ${fmt(StateManager.timerSecs)}`;
 
     // Create new element for coins if it doesn't exist yet, or just inject HTML over 'celPts'
-    const celPts = document.getElementById('celPts');
     celPts.innerHTML = `
-        <span style="color:var(--ouro)">+${pts.toLocaleString('pt-BR')} XP</span>
-        <span style="color:#F6E05E; margin-left:15px; background:rgba(255,215,0,0.1); padding:4px 12px; border-radius:12px; border:1px solid #D69E2E">
-            🟡 +${coins} Coins
-        </span>
+        <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:12px; align-items:center;">
+            <span style="color:var(--ouro)">+${pts.toLocaleString('pt-BR')} XP</span>
+            <span style="color:#F6E05E; background:rgba(255,215,0,0.1); padding:4px 12px; border-radius:12px; border:1px solid rgba(255,215,0,0.3); white-space:nowrap;">
+                🟡 +${coins} Coins
+            </span>
+        </div>
     `;
 
     const order = question.getOrder(lang);
