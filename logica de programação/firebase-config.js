@@ -14,15 +14,13 @@
  */
 
 export const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID",
-    // Optional — for Realtime Database fallback:
-    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+    apiKey: "AIzaSyABj93R2DcjKIoBPrCZYK_B6a_VYaH4-_4",
+    authDomain: "code-chain-db.firebaseapp.com",
+    projectId: "code-chain-db",
+    storageBucket: "code-chain-db.firebasestorage.app",
+    messagingSenderId: "595214265322",
+    appId: "1:595214265322:web:0fe3d9864ebe07b291e093"
 };
 
 // Set to true once you've filled in your credentials above
-export const FIREBASE_CONFIGURED = false;
+export const FIREBASE_CONFIGURED = true;
