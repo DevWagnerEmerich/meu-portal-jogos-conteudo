@@ -79,7 +79,7 @@ class RankingService {
         try {
             const { doc, setDoc } =
                 await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-            await setDoc(doc(this.#db, this.#collection, userId), enriched, { merge: true });
+            await setDoc(doc(this.#db, this.#collection, String(userId)), enriched, { merge: true });
         } catch (err) {
             console.error('[RankingService] updateEntry failed:', err);
         }
