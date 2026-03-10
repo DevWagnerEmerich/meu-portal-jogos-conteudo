@@ -332,8 +332,8 @@ EventBus.on('state:change', ({ to, stars, pts, coins, langMode }) => {
             showView('jogo');
             break;
         case GameState.RANKING:
-            renderRanking(langMode);
             showView('ranking');
+            renderRanking(langMode);
             break;
         case GameState.RESULT:
             showResult(stars, pts, coins);
