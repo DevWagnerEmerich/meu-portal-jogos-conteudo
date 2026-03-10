@@ -30,7 +30,7 @@ class RankingService {
     async subscribeGlobal(callback, langMode = 'global') {
         if (!this.#db) {
             // Offline fallback
-            callback(this.#loadLocal(langMode));
+            callback(this.#loadLocal(langMode), langMode);
             return;
         }
         try {
@@ -52,11 +52,11 @@ class RankingService {
                 EventBus.emit('ranking:updated', { entries, langMode });
             }, err => {
                 console.error('[RankingService] onSnapshot error:', err);
-                callback(this.#loadLocal());
+                callback(this.#loadLocal(langMode), langMode);
             });
         } catch (err) {
             console.error('[RankingService] subscribe failed:', err);
-            callback(this.#loadLocal());
+            callback(this.#loadLocal(langMode), langMode);
         }
     }
 
