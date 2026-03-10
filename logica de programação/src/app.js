@@ -280,31 +280,44 @@ function showView(id) {
 }
 
 // ── Ranking Renderer ─────────────────────────────────────────
-async function renderRanking() {
+async function renderRanking(langMode = 'global') {
     const lista = document.getElementById('rkLista');
+    const hdr = document.querySelector('.rk-title');
+
+    hdr.textContent = langMode === 'global' ? '🏆 Ranking Global' : `🏆 Ranking - ${LANG_META[langMode]?.nome}`;
+
     lista.innerHTML = '<div class="rk-loading">⏳ Carregando ranking...</div>';
 
-    await RankingService.subscribeGlobal(entries => {
+    await RankingService.subscribeGlobal((entries, activeLangMode) => {
+        // Prevent race conditions showing wrong list if user backed out fast
+        if (!document.getElementById('ranking').classList.contains('ativa')) return;
+
         if (!entries.length) {
             lista.innerHTML = '<div class="rk-vazio"><span>🏆</span>Nenhum score ainda!<br>Complete questões para aparecer aqui.</div>';
             return;
         }
+
+        const isGlobal = activeLangMode === 'global';
         const med = ['🥇', '🥈', '🥉'];
-        lista.innerHTML = entries.slice(0, 30).map((r, i) => `
+        lista.innerHTML = entries.slice(0, 30).map((r, i) => {
+            const displayPts = isGlobal ? (r.pts || 0) : (r[`pts_${activeLangMode}`] || 0);
+
+            return `
       <div class="rk-item ${i < 3 ? 'r' + (i + 1) : ''}" style="animation-delay:${i * .05}s">
         <div class="rk-pos">${i + 1}º</div>
         <div class="rk-med">${med[i] || '🎖️'}</div>
         <div class="rk-info">
           <div class="rk-nome">${r.nome || 'Anônimo'}</div>
-          <div class="rk-det">⭐${r.estrelas || 0} estrelas • 🎮${r.questoes || 0} questões • ${r.updatedAt ? new Date(r.updatedAt).toLocaleDateString('pt-BR') : ''}</div>
+          <div class="rk-det">⭐${r.estrelas || 0} estrelas • 🎮${r.questoes || 0} questões</div>
         </div>
-        <div class="rk-pts">${(r.pts || 0).toLocaleString('pt-BR')} XP</div>
-      </div>`).join('');
-    });
+        <div class="rk-pts">${displayPts.toLocaleString('pt-BR')} XP</div>
+      </div>`;
+        }).join('');
+    }, langMode);
 }
 
 // ── Game Events ───────────────────────────────────────────────
-EventBus.on('state:change', ({ to, stars, pts, coins }) => {
+EventBus.on('state:change', ({ to, stars, pts, coins, langMode }) => {
     switch (to) {
         case GameState.LANG_PICK:
             renderLangPick();
@@ -319,7 +332,7 @@ EventBus.on('state:change', ({ to, stars, pts, coins }) => {
             showView('jogo');
             break;
         case GameState.RANKING:
-            renderRanking();
+            renderRanking(langMode);
             showView('ranking');
             break;
         case GameState.RESULT:
@@ -423,7 +436,8 @@ EventBus.on('auth:loggedIn', () => {
 // ── Global Onclick Bindings (legacy HTML onclick compatibility) ──
 window.appGoLangPick = () => GameController.goToLangPick();
 window.appGoMenu = () => GameController.goToMenu();
-window.appGoRanking = () => GameController.goToRanking();
+// In selection we want 'global', in menu we want the 'lang' specific board.
+window.appGoRanking = () => GameController.goToRanking(document.getElementById('lang-pick').classList.contains('ativa') ? 'global' : StateManager.lang);
 window.appChooseLang = (l) => GameController.chooseLang(l);
 window.appVerify = () => GameController.verify();
 window.appHint = () => GameController.showHint();
@@ -441,12 +455,6 @@ window.appSaveName = () => {
     AuthService.setGuestName(v);
     document.getElementById('overlayNome')?.classList.remove('on');
     renderLangPick();
-};
-window.appClearRank = () => {
-    if (confirm('Limpar ranking local?')) {
-        RankingService.clearLocal();
-        renderRanking();
-    }
 };
 
 document.getElementById('inputNome')?.addEventListener('keydown', e => {

@@ -25,27 +25,31 @@ class RankingService {
      * Subscribe to real-time ranking updates.
      * Callback receives array of rank entries sorted by pts desc.
      * @param {Function} callback
+     * @param {string} langMode - 'global' or language key ('visualg', 'python', 'js')
      */
-    async subscribeGlobal(callback) {
+    async subscribeGlobal(callback, langMode = 'global') {
         if (!this.#db) {
             // Offline fallback
-            callback(this.#loadLocal());
+            callback(this.#loadLocal(langMode));
             return;
         }
         try {
             const { collection, query, orderBy, limit, onSnapshot } =
                 await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
 
+            const sortField = langMode === 'global' ? 'pts' : `pts_${langMode}`;
+
             const q = query(
                 collection(this.#db, this.#collection),
-                orderBy('pts', 'desc'),
+                orderBy(sortField, 'desc'),
                 limit(this.#limit)
             );
 
             this.#unsubscribe = onSnapshot(q, snapshot => {
                 const entries = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                callback(entries);
-                EventBus.emit('ranking:updated', { entries });
+                // Fire callback with the active langMode attached for context
+                callback(entries, langMode);
+                EventBus.emit('ranking:updated', { entries, langMode });
             }, err => {
                 console.error('[RankingService] onSnapshot error:', err);
                 callback(this.#loadLocal());
@@ -107,18 +111,22 @@ class RankingService {
 
     // ── Local (localStorage) fallback ──────────────────────────
 
-    #loadLocal() {
+    #loadLocal(langMode = 'global') {
         try {
-            return JSON.parse(localStorage.getItem(this.#localKey) || '[]');
+            const all = JSON.parse(localStorage.getItem(this.#localKey) || '[]');
+            const sortField = langMode === 'global' ? 'pts' : `pts_${langMode}`;
+            return all.sort((a, b) => (b[sortField] || 0) - (a[sortField] || 0));
         } catch { return []; }
     }
 
     #saveLocalEntry(userId, entry) {
-        const all = this.#loadLocal();
+        let all = JSON.parse(localStorage.getItem(this.#localKey) || '[]');
         const idx = all.findIndex(r => r.id === userId || r.nome === entry.nome);
         if (idx >= 0) all[idx] = { id: userId, ...entry };
         else all.push({ id: userId, ...entry });
-        all.sort((a, b) => b.pts - a.pts);
+
+        // We only prune based on total pts to keep stable storage map
+        all.sort((a, b) => (b.pts || 0) - (a.pts || 0));
         if (all.length > 50) all.length = 50;
         localStorage.setItem(this.#localKey, JSON.stringify(all));
     }

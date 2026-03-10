@@ -47,9 +47,9 @@ class GameController {
         GameEngine.transition(GameState.MENU, { lang: StateManager.lang });
     }
 
-    goToRanking() {
+    goToRanking(langMode = 'global') {
         this.#stopTimer();
-        GameEngine.transition(GameState.RANKING, {});
+        GameEngine.transition(GameState.RANKING, { langMode });
     }
 
     // ══ GAME ACTIONS ═════════════════════════════════════════════

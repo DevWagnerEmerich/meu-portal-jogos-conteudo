@@ -97,6 +97,15 @@ export class Player {
         return s;
     }
 
+    /** Total XP for a specific language */
+    langPts(lang) {
+        let pts = 0;
+        for (const [key, val] of this.#progress) {
+            if (key.startsWith(lang + ':')) pts += (val?.pts ?? 0);
+        }
+        return pts;
+    }
+
     /** Progress serialized for persistence */
     serializeProgress() {
         return Object.fromEntries(this.#progress);
@@ -109,6 +118,9 @@ export class Player {
             nome: this.#nome,
             avatar: this.#avatar,
             pts: this.totalPts,
+            pts_visualg: this.langPts('visualg'),
+            pts_python: this.langPts('python'),
+            pts_js: this.langPts('js'),
             estrelas: this.totalAllStars,
             questoes: ['visualg', 'python', 'js'].reduce((s, l) => s + this.totalConc(l), 0),
         };
