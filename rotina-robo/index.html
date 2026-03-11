@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0D0B1E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="description" content="A Rotina do Robô — Jogo educativo de lógica e ordenação. Estudo sequencial e divertido para crianças e estudantes. Integrado ao BrincaBytes.">
+<meta property="og:title" content="🤖 A Rotina do Robô — Aprenda Ordenando">
+<meta property="og:description" content="Ajude o robozinho a organizar sua rotina! 48 fases de lógica e diversão.">
+<meta property="og:type" content="website">
+<title>🤖 A Rotina do Robô — Edição Completa</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #0D0B1E;
+  --bg2:    #13102A;
+  --card:   #1C1840;
+  --card2:  #231F52;
+  --border: rgba(255,255,255,0.07);
+  --text:   #EAE6FF;
+  --muted:  #7A769A;
+  --roxo:   #8B7FFF;
+  --rosa:   #FF6BAE;
+  --verde:  #4EFACC;
+  --azul:   #4FC8FF;
+  --amarelo:#FFE14D;
+  --laranja:#FF9A3C;
+  --coral:  #FF6B6B;
+  --menta:  #52E5A0;
+  --lilas:  #C084FC;
+  --ouro:   #FFD700;
+  --shadow: 0 12px 40px rgba(0,0,0,0.5);
+  --glass:  rgba(255,255,255,0.03);
+  --glass-border: rgba(255,255,255,0.08);
+  --glow-roxo: 0 0 35px rgba(139,127,255,0.4);
+  --glow-verde: 0 0 35px rgba(78,250,204,0.4);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Nunito',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ─── CANVAS PARTÍCULAS ─── */
+#particleCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.5;}
+
+/* ─── VIEWS ─── */
+.view{display:none;position:relative;z-index:1;}
+.view.ativa{display:block;}
+#menu.ativa,#jogo.ativa,#ranking.ativa{display:flex;}
+
+/* ══════════════ MENU ══════════════ */
+#menu{
+  flex-direction:column;align-items:center;
+  padding:28px 16px 60px;min-height:100vh;
+}
+
+/* Cabeçalho do menu */
+.menu-top{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;max-width:760px;margin-bottom:32px;
+}
+.btn-ranking{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.3);
+  border-radius:50px;padding:10px 18px;
+  color:var(--ouro);font-family:'Fredoka One',cursive;font-size:1rem;
+  cursor:pointer;transition:all 0.2s;
+}
+.btn-ranking:hover{background:rgba(255,215,0,0.18);transform:translateY(-2px);}
+
+/* Logo área */
+.logo-area{text-align:center;margin-bottom:36px;}
+.logo-robo{
+  font-size:88px;display:block;
+  animation:roboFloat 3.5s ease-in-out infinite;
+  filter:drop-shadow(0 0 28px rgba(139,127,255,0.6));
+}
+@keyframes roboFloat{
+  0%,100%{transform:translateY(0) rotate(-4deg) scale(1);}
+  50%    {transform:translateY(-16px) rotate(4deg) scale(1.05);}
+}
+.titulo-game{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(2.2rem,7vw,3.6rem);
+  line-height:1.1;
+  background:linear-gradient(135deg,var(--roxo),var(--verde),var(--rosa));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.subtitulo-game{
+  font-size:1rem;color:var(--muted);font-weight:700;margin-top:6px;
+}
+
+/* Stats rápidos */
+.stats-bar{
+  display:flex;gap:12px;flex-wrap:wrap;justify-content:center;
+  margin-bottom:32px;width:100%;max-width:760px;
+}
+.stat-pill{
+  display:flex;align-items:center;gap:8px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:50px;padding:10px 18px;
+  font-weight:900;font-size:0.9rem;
+}
+.stat-pill .sp-icon{font-size:1.3rem;}
+.stat-pill .sp-val{color:var(--amarelo);}
+.stat-pill .sp-lbl{color:var(--muted);font-size:0.8rem;}
+
+/* Filtro de mundos */
+.filtro{
+  display:flex;gap:8px;flex-wrap:wrap;justify-content:center;
+  margin-bottom:24px;width:100%;max-width:760px;
+}
+.filtro-btn{
+  font-family:'Fredoka One',cursive;font-size:0.9rem;
+  padding:8px 18px;border-radius:50px;border:2px solid var(--border);
+  background:transparent;color:var(--muted);cursor:pointer;transition:all 0.2s;
+}
+.filtro-btn.ativo,.filtro-btn:hover{
+  background:var(--card2);border-color:var(--roxo);color:var(--text);
+}
+
+/* Grid de mundos */
+.mundos-grid{width:100%;max-width:760px;display:flex;flex-direction:column;gap:20px;}
+
+.mundo{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:26px;padding:20px;
+  animation:fadeUp 0.5s ease both;
+  transition:box-shadow 0.2s;
+}
+.mundo:hover{box-shadow:var(--shadow);}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px);}
+  to  {opacity:1;transform:translateY(0);}
+}
+.mundo-header{
+  display:flex;align-items:center;gap:14px;margin-bottom:16px;
+  padding-bottom:14px;border-bottom:1px solid var(--border);
+}
+.mundo-ico{
+  font-size:2.2rem;
+  background:rgba(255,255,255,0.06);
+  border-radius:16px;width:56px;height:56px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.mundo-info h2{font-family:'Fredoka One',cursive;font-size:1.25rem;line-height:1.2;}
+.mundo-info p{font-size:0.82rem;color:var(--muted);font-weight:700;margin-top:3px;}
+.mundo-prog{
+  margin-left:auto;text-align:right;flex-shrink:0;
+}
+.mundo-prog-txt{font-size:0.78rem;color:var(--muted);font-weight:900;margin-bottom:4px;}
+.mundo-prog-bar{
+  width:80px;height:6px;background:rgba(255,255,255,0.08);
+  border-radius:6px;overflow:hidden;
+}
+.mundo-prog-fill{height:100%;border-radius:6px;transition:width 0.5s ease;}
+
+.dif-tag{
+  display:inline-block;border-radius:50px;padding:2px 10px;
+  font-size:0.7rem;font-weight:900;margin-left:6px;letter-spacing:0.3px;
+}
+.tag-iniciante {background:rgba(92,234,212,0.15);color:var(--verde);}
+.tag-facil     {background:rgba(82,229,160,0.15);color:var(--menta);}
+.tag-medio     {background:rgba(255,225,77,0.15); color:var(--amarelo);}
+.tag-dificil   {background:rgba(255,107,107,0.15);color:var(--coral);}
+.tag-expert    {background:rgba(255,107,174,0.15);color:var(--rosa);}
+.tag-mestre    {background:rgba(192,132,252,0.15);color:var(--lilas);}
+.tag-lendario  {background:rgba(255,215,0,0.15);  color:var(--ouro);}
+
+/* Fases */
+.fases-row{display:flex;flex-wrap:wrap;gap:10px;}
+.fase-btn{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:rgba(255,255,255,0.04);border:2px solid rgba(255,255,255,0.08);
+  border-radius:18px;padding:12px 10px;cursor:pointer;
+  transition:all 0.2s;min-width:88px;flex:1;
+  font-family:'Nunito',sans-serif;color:var(--text);
+  position:relative;
+}
+.fase-btn:hover:not(.bloqueada){
+  transform:translateY(-5px);
+  box-shadow:var(--glow-roxo);border-color:rgba(139,127,255,0.5);
+}
+.fase-btn.concluida{
+  border-color:rgba(78,250,204,0.4);
+  background:rgba(78,250,204,0.06);
+}
+.fase-btn.bloqueada{opacity:0.3;cursor:not-allowed;pointer-events:none;}
+.fase-emoji{font-size:1.9rem;}
+.fase-nome{font-size:0.78rem;font-weight:900;text-align:center;line-height:1.2;}
+.fase-stars{font-size:0.72rem;color:var(--amarelo);letter-spacing:2px;min-height:14px;}
+.fase-num{font-size:0.68rem;color:var(--muted);font-weight:700;}
+.fase-novo{
+  position:absolute;top:-6px;right:-6px;
+  background:var(--coral);color:#fff;
+  font-size:0.6rem;font-weight:900;
+  border-radius:50px;padding:2px 6px;
+}
+
+/* ══════════════ JOGO ══════════════ */
+#jogo{
+  flex-direction:column;align-items:center;
+  padding:18px 14px 44px;min-height:100vh;
+}
+
+.jogo-header{
+  width:100%;max-width:660px;
+  display:flex;align-items:center;gap:10px;margin-bottom:16px;
+}
+.btn-voltar{
+  background:rgba(255,255,255,0.07);border:1px solid var(--border);
+  border-radius:50px;padding:9px 16px;
+  color:var(--text);font-family:'Fredoka One',cursive;font-size:0.95rem;
+  cursor:pointer;transition:all 0.2s;flex-shrink:0;
+}
+.btn-voltar:hover{background:rgba(255,255,255,0.13);transform:translateX(-2px);}
+
+.prog-wrap{flex:1;display:flex;flex-direction:column;gap:4px;}
+.prog-bar{
+  background:rgba(255,255,255,0.07);border-radius:50px;
+  height:8px;overflow:hidden;
+}
+.prog-fill{
+  height:100%;border-radius:50px;
+  background:linear-gradient(90deg,var(--roxo),var(--verde));
+  transition:width 0.5s ease;
+}
+.prog-lbl{font-size:0.75rem;font-weight:900;color:var(--muted);text-align:right;}
+
+/* Cronômetro */
+.timer-wrap{
+  display:flex;align-items:center;gap:6px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:50px;padding:8px 16px;flex-shrink:0;
+}
+.timer-ico{font-size:1.1rem;}
+.timer-num{
+  font-family:'Fredoka One',cursive;font-size:1.2rem;
+  color:var(--verde);min-width:52px;text-align:center;
+  transition:color 0.3s;
+}
+.timer-num.urgente{color:var(--coral);animation:pulse 0.5s ease infinite alternate;}
+@keyframes pulse{from{transform:scale(1);}to{transform:scale(1.12);}}
+
+/* Info da fase */
+.fase-info-card{
+  width:100%;max-width:660px;
+  display:flex;align-items:center;gap:14px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:22px;padding:16px 20px;margin-bottom:14px;
+}
+.fi-icon{font-size:3.2rem;filter:drop-shadow(0 0 12px rgba(139,127,255,0.4));}
+.fi-texto h2{font-family:'Fredoka One',cursive;font-size:clamp(1.2rem,4vw,1.7rem);}
+.fi-texto p{font-size:0.85rem;color:var(--muted);font-weight:700;margin-top:2px;}
+.fi-badge{
+  display:flex;align-items:center;gap:5px;
+  font-size:0.75rem;font-weight:900;color:var(--muted);
+  margin-top:5px;
+}
+
+/* Blocos */
+.zona-drop{
+  width:100%;max-width:660px;
+  display:flex;flex-direction:column;gap:10px;
+  margin-bottom:18px;
+}
+.bloco{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 18px;border-radius:18px;
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(1rem,3.2vw,1.3rem);
+  color:#fff;cursor:grab;user-select:none;
+  border:3px solid rgba(255,255,255,0.12);
+  transition:transform 0.15s,box-shadow 0.15s,opacity 0.15s,border-color 0.2s;
+  -webkit-tap-highlight-color:transparent;
+  position:relative;overflow:hidden;
+}
+.bloco::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.08),transparent);
+  pointer-events:none;
+}
+.bloco:active{cursor:grabbing;}
+.bloco .b-num{
+  background:rgba(0,0,0,0.25);border-radius:50%;
+  width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+  font-size:0.95rem;flex-shrink:0;border:2px solid rgba(255,255,255,0.25);
+}
+.bloco .b-emoji{font-size:clamp(1.5rem,4.5vw,2rem);flex-shrink:0;}
+.bloco .b-texto{flex:1;}
+.bloco .b-drag{font-size:1.1rem;opacity:0.35;flex-shrink:0;}
+
+.bloco.dragging {opacity:0.35;transform:scale(0.97);}
+.bloco.drag-over{transform:scale(1.04);border-color:rgba(255,255,255,0.8);box-shadow:0 0 28px rgba(139,127,255,0.5);}
+
+/* 16 gradientes para blocos */
+.bc-0 {background:linear-gradient(135deg,#FF9F1C,#FFBF69);}
+.bc-1 {background:linear-gradient(135deg,#4ECDC4,#2A9D8F);}
+.bc-2 {background:linear-gradient(135deg,#FF6B9D,#C9184A);}
+.bc-3 {background:linear-gradient(135deg,#7C6AFF,#4A90D9);}
+.bc-4 {background:linear-gradient(135deg,#5CDB95,#379683);}
+.bc-5 {background:linear-gradient(135deg,#E29578,#C77DFF);}
+.bc-6 {background:linear-gradient(135deg,#F72585,#B5179E);}
+.bc-7 {background:linear-gradient(135deg,#3A86FF,#0077B6);}
+.bc-8 {background:linear-gradient(135deg,#FB5607,#FF9F1C);}
+.bc-9 {background:linear-gradient(135deg,#06D6A0,#118577);}
+.bc-10{background:linear-gradient(135deg,#D62828,#F77F00);}
+.bc-11{background:linear-gradient(135deg,#4361EE,#7209B7);}
+.bc-12{background:linear-gradient(135deg,#52B788,#40916C);}
+.bc-13{background:linear-gradient(135deg,#E63946,#A8DADC);}
+.bc-14{background:linear-gradient(135deg,#8338EC,#3A86FF);}
+.bc-15{background:linear-gradient(135deg,#FF006E,#8338EC);}
+
+/* Caixas auxiliares */
+.dica-box{
+  width:100%;max-width:660px;
+  background:rgba(255,225,77,0.08);border:2px solid rgba(255,225,77,0.25);
+  border-radius:16px;padding:13px 18px;
+  font-size:0.92rem;font-weight:700;color:var(--amarelo);
+  display:none;margin-bottom:12px;animation:fadeUp 0.3s ease;
+}
+.feedback-erro{
+  width:100%;max-width:660px;
+  background:rgba(255,107,107,0.09);border:2px solid rgba(255,107,107,0.25);
+  border-radius:16px;padding:13px 18px;
+  font-size:1rem;font-weight:900;font-family:'Fredoka One',cursive;
+  color:var(--coral);text-align:center;
+  display:none;margin-bottom:12px;animation:shakeAnim 0.4s ease;
+}
+@keyframes shakeAnim{
+  0%,100%{transform:translateX(0);}
+  20%    {transform:translateX(-9px);}
+  40%    {transform:translateX(9px);}
+  60%    {transform:translateX(-6px);}
+  80%    {transform:translateX(6px);}
+}
+
+/* Botões de ação */
+.acoes{
+  width:100%;max-width:660px;
+  display:flex;gap:10px;flex-wrap:wrap;justify-content:center;
+}
+.btn-acao{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(0.95rem,2.8vw,1.15rem);
+  padding:12px 22px;border:none;border-radius:50px;
+  cursor:pointer;transition:all 0.18s;flex:1;min-width:120px;
+}
+.btn-acao:hover {transform:translateY(-3px);}
+.btn-acao:active{transform:translateY(0);}
+.btn-verificar {background:linear-gradient(135deg,var(--roxo),#5B4FCC);color:#fff;box-shadow:0 4px 20px rgba(139,127,255,0.4);}
+.btn-dica      {background:rgba(255,255,255,0.07);color:var(--text);border:1px solid var(--border);}
+.btn-embaralhar{background:rgba(255,255,255,0.07);color:var(--text);border:1px solid var(--border);}
+
+/* Instruções */
+.instrucao-bar{
+  width:100%;max-width:660px;
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  border-radius:14px;padding:11px 16px;
+  font-size:0.88rem;font-weight:700;color:var(--muted);
+  margin-bottom:14px;
+}
+
+/* ══════════════ MODAL CELEBRAÇÃO ══════════════ */
+.overlay{
+  position:fixed;inset:0;z-index:300;
+  background:rgba(0,0,0,0.75);
+  display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(8px);
+}
+.overlay.ativo{display:flex;}
+
+.modal-cel{
+  background:linear-gradient(160deg,#1A1640,#241D5C);
+  border:2px solid rgba(139,127,255,0.35);
+  border-radius:32px;padding:38px 30px;
+  max-width:440px;width:92%;text-align:center;
+  box-shadow:0 0 80px rgba(139,127,255,0.25);
+  animation:modalPop 0.5s cubic-bezier(0.175,0.885,0.32,1.275);
+  position:relative;overflow:hidden;
+}
+@keyframes modalPop{
+  from{transform:scale(0.4) rotate(-6deg);opacity:0;}
+  to  {transform:scale(1)   rotate(0deg); opacity:1;}
+}
+.cel-firework{position:absolute;inset:0;pointer-events:none;}
+.cel-emoji{
+  font-size:80px;display:block;margin-bottom:10px;
+  animation:bounce 0.9s ease infinite alternate;
+}
+@keyframes bounce{
+  from{transform:translateY(0) scale(1);}
+  to  {transform:translateY(-16px) scale(1.1);}
+}
+.cel-titulo{
+  font-family:'Fredoka One',cursive;font-size:1.9rem;margin-bottom:7px;
+  background:linear-gradient(135deg,var(--amarelo),var(--rosa));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.cel-msg{font-size:0.97rem;color:var(--muted);font-weight:700;margin-bottom:8px;}
+.cel-stars{font-size:2rem;letter-spacing:6px;margin-bottom:4px;}
+.cel-tempo{
+  font-size:0.88rem;color:var(--verde);font-weight:900;
+  margin-bottom:18px;
+}
+.cel-pts{
+  background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);
+  border-radius:50px;padding:8px 20px;display:inline-block;
+  font-family:'Fredoka One',cursive;font-size:1.1rem;color:var(--ouro);
+  margin-bottom:20px;
+}
+.cel-botoes{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.btn-cel{
+  font-family:'Fredoka One',cursive;font-size:1.05rem;
+  padding:12px 22px;border:none;border-radius:50px;
+  cursor:pointer;transition:all 0.18s;flex:1;min-width:120px;
+}
+.btn-cel:hover{transform:translateY(-3px);}
+.btn-proxima {background:linear-gradient(135deg,var(--verde),#2BC08A);color:#0D0B1E;font-weight:900;}
+.btn-menu-cel{background:rgba(255,255,255,0.08);color:var(--text);border:1px solid var(--border);}
+
+/* Confetes & partículas */
+.confete{
+  position:absolute;border-radius:3px;
+  animation:confeteCair linear forwards;pointer-events:none;
+}
+@keyframes confeteCair{
+  0%  {transform:translateY(-20px) rotate(0deg);  opacity:1;}
+  100%{transform:translateY(550px) rotate(800deg);opacity:0;}
+}
+.sparkle{
+  position:absolute;pointer-events:none;
+  animation:sparkleAnim ease-out forwards;
+}
+@keyframes sparkleAnim{
+  0%  {transform:scale(0) translate(0,0);opacity:1;}
+  100%{transform:scale(1.5) translate(var(--tx),var(--ty));opacity:0;}
+}
+
+/* ══════════════ RANKING ══════════════ */
+#ranking{
+  flex-direction:column;align-items:center;
+  padding:28px 16px 60px;min-height:100vh;
+}
+.ranking-header{
+  width:100%;max-width:600px;
+  display:flex;align-items:center;gap:12px;margin-bottom:28px;
+}
+.ranking-titulo{
+  font-family:'Fredoka One',cursive;
+  font-size:clamp(1.6rem,5vw,2.4rem);flex:1;
+  background:linear-gradient(135deg,var(--ouro),var(--laranja));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.ranking-lista{width:100%;max-width:600px;display:flex;flex-direction:column;gap:10px;}
+.rank-item{
+  display:flex;align-items:center;gap:14px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:20px;padding:16px 20px;
+  animation:fadeUp 0.4s ease both;
+}
+.rank-item.top1{border-color:rgba(255,215,0,0.4);background:rgba(255,215,0,0.06);}
+.rank-item.top2{border-color:rgba(192,192,192,0.35);}
+.rank-item.top3{border-color:rgba(205,127,50,0.35);}
+.rank-pos{font-family:'Fredoka One',cursive;font-size:1.5rem;width:40px;text-align:center;flex-shrink:0;}
+.rank-medal{font-size:1.8rem;flex-shrink:0;}
+.rank-info{flex:1;}
+.rank-nome{font-family:'Fredoka One',cursive;font-size:1.1rem;}
+.rank-detalhe{font-size:0.8rem;color:var(--muted);font-weight:700;margin-top:2px;}
+.rank-pts{
+  font-family:'Fredoka One',cursive;font-size:1.3rem;
+  color:var(--amarelo);
+}
+
+.ranking-vazio{
+  text-align:center;padding:50px 20px;
+  color:var(--muted);font-weight:700;font-size:1rem;
+}
+.ranking-vazio span{font-size:3rem;display:block;margin-bottom:14px;}
+
+/* ══════════════ INPUT NOME ══════════════ */
+.overlay-nome{
+  position:fixed;inset:0;z-index:400;
+  background:rgba(0,0,0,0.8);
+  display:none;align-items:center;justify-content:center;
+  backdrop-filter:blur(8px);
+}
+.overlay-nome.ativo{display:flex;}
+.modal-nome{
+  background:linear-gradient(160deg,#1A1640,#241D5C);
+  border:2px solid rgba(139,127,255,0.35);
+  border-radius:28px;padding:36px 28px;
+  max-width:400px;width:90%;text-align:center;
+  animation:modalPop 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+.modal-nome h2{
+  font-family:'Fredoka One',cursive;font-size:1.8rem;margin-bottom:8px;
+  color:var(--verde);
+}
+.modal-nome p{color:var(--muted);font-weight:700;font-size:0.95rem;margin-bottom:20px;}
+.input-nome{
+  width:100%;background:rgba(255,255,255,0.07);
+  border:2px solid var(--border);border-radius:14px;
+  padding:14px 18px;font-family:'Fredoka One',cursive;
+  font-size:1.2rem;color:var(--text);outline:none;
+  transition:border-color 0.2s;margin-bottom:16px;
+  text-align:center;
+}
+.input-nome:focus{border-color:var(--roxo);}
+.btn-salvar-nome{
+  width:100%;background:linear-gradient(135deg,var(--roxo),#5B4FCC);
+  color:#fff;font-family:'Fredoka One',cursive;font-size:1.2rem;
+  padding:14px;border:none;border-radius:50px;
+  cursor:pointer;transition:all 0.2s;
+}
+.btn-salvar-nome:hover{transform:translateY(-2px);box-shadow:var(--glow-roxo);}
+
+/* Responsivo */
+@media(max-width:480px){
+  .fases-row{gap:8px;}
+  .fase-btn{min-width:76px;padding:10px 8px;}
+  .bloco{padding:12px 14px;gap:10px;}
+}
+
+/* Scrollbar estilizada */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--card2);border-radius:6px;}
+
+/* ─── CUSTOM MODALS & TOASTS ─── */
+.modal-overlay {
+  position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,0.85);backdrop-filter:blur(10px);
+  display:none;align-items:center;justify-content:center;
+  animation:fadeIn 0.3s ease;
+}
+.modal-overlay.ativo {display:flex;}
+.modal-custom {
+  background:var(--card);border:1.5px solid var(--glass-border);
+  border-radius:28px;padding:32px;max-width:400px;width:90%;
+  text-align:center;box-shadow:var(--shadow);
+  animation:modalPop 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+.modal-custom h2 {font-family:'Fredoka One',cursive;font-size:1.6rem;color:var(--text);margin-bottom:12px;}
+.modal-custom p {font-size:1rem;color:var(--muted);margin-bottom:24px;line-height:1.5;}
+.modal-btns {display:flex;gap:12px;justify-content:center;}
+.btn-modal {
+  font-family:'Fredoka One',cursive;font-size:1rem;padding:12px 24px;
+  border-radius:50px;border:none;cursor:pointer;transition:all 0.2s;
+}
+.btn-modal-sim {background:var(--roxo);color:#fff;}
+.btn-modal-nao {background:rgba(255,255,255,0.08);color:var(--muted);border:1px solid var(--glass-border);}
+.btn-modal:hover {transform:translateY(-2px);box-shadow:var(--glow-roxo);}
+
+.toast-container {
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
+  display:flex;flex-direction:column;gap:10px;z-index:1000;
+}
+.toast {
+  background:var(--card);border:1px solid var(--glass-border);
+  padding:12px 24px;border-radius:50px;color:var(--text);
+  font-weight:700;font-size:0.9rem;box-shadow:var(--shadow);
+  animation:toastIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), fadeOut 0.4s ease 2.6s forwards;
+  display:flex;align-items:center;gap:10px;
+}
+@keyframes fadeIn {from{opacity:0;}to{opacity:1;}}
+@keyframes toastIn {from{transform:translateY(100px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+@keyframes fadeOut {from{opacity:1;}to{opacity:0;}}
+</style>
+</head>
+<body>
+
+<canvas id="particleCanvas"></canvas>
+
+<!-- ══ MENU ══ -->
+<div id="menu" class="view ativa">
+  <div class="menu-top">
+    <div style="font-size:1.5rem;font-family:'Fredoka One',cursive;color:var(--roxo)">🤖 Rotina</div>
+    <button class="btn-ranking" onclick="irRanking()">🏆 Ranking</button>
+  </div>
+
+  <div class="logo-area">
+    <span class="logo-robo">🤖</span>
+    <div class="titulo-game">A Rotina do Robô</div>
+    <div class="subtitulo-game">Aprenda ordenando! 48 fases esperando por você 🚀</div>
+  </div>
+
+  <div class="stats-bar" id="statsBar"></div>
+
+  <div class="filtro" id="filtroBar">
+    <button class="filtro-btn ativo" data-filtro="todos" onclick="filtrar(this)">🌍 Todos</button>
+    <button class="filtro-btn" data-filtro="iniciante" onclick="filtrar(this)">⭐ Iniciante</button>
+    <button class="filtro-btn" data-filtro="facil"     onclick="filtrar(this)">🟢 Fácil</button>
+    <button class="filtro-btn" data-filtro="medio"     onclick="filtrar(this)">🟡 Médio</button>
+    <button class="filtro-btn" data-filtro="dificil"   onclick="filtrar(this)">🔴 Difícil</button>
+    <button class="filtro-btn" data-filtro="expert"    onclick="filtrar(this)">💜 Expert</button>
+    <button class="filtro-btn" data-filtro="mestre"    onclick="filtrar(this)">🏆 Mestre</button>
+    <button class="filtro-btn" data-filtro="lendario"  onclick="filtrar(this)">👑 Lendário</button>
+  </div>
+
+  <div class="mundos-grid" id="mundosGrid"></div>
+</div>
+
+<!-- ══ JOGO ══ -->
+<div id="jogo" class="view">
+  <div class="jogo-header">
+    <button class="btn-voltar" onclick="irMenu()">← Voltar</button>
+    <div class="prog-wrap">
+      <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+      <div class="prog-lbl" id="progLbl"></div>
+    </div>
+    <div class="timer-wrap">
+      <span class="timer-ico">⏱️</span>
+      <span class="timer-num" id="timerNum">0:00</span>
+    </div>
+  </div>
+
+  <div class="fase-info-card">
+    <span class="fi-icon" id="fiIcon"></span>
+    <div class="fi-texto">
+      <div class="fi-badge" id="fiBadge"></div>
+      <h2 id="fiNome"></h2>
+      <p  id="fiDesc"></p>
+    </div>
+  </div>
+
+  <div class="instrucao-bar">📋 Arraste os blocos na <strong>ordem correta</strong> e clique em <strong>Verificar!</strong></div>
+
+  <div class="zona-drop" id="zonadrop"></div>
+
+  <div class="dica-box"     id="dicaBox"></div>
+  <div class="feedback-erro" id="feedbackErro">🤔 Hmm… tente reorganizar!</div>
+
+  <div class="acoes">
+    <button class="btn-acao btn-verificar"  onclick="verificar()">✅ Verificar!</button>
+    <button class="btn-acao btn-dica"       onclick="mostrarDica()">💡 Dica</button>
+    <button class="btn-acao btn-embaralhar" onclick="embaralhar()">🔀 Misturar</button>
+  </div>
+</div>
+
+<!-- ══ MODAL CONFIRMAÇÃO ══ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-custom">
+    <h2 id="modalTitle">Confirmação</h2>
+    <p id="modalMsg">Tem certeza que deseja fazer isso?</p>
+    <div class="modal-btns">
+      <button class="btn-modal btn-modal-nao" id="btnModalNao">Não</button>
+      <button class="btn-modal btn-modal-sim" id="btnModalSim">Sim</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOASTS ══ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ══ RANKING ══ -->
+<div id="ranking" class="view">
+  <div class="ranking-header">
+    <button class="btn-voltar" onclick="irMenu()">← Voltar</button>
+    <div class="ranking-titulo">🏆 Ranking</div>
+  </div>
+  <div class="ranking-lista" id="rankingLista"></div>
+</div>
+
+<!-- ══ MODAL CELEBRAÇÃO ══ -->
+<div class="overlay" id="overlay">
+  <div class="modal-cel" id="modalCel">
+    <div class="cel-firework" id="celFirework"></div>
+    <span class="cel-emoji"  id="celEmoji">🎉</span>
+    <div class="cel-titulo"  id="celTitulo"></div>
+    <div class="cel-msg"     id="celMsg"></div>
+    <div class="cel-stars"   id="celStars"></div>
+    <div class="cel-tempo"   id="celTempo"></div>
+    <div class="cel-pts"     id="celPts"></div>
+    <div class="cel-botoes">
+      <button class="btn-cel btn-proxima"  id="btnProxima" onclick="proximaFase()">Próxima ▶</button>
+      <button class="btn-cel btn-menu-cel" onclick="irMenu()">🏠 Menu</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL NOME ══ -->
+<div class="overlay-nome" id="overlayNome">
+  <div class="modal-nome">
+    <h2>👋 Olá, Robozinho!</h2>
+    <p>Qual é o seu nome? Vamos colocar no ranking!</p>
+    <input class="input-nome" id="inputNome" type="text" maxlength="16" placeholder="Seu nome aqui..." />
+    <button class="btn-salvar-nome" onclick="salvarNome()">Entrar no jogo! 🚀</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  ACERVO COMPLETO — 12 Mundos × 4 Fases = 48 Fases
+// ═══════════════════════════════════════════════════════════════
+const ACERVO = [
+  // ── MUNDO 1: INICIANTE ──
+  {
+    id:"m1",nome:"Mundo 1 — Primeiros Passos",ico:"🌱",dif:"iniciante",tag:"Iniciante",
+    cor:"var(--verde)",
+    fases:[
+      {id:"m1f1",nome:"Manhã Simples",icon:"🌅",desc:"Como o Robozinho começa o dia",
+       dica:"Acorde antes de escovar os dentes!",
+       blocos:[{id:"a",e:"☀️",t:"Acordar"},{id:"b",e:"🪥",t:"Escovar os dentes"},{id:"c",e:"🥛",t:"Tomar café"}],
+       ordem:["a","b","c"]},
+      {id:"m1f2",nome:"Hora de Dormir",icon:"🌙",desc:"A rotina noturna do Robozinho",
+       dica:"Jante primeiro, depois prepare-se para dormir!",
+       blocos:[{id:"a",e:"🍽️",t:"Jantar"},{id:"b",e:"🛁",t:"Tomar banho"},{id:"c",e:"😴",t:"Dormir"}],
+       ordem:["a","b","c"]},
+      {id:"m1f3",nome:"Lavar as Mãos",icon:"🧼",desc:"A ordem certa para lavar as mãos",
+       dica:"Abra a torneira antes de usar o sabão!",
+       blocos:[{id:"a",e:"🚰",t:"Abrir torneira"},{id:"b",e:"🧼",t:"Passar sabão"},{id:"c",e:"🤲",t:"Esfregar"},{id:"d",e:"💧",t:"Enxaguar"}],
+       ordem:["a","b","c","d"]},
+      {id:"m1f4",nome:"Ir à Escola",icon:"🏫",desc:"Preparativos para a escola",
+       dica:"Acorde e prepare o corpo antes da mochila!",
+       blocos:[{id:"a",e:"⏰",t:"Acordar"},{id:"b",e:"🥪",t:"Fazer lanche"},{id:"c",e:"🎒",t:"Pegar mochila"},{id:"d",e:"🚌",t:"Pegar ônibus"}],
+       ordem:["a","b","c","d"]},
+    ]
+  },
+  // ── MUNDO 2: HIGIENE ──
+  {
+    id:"m2",nome:"Mundo 2 — Higiene em Dia",ico:"🪥",dif:"facil",tag:"Fácil",
+    cor:"var(--menta)",
+    fases:[
+      {id:"m2f1",nome:"Escovação Perfeita",icon:"🦷",desc:"Como escovar os dentes direitinho",
+       dica:"Coloque a pasta antes de molhar a escova!",
+       blocos:[{id:"a",e:"🪥",t:"Pegar a escova"},{id:"b",e:"🧴",t:"Colocar pasta"},{id:"c",e:"💧",t:"Molhar"},{id:"d",e:"😬",t:"Escovar"},{id:"e",e:"🌀",t:"Enxaguar a boca"}],
+       ordem:["a","b","c","d","e"]},
+      {id:"m2f2",nome:"Banho Caprichado",icon:"🚿",desc:"Tomar banho do jeito certo",
+       dica:"Molhe o corpo antes de usar o sabonete!",
+       blocos:[{id:"a",e:"🚿",t:"Abrir o chuveiro"},{id:"b",e:"💦",t:"Molhar o corpo"},{id:"c",e:"🧴",t:"Passar sabonete"},{id:"d",e:"🫧",t:"Ensaboar tudo"},{id:"e",e:"💧",t:"Enxaguar"},{id:"f",e:"🧺",t:"Secar com toalha"}],
+       ordem:["a","b","c","d","e","f"]},
+      {id:"m2f3",nome:"Cuidando do Cabelo",icon:"💇",desc:"Lavar e pentear o cabelo",
+       dica:"Primeiro molhe, depois aplique o shampoo!",
+       blocos:[{id:"a",e:"💆",t:"Molhar o cabelo"},{id:"b",e:"🧴",t:"Aplicar shampoo"},{id:"c",e:"🫧",t:"Esfregar"},{id:"d",e:"💧",t:"Enxaguar"},{id:"e",e:"🪮",t:"Pentear"}],
+       ordem:["a","b","c","d","e"]},
+      {id:"m2f4",nome:"Cortar as Unhas",icon:"✂️",desc:"Rotina de cuidar das unhas",
+       dica:"Lave as mãos antes de cortar!",
+       blocos:[{id:"a",e:"🧼",t:"Lavar as mãos"},{id:"b",e:"✂️",t:"Cortar as unhas"},{id:"c",e:"📁",t:"Limar as bordas"},{id:"d",e:"🧴",t:"Passar hidratante"}],
+       ordem:["a","b","c","d"]},
+    ]
+  },
+  // ── MUNDO 3: ALIMENTAÇÃO ──
+  {
+    id:"m3",nome:"Mundo 3 — Na Cozinha",ico:"🍳",dif:"facil",tag:"Fácil",
+    cor:"var(--laranja)",
+    fases:[
+      {id:"m3f1",nome:"Fazer um Suco",icon:"🍊",desc:"O Robozinho vai fazer um suco!",
+       dica:"Corte a fruta antes de espremer!",
+       blocos:[{id:"a",e:"🍊",t:"Pegar a fruta"},{id:"b",e:"🚰",t:"Lavar a fruta"},{id:"c",e:"🔪",t:"Cortar ao meio"},{id:"d",e:"🥤",t:"Espremer"},{id:"e",e:"🥛",t:"Servir no copo"}],
+       ordem:["a","b","c","d","e"]},
+      {id:"m3f2",nome:"Sanduíche Delicioso",icon:"🥪",desc:"Montar um sanduíche gostoso",
+       dica:"Passe o recheio antes de fechar!",
+       blocos:[{id:"a",e:"🍞",t:"Pegar o pão"},{id:"b",e:"🧈",t:"Passar manteiga"},{id:"c",e:"🧀",t:"Colocar queijo"},{id:"d",e:"🥬",t:"Colocar alface"},{id:"e",e:"🍞",t:"Fechar o sanduíche"}],
+       ordem:["a","b","c","d","e"]},
+      {id:"m3f3",nome:"Preparar o Café da Manhã",icon:"☕",desc:"Café da manhã completo",
+       dica:"Ferva a água antes de fazer o café!",
+       blocos:[{id:"a",e:"💧",t:"Ferver água"},{id:"b",e:"☕",t:"Fazer o café"},{id:"c",e:"🍞",t:"Torrar o pão"},{id:"d",e:"🧈",t:"Passar manteiga"},{id:"e",e:"🍌",t:"Descascar fruta"},{id:"f",e:"🍽️",t:"Montar a mesa"}],
+       ordem:["a","b","c","d","e","f"]},
+      {id:"m3f4",nome:"Lavar a Louça",icon:"🫧",desc:"Deixar a cozinha brilhando!",
+       dica:"Ensaboe antes de esfregar!",
+       blocos:[{id:"a",e:"🚰",t:"Abrir a torneira"},{id:"b",e:"🧴",t:"Colocar detergente"},{id:"c",e:"🫧",t:"Ensaboar os pratos"},{id:"d",e:"🧽",t:"Esfregar"},{id:"e",e:"💧",t:"Enxaguar"},{id:"f",e:"🧺",t:"Secar e guardar"}],
+       ordem:["a","b","c","d","e","f"]},
+    ]
+  },
+  // ── MUNDO 4: ESCOLA ──
+  {
+    id:"m4",nome:"Mundo 4 — Hora de Estudar",ico:"📚",dif:"medio",tag:"Médio",
+    cor:"var(--azul)",
+    fases:[
+      {id:"m4f1",nome:"Organizar o Estudo",icon:"📖",desc:"Como estudar com foco",
+       dica:"Organize o material antes de começar!",
+       blocos:[{id:"a",e:"🗓️",t:"Fazer cronograma"},{id:"b",e:"📚",t:"Pegar o material"},{id:"c",e:"📖",t:"Ler o conteúdo"},{id:"d",e:"📝",t:"Fazer anotações"},{id:"e",e:"❓",t:"Tirar dúvidas"},{id:"f",e:"✅",t:"Revisar o que aprendeu"}],
+       ordem:["a","b","c","d","e","f"]},
+      {id:"m4f2",nome:"Fazer a Lição",icon:"✏️",desc:"Completar a lição de casa",
+       dica:"Leia as perguntas antes de responder!",
+       blocos:[{id:"a",e:"🎒",t:"Abrir a mochila"},{id:"b",e:"📓",t:"Pegar o caderno"},{id:"c",e:"📖",t:"Ler a lição"},{id:"d",e:"✏️",t:"Responder as questões"},{id:"e",e:"🔍",t:"Revisar as respostas"},{id:"f",e:"🎒",t:"Guardar na mochila"}],
+       ordem:["a","b","c","d","e","f"]},
+      {id:"m4f3",nome:"Apresentação na Aula",icon:"🎤",desc:"Como fazer uma boa apresentação",
+       dica:"Pesquise antes de preparar os slides!",
+       blocos:[{id:"a",e:"🔍",t:"Pesquisar o tema"},{id:"b",e:"📋",t:"Organizar as ideias"},{id:"c",e:"🖥️",t:"Fazer os slides"},{id:"d",e:"🗣️",t:"Praticar em casa"},{id:"e",e:"🎤",t:"Apresentar para a turma"},{id:"f",e:"🤝",t:"Responder perguntas"}],
+       ordem:["a","b","c","d","e","f"]},
+      {id:"m4f4",nome:"Ler um Livro",icon:"📚",desc:"Aproveitar bem a leitura",
+       dica:"Escolha um lugar tranquilo antes de começar!",
+       blocos:[{id:"a",e:"📚",t:"Escolher o livro"},{id:"b",e:"🛋️",t:"Achar lugar tranquilo"},{id:"c",e:"📖",t:"Ler com atenção"},{id:"d",e:"📝",t:"Anotar partes legais"},{id:"e",e:"🤔",t:"Refletir sobre a história"},{id:"f",e:"⭐",t:"Recomendar para amigos"}],
+       ordem:["a","b","c","d","e","f"]},
+    ]
+  },
+  // ── MUNDO 5: ESPORTES ──
+  {
+    id:"m5",nome:"Mundo 5 — Corpo em Movimento",ico:"⚽",dif:"medio",tag:"Médio",
+    cor:"var(--coral)",
+    fases:[
+      {id:"m5f1",nome:"Treino de Futebol",icon:"⚽",desc:"Como se preparar para jogar",
+       dica:"Aqueça o corpo antes de jogar!",
+       blocos:[{id:"a",e:"👟",t:"Colocar o uniforme"},{id:"b",e:"🤸",t:"Alongar"},{id:"c",e:"🏃",t:"Aquecer correndo"},{id:"d",e:"⚽",t:"Treinar os passes"},{id:"e",e:"🥅",t:"Praticar o chute"},{id:"f",e:"💧",t:"Beber água"},{id:"g",e:"🧘",t:"Descansar e alongar"}],
+       ordem:["a","b","c","d","e","f","g"]},
+      {id:"m5f2",nome:"Aula de Natação",icon:"🏊",desc:"Rotina na piscina",
+       dica:"Tome banho antes de entrar na piscina!",
+       blocos:[{id:"a",e:"🩱",t:"Colocar o maiô"},{id:"b",e:"🚿",t:"Tomar banho"},{id:"c",e:"🥽",t:"Colocar óculos"},{id:"d",e:"🤸",t:"Alongar na beira"},{id:"e",e:"🏊",t:"Nadar"},{id:"f",e:"🚿",t:"Banho depois"},{id:"g",e:"🧴",t:"Hidratar a pele"}],
+       ordem:["a","b","c","d","e","f","g"]},
+      {id:"m5f3",nome:"Passeio de Bicicleta",icon:"🚴",desc:"Pedalar com segurança",
+       dica:"Verifique os pneus antes de sair!",
+       blocos:[{id:"a",e:"⛑️",t:"Colocar o capacete"},{id:"b",e:"🚴",t:"Checar a bicicleta"},{id:"c",e:"🔧",t:"Calibrar os pneus"},{id:"d",e:"🗺️",t:"Planejar o percurso"},{id:"e",e:"🚦",t:"Respeitar as regras"},{id:"f",e:"💧",t:"Beber água"}],
+       ordem:["a","b","c","d","e","f"]},
+      {id:"m5f4",nome:"Yoga Matinal",icon:"🧘",desc:"Começar o dia com energia",
+       dica:"Respire fundo antes de cada posição!",
+       blocos:[{id:"a",e:"⏰",t:"Acordar cedo"},{id:"b",e:"🌅",t:"Encontrar um lugar calmo"},{id:"c",e:"🧘",t:"Sentar e respirar"},{id:"d",e:"🙆",t:"Fazer posturas"},{id:"e",e:"🌬️",t:"Exercícios respiratórios"},{id:"f",e:"☀️",t:"Agradecer o novo dia"}],
+       ordem:["a","b","c","d","e","f"]},
+    ]
+  },
+  // ── MUNDO 6: NATUREZA ──
+  {
+    id:"m6",nome:"Mundo 6 — Amor à Natureza",ico:"🌿",dif:"medio",tag:"Médio",
+    cor:"var(--menta)",
+    fases:[
+      {id:"m6f1",nome:"Plantar uma Muda",icon:"🌱",desc:"Como plantar uma florzinha",
+       dica:"Prepare o vaso antes de colocar a terra!",
+       blocos:[{id:"a",e:"🪴",t:"Pegar o vaso"},{id:"b",e:"🌍",t:"Colocar terra"},{id:"c",e:"🌱",t:"Plantar a muda"},{id:"d",e:"💧",t:"Regar"},{id:"e",e:"☀️",t:"Pôr no sol"},{id:"f",e:"📅",t:"Regar todo dia"}],
+       ordem:["a","b","c","d","e","f"]},
+      {id:"m6f2",nome:"Reciclar o Lixo",icon:"♻️",desc:"Ajudando o planeta!",
+       dica:"Separe o lixo antes de descartar!",
+       blocos:[{id:"a",e:"🗑️",t:"Recolher o lixo"},{id:"b",e:"🔍",t:"Identificar o material"},{id:"c",e:"♻️",t:"Separar plástico"},{id:"d",e:"📄",t:"Separar papel"},{id:"e",e:"🥫",t:"Separar metal"},{id:"f",e:"🚛",t:"Levar à coleta seletiva"}],
+       ordem:["a","b","c","d","e","f"]},
+      {id:"m6f3",nome:"Trilha na Natureza",icon:"🥾",desc:"Explorando a floresta",
+       dica:"Leve água antes de começar a trilha!",
+       blocos:[{id:"a",e:"🗺️",t:"Estudar o mapa"},{id:"b",e:"🥾",t:"Calçar bota"},{id:"c",e:"🎒",t:"Montar a mochila"},{id:"d",e:"💧",t:"Levar bastante água"},{id:"e",e:"🌿",t:"Caminhar observando"},{id:"f",e:"📷",t:"Fotografar a natureza"},{id:"g",e:"🏕️",t:"Descansar no acampamento"}],
+       ordem:["a","b","c","d","e","f","g"]},
+      {id:"m6f4",nome:"Cuidar de um Animal",icon:"🐾",desc:"Ser o melhor tutor do mundo",
+       dica:"Alimente antes de brincar!",
+       blocos:[{id:"a",e:"🐾",t:"Dar comida e água"},{id:"b",e:"🧼",t:"Dar banho"},{id:"c",e:"🪮",t:"Escovar o pelo"},{id:"d",e:"⚽",t:"Brincar e exercitar"},{id:"e",e:"💊",t:"Dar remédios se precisar"},{id:"f",e:"❤️",t:"Dar carinho"}],
+       ordem:["a","b","c","d","e","f"]},
+    ]
+  },
+  // ── MUNDO 7: CULINÁRIA ──
+  {
+    id:"m7",nome:"Mundo 7 — Chef Robozinho",ico:"👨‍🍳",dif:"dificil",tag:"Difícil",
+    cor:"var(--laranja)",
+    fases:[
+      {id:"m7f1",nome:"Preparar um Bolo",icon:"🎂",desc:"O Robô vai assar um bolo!",
+       dica:"Separe os ingredientes antes de misturar!",
+       blocos:[{id:"a",e:"📖",t:"Ler a receita"},{id:"b",e:"🛒",t:"Separar ingredientes"},{id:"c",e:"🧈",t:"Untar a forma"},{id:"d",e:"🥣",t:"Misturar a massa"},{id:"e",e:"⬇️",t:"Despejar na forma"},{id:"f",e:"🔥",t:"Levar ao forno"},{id:"g",e:"❄️",t:"Esfriar"},{id:"h",e:"🎂",t:"Decorar"}],
+       ordem:["a","b","c","d","e","f","g","h"]},
+      {id:"m7f2",nome:"Pizza Caseira",icon:"🍕",desc:"Fazer a melhor pizza!",
+       dica:"Prepare a massa antes do recheio!",
+       blocos:[{id:"a",e:"🌾",t:"Fazer a massa"},{id:"b",e:"⏳",t:"Deixar descansar"},{id:"c",e:"🍅",t:"Preparar o molho"},{id:"d",e:"🫓",t:"Abrir a massa"},{id:"e",e:"🍅",t:"Espalhar o molho"},{id:"f",e:"🧀",t:"Colocar queijo"},{id:"g",e:"🍖",t:"Colocar recheio"},{id:"h",e:"🔥",t:"Assar no forno"}],
+       ordem:["a","b","c","d","e","f","g","h"]},
+      {id:"m7f3",nome:"Sorvete Caseiro",icon:"🍦",desc:"Sorvete gelado e gostoso!",
+       dica:"Bata os ingredientes antes de congelar!",
+       blocos:[{id:"a",e:"🍌",t:"Escolher as frutas"},{id:"b",e:"🔪",t:"Cortar as frutas"},{id:"c",e:"🧊",t:"Congelar as frutas"},{id:"d",e:"🍶",t:"Adicionar leite"},{id:"e",e:"🔄",t:"Bater no liquidificador"},{id:"f",e:"🫙",t:"Colocar no pote"},{id:"g",e:"❄️",t:"Congelar por 4 horas"}],
+       ordem:["a","b","c","d","e","f","g"]},
+      {id:"m7f4",nome:"Churrasco em Família",icon:"🍖",desc:"Organizar o churrasco",
+       dica:"Marine a carne antes de assar!",
+       blocos:[{id:"a",e:"🛒",t:"Comprar a carne"},{id:"b",e:"🧂",t:"Temperar e marinar"},{id:"c",e:"⏳",t:"Aguardar 2 horas"},{id:"d",e:"🔥",t:"Acender a churrasqueira"},{id:"e",e:"🍖",t:"Colocar a carne"},{id:"f",e:"🍽️",t:"Servir para a família"},{id:"g",e:"😊",t:"Aproveitar juntos"}],
+       ordem:["a","b","c","d","e","f","g"]},
+    ]
+  },
+  // ── MUNDO 8: CIÊNCIA ──
+  {
+    id:"m8",nome:"Mundo 8 — Cientista Robô",ico:"🔬",dif:"dificil",tag:"Difícil",
+    cor:"var(--roxo)",
+    fases:[
+      {id:"m8f1",nome:"Método Científico",icon:"🧪",desc:"Como fazer um experimento",
+       dica:"Observe antes de criar a hipótese!",
+       blocos:[{id:"a",e:"👀",t:"Observar o problema"},{id:"b",e:"❓",t:"Fazer uma pergunta"},{id:"c",e:"💡",t:"Criar hipótese"},{id:"d",e:"🧪",t:"Realizar experimento"},{id:"e",e:"📊",t:"Analisar os dados"},{id:"f",e:"📝",t:"Tirar conclusão"},{id:"g",e:"📢",t:"Apresentar resultados"}],
+       ordem:["a","b","c","d","e","f","g"]},
+      {id:"m8f2",nome:"Vulcão de Bicarbonato",icon:"🌋",desc:"Experimento espetacular!",
+       dica:"Monte o vulcão antes de colocar os ingredientes!",
+       blocos:[{id:"a",e:"📋",t:"Ler as instruções"},{id:"b",e:"🗻",t:"Montar o vulcão"},{id:"c",e:"🧂",t:"Colocar bicarbonato"},{id:"d",e:"🍊",t:"Adicionar corante"},{id:"e",e:"🫙",t:"Despejar vinagre"},{id:"f",e:"🌋",t:"Observar a reação"},{id:"g",e:"📝",t:"Anotar o resultado"}],
+       ordem:["a","b","c","d","e","f","g"]},
+      {id:"m8f3",nome:"Telescópio Caseiro",icon:"🔭",desc:"Construir e observar estrelas",
+       dica:"Monte o telescópio antes de sair à noite!",
+       blocos:[{id:"a",e:"🔧",t:"Reunir os materiais"},{id:"b",e:"🔭",t:"Montar o telescópio"},{id:"c",e:"🌙",t:"Esperar anoitecer"},{id:"d",e:"⭐",t:"Apontar para o céu"},{id:"e",e:"🔍",t:"Ajustar o foco"},{id:"f",e:"👀",t:"Observar as estrelas"},{id:"g",e:"🗺️",t:"Identificar constelações"}],
+       ordem:["a","b","c","d","e","f","g"]},
+      {id:"m8f4",nome:"Robô de Papelão",icon:"🤖",desc:"Construir um robozinho!",
+       dica:"Planeje antes de cortar o papelão!",
+       blocos:[{id:"a",e:"✏️",t:"Desenhar o projeto"},{id:"b",e:"📦",t:"Pegar papelão"},{id:"c",e:"✂️",t:"Cortar as peças"},{id:"d",e:"🔧",t:"Montar o corpo"},{id:"e",e:"🎨",t:"Pintar e decorar"},{id:"f",e:"💡",t:"Colocar olhos de LED"},{id:"g",e:"🤖",t:"Apresentar o robô!"}],
+       ordem:["a","b","c","d","e","f","g"]},
+    ]
+  },
+  // ── MUNDO 9: SOCIAL ──
+  {
+    id:"m9",nome:"Mundo 9 — Vida Social",ico:"🤝",dif:"expert",tag:"Expert",
+    cor:"var(--rosa)",
+    fases:[
+      {id:"m9f1",nome:"Festa de Aniversário",icon:"🎉",desc:"Organizar uma festinha!",
+       dica:"Convide os amigos antes de comprar as coisas!",
+       blocos:[{id:"a",e:"📅",t:"Escolher a data"},{id:"b",e:"📋",t:"Fazer lista de convidados"},{id:"c",e:"✉️",t:"Enviar convites"},{id:"d",e:"🎂",t:"Encomendar o bolo"},{id:"e",e:"🎈",t:"Decorar o local"},{id:"f",e:"🎁",t:"Preparar lembranças"},{id:"g",e:"🎉",t:"Receber os amigos"},{id:"h",e:"🎊",t:"Comemorar junto!"}],
+       ordem:["a","b","c","d","e","f","g","h"]},
+      {id:"m9f2",nome:"Resolver um Conflito",icon:"💬",desc:"Fazer as pazes do jeito certo",
+       dica:"Respire antes de falar!",
+       blocos:[{id:"a",e:"😤",t:"Identificar o problema"},{id:"b",e:"🌬️",t:"Respirar fundo"},{id:"c",e:"🗣️",t:"Conversar com calma"},{id:"d",e:"👂",t:"Ouvir o outro lado"},{id:"e",e:"🤝",t:"Buscar uma solução"},{id:"f",e:"😊",t:"Fazer as pazes"}],
+       ordem:["a","b","c","d","e","f"]},
+      {id:"m9f3",nome:"Fazer Novos Amigos",icon:"🫂",desc:"Como o Robô faz amizades",
+       dica:"Sorria antes de falar!",
+       blocos:[{id:"a",e:"👀",t:"Notar alguém sozinho"},{id:"b",e:"😊",t:"Sorrir"},{id:"c",e:"👋",t:"Se apresentar"},{id:"d",e:"❓",t:"Fazer perguntas"},{id:"e",e:"🎮",t:"Propor brincar juntos"},{id:"f",e:"🤝",t:"Trocar contatos"}],
+       ordem:["a","b","c","d","e","f"]},
+      {id:"m9f4",nome:"Trabalho em Equipe",icon:"👥",desc:"Realizar um projeto em grupo",
+       dica:"Defina os papéis antes de começar!",
+       blocos:[{id:"a",e:"🎯",t:"Definir o objetivo"},{id:"b",e:"👥",t:"Dividir as tarefas"},{id:"c",e:"📅",t:"Combinar prazos"},{id:"d",e:"🤝",t:"Trabalhar juntos"},{id:"e",e:"💬",t:"Comunicar o progresso"},{id:"f",e:"🔍",t:"Revisar o trabalho"},{id:"g",e:"🎉",t:"Entregar e celebrar"}],
+       ordem:["a","b","c","d","e","f","g"]},
+    ]
+  },
+  // ── MUNDO 10: VIAGENS ──
+  {
+    id:"m10",nome:"Mundo 10 — Aventuras do Robô",ico:"✈️",dif:"expert",tag:"Expert",
+    cor:"var(--azul)",
+    fases:[
+      {id:"m10f1",nome:"Viagem de Férias",icon:"🏖️",desc:"Do planejamento à praia!",
+       dica:"Reserve o hotel antes de fazer as malas!",
+       blocos:[{id:"a",e:"🗺️",t:"Escolher o destino"},{id:"b",e:"🏨",t:"Reservar o hotel"},{id:"c",e:"🧳",t:"Fazer as malas"},{id:"d",e:"🚕",t:"Ir ao aeroporto"},{id:"e",e:"🎫",t:"Fazer check-in"},{id:"f",e:"✈️",t:"Embarcar"},{id:"g",e:"🏖️",t:"Chegar e curtir!"}],
+       ordem:["a","b","c","d","e","f","g"]},
+      {id:"m10f2",nome:"Acampar na Floresta",icon:"🏕️",desc:"Aventura no camping!",
+       dica:"Monte a barraca antes de escurecer!",
+       blocos:[{id:"a",e:"🗺️",t:"Planejar o acampamento"},{id:"b",e:"🎒",t:"Montar o kit"},{id:"c",e:"🏕️",t:"Encontrar o local"},{id:"d",e:"⛺",t:"Montar a barraca"},{id:"e",e:"🔥",t:"Fazer a fogueira"},{id:"f",e:"🍳",t:"Preparar a comida"},{id:"g",e:"⭐",t:"Observar as estrelas"}],
+       ordem:["a","b","c","d","e","f","g"]},
+      {id:"m10f3",nome:"Passeio ao Museu",icon:"🏛️",desc:"Aprender de forma divertida",
+       dica:"Pesquise o museu antes de visitar!",
+       blocos:[{id:"a",e:"🔍",t:"Pesquisar o museu"},{id:"b",e:"🎟️",t:"Comprar ingressos"},{id:"c",e:"🚌",t:"Ir de ônibus"},{id:"d",e:"🏛️",t:"Entrar no museu"},{id:"e",e:"👀",t:"Visitar as exposições"},{id:"f",e:"📷",t:"Tirar fotos permitidas"},{id:"g",e:"📝",t:"Anotar o que aprendeu"}],
+       ordem:["a","b","c","d","e","f","g"]},
+      {id:"m10f4",nome:"Viagem de Carro",icon:"🚗",desc:"Road trip em família!",
+       dica:"Verifique o carro antes de partir!",
+       blocos:[{id:"a",e:"🗺️",t:"Planejar a rota"},{id:"b",e:"🔧",t:"Checar o carro"},{id:"c",e:"⛽",t:"Abastecer"},{id:"d",e:"🧳",t:"Carregar as malas"},{id:"e",e:"🚦",t:"Sair com cuidado"},{id:"f",e:"🎵",t:"Colocar música"},{id:"g",e:"🍔",t:"Parar para comer"},{id:"h",e:"🏡",t:"Chegar ao destino"}],
+       ordem:["a","b","c","d","e","f","g","h"]},
+    ]
+  },
+  // ── MUNDO 11: TECNOLOGIA ──
+  {
+    id:"m11",nome:"Mundo 11 — Robô Programador",ico:"💻",dif:"mestre",tag:"Mestre",
+    cor:"var(--lilas)",
+    fases:[
+      {id:"m11f1",nome:"Ligar o Computador",icon:"💻",desc:"Sequência de boot do Robô",
+       dica:"Sem energia, nada acontece!",
+       blocos:[{id:"a",e:"🔌",t:"Plugar na tomada"},{id:"b",e:"⏻",t:"Apertar o Power"},{id:"c",e:"⚙️",t:"Sistema carregando"},{id:"d",e:"🔐",t:"Fazer login"},{id:"e",e:"🖥️",t:"Ver o desktop"},{id:"f",e:"🌐",t:"Abrir o navegador"}],
+       ordem:["a","b","c","d","e","f"]},
+      {id:"m11f2",nome:"Escrever um Programa",icon:"👨‍💻",desc:"Como o Robô cria código",
+       dica:"Entenda o problema antes de escrever código!",
+       blocos:[{id:"a",e:"🤔",t:"Entender o problema"},{id:"b",e:"📝",t:"Planejar a solução"},{id:"c",e:"⌨️",t:"Escrever o código"},{id:"d",e:"🧪",t:"Testar o programa"},{id:"e",e:"🐛",t:"Corrigir os bugs"},{id:"f",e:"🚀",t:"Publicar o programa"}],
+       ordem:["a","b","c","d","e","f"]},
+      {id:"m11f3",nome:"Criar um Site",icon:"🌐",desc:"Do rascunho ao ar!",
+       dica:"Planeje antes de escrever HTML!",
+       blocos:[{id:"a",e:"💡",t:"Ter a ideia"},{id:"b",e:"📐",t:"Fazer o wireframe"},{id:"c",e:"🏗️",t:"Escrever o HTML"},{id:"d",e:"🎨",t:"Estilizar com CSS"},{id:"e",e:"⚡",t:"Adicionar JavaScript"},{id:"f",e:"🧪",t:"Testar no navegador"},{id:"g",e:"🚀",t:"Publicar na internet"}],
+       ordem:["a","b","c","d","e","f","g"]},
+      {id:"m11f4",nome:"Backup dos Dados",icon:"💾",desc:"Proteger informações importantes",
+       dica:"Identifique os arquivos antes de fazer o backup!",
+       blocos:[{id:"a",e:"📂",t:"Identificar os arquivos"},{id:"b",e:"💾",t:"Escolher o armazenamento"},{id:"c",e:"📋",t:"Copiar os arquivos"},{id:"d",e:"✅",t:"Verificar a cópia"},{id:"e",e:"🔐",t:"Criptografar dados"},{id:"f",e:"📅",t:"Agendar próximo backup"}],
+       ordem:["a","b","c","d","e","f"]},
+    ]
+  },
+  // ── MUNDO 12: LENDÁRIO ──
+  {
+    id:"m12",nome:"Mundo 12 — Robô Lendário",ico:"👑",dif:"lendario",tag:"Lendário",
+    cor:"var(--ouro)",
+    fases:[
+      {id:"m12f1",nome:"Dia Épico do Robô",icon:"📅",desc:"Do nascer ao pôr do sol",
+       dica:"Pense em cada parte do dia!",
+       blocos:[{id:"a",e:"🌅",t:"Acordar ao amanhecer"},{id:"b",e:"🧘",t:"Meditação matinal"},{id:"c",e:"🥗",t:"Café da manhã saudável"},{id:"d",e:"🏫",t:"Ir à escola"},{id:"e",e:"🍱",t:"Almoçar"},{id:"f",e:"📚",t:"Estudar"},{id:"g",e:"⚽",t:"Praticar esporte"},{id:"h",e:"🍽️",t:"Jantar em família"},{id:"i",e:"📖",t:"Ler antes de dormir"},{id:"j",e:"😴",t:"Dormir bem"}],
+       ordem:["a","b","c","d","e","f","g","h","i","j"]},
+      {id:"m12f2",nome:"Projeto Espacial",icon:"🚀",desc:"Lançar um foguete de verdade!",
+       dica:"Calcule a trajetória antes do lançamento!",
+       blocos:[{id:"a",e:"🔭",t:"Estudar o espaço"},{id:"b",e:"📐",t:"Projetar o foguete"},{id:"c",e:"🔧",t:"Construir o foguete"},{id:"d",e:"⛽",t:"Abastecer"},{id:"e",e:"📡",t:"Configurar o computador"},{id:"f",e:"🧮",t:"Calcular trajetória"},{id:"g",e:"✅",t:"Fazer checklist"},{id:"h",e:"🚀",t:"Lançar!"},{id:"i",e:"📡",t:"Monitorar o voo"},{id:"j",e:"🏆",t:"Missão cumprida!"}],
+       ordem:["a","b","c","d","e","f","g","h","i","j"]},
+      {id:"m12f3",nome:"Olimpíadas do Robô",icon:"🏅",desc:"Competir nas olimpíadas!",
+       dica:"Treine muito antes de competir!",
+       blocos:[{id:"a",e:"🎯",t:"Escolher a modalidade"},{id:"b",e:"🏋️",t:"Treinar por meses"},{id:"c",e:"🥗",t:"Seguir a dieta"},{id:"d",e:"😴",t:"Descansar bem"},{id:"e",e:"🚌",t:"Viajar ao país sede"},{id:"f",e:"🏟️",t:"Ir ao estádio"},{id:"g",e:"🧘",t:"Concentrar-se"},{id:"h",e:"🏃",t:"Competir"},{id:"i",e:"🏅",t:"Receber medalha"},{id:"j",e:"🎉",t:"Celebrar com a família"}],
+       ordem:["a","b","c","d","e","f","g","h","i","j"]},
+      {id:"m12f4",nome:"Missão Impossível",icon:"🕵️",desc:"A maior aventura do Robô!",
+       dica:"Analise todas as informações antes de agir!",
+       blocos:[{id:"a",e:"📨",t:"Receber a missão"},{id:"b",e:"🗺️",t:"Estudar o mapa"},{id:"c",e:"🔍",t:"Fazer a vigilância"},{id:"d",e:"🎭",t:"Disfarçar-se"},{id:"e",e:"🔓",t:"Infiltrar o local"},{id:"f",e:"💾",t:"Obter as informações"},{id:"g",e:"🏃",t:"Fugir com os dados"},{id:"h",e:"📡",t:"Transmitir o relatório"},{id:"i",e:"🎖️",t:"Missão concluída!"}],
+       ordem:["a","b","c","d","e","f","g","h","i"]},
+    ]
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════
+//  ESTADO
+// ═══════════════════════════════════════════════════════════════
+let progresso   = JSON.parse(localStorage.getItem('roboV3prog') || '{}');
+let rankingData = JSON.parse(localStorage.getItem('roboV3rank') || '[]');
+let nomeJogador = localStorage.getItem('roboV3nome') || '';
+
+let faseAtual  = null;
+let mundoAtual = null;
+let ordemAtual = [];
+let tentativas = 0;
+let dicaUsada  = false;
+let timerSeg   = 0;
+let timerInt   = null;
+let dragSrcIdx = null;
+let touchGhost = null, touchSrcIdx = null, touchOffX = 0, touchOffY = 0;
+
+// ═══════════════════════════════════════════════════════════════
+//  PARTÍCULAS DE FUNDO
+// ═══════════════════════════════════════════════════════════════
+(function(){
+  const canvas = document.getElementById('particleCanvas');
+  const ctx    = canvas.getContext('2d');
+  let parts    = [];
+
+  function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+  resize();
+  window.addEventListener('resize',resize);
+
+  for(let i=0;i<60;i++){
+    parts.push({
+      x:Math.random()*window.innerWidth,
+      y:Math.random()*window.innerHeight,
+      r:Math.random()*2+0.5,
+      vx:(Math.random()-0.5)*0.3,
+      vy:(Math.random()-0.5)*0.3,
+      a:Math.random(),
+      da:(Math.random()-0.5)*0.005,
+    });
+  }
+
+  function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    parts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy; p.a+=p.da;
+      if(p.a<0)p.a=0,p.da*=-1;
+      if(p.a>1)p.a=1,p.da*=-1;
+      if(p.x<0)p.x=canvas.width; if(p.x>canvas.width)p.x=0;
+      if(p.y<0)p.y=canvas.height;if(p.y>canvas.height)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(255,255,255,${p.a*0.6})`;ctx.fill();
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+
+// ═══════════════════════════════════════════════════════════════
+//  ÁUDIO (Web Audio API)
+// ═══════════════════════════════════════════════════════════════
+const AC = window.AudioContext ? new AudioContext() : null;
+function beep(freq,dur,type='sine',vol=0.3){
+  if(!AC) return;
+  try{
+    const g=AC.createGain(); const o=AC.createOscillator();
+    o.type=type; o.frequency.value=freq;
+    g.gain.setValueAtTime(vol,AC.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,AC.currentTime+dur);
+    o.connect(g); g.connect(AC.destination);
+    o.start(AC.currentTime); o.stop(AC.currentTime+dur);
+  }catch(e){}
+}
+function somAcerto()  {[523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,0.15),i*80));}
+function somErro()    {beep(220,0.3,'sawtooth',0.2);}
+function somDrag()    {beep(440,0.05,'triangle',0.1);}
+function somCelebrar(){[784,988,1175,1568].forEach((f,i)=>setTimeout(()=>beep(f,0.2),i*100));}
+
+// ═══════════════════════════════════════════════════════════════
+//  UTILITÁRIOS
+// ═══════════════════════════════════════════════════════════════
+function salvarProg(){ localStorage.setItem('roboV3prog', JSON.stringify(progresso)); }
+function salvarRank(){ localStorage.setItem('roboV3rank', JSON.stringify(rankingData)); }
+
+// --- MODAIS CUSTOMIZADOS ---
+function showConfirm(title, msg, onConfirm) {
+  const overlay = document.getElementById('modalOverlay');
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalMsg').textContent = msg;
+  overlay.classList.add('ativo');
+
+  const btnSim = document.getElementById('btnModalSim');
+  const btnNao = document.getElementById('btnModalNao');
+
+  const close = () => { overlay.classList.remove('ativo'); };
+  
+  btnSim.onclick = () => { onConfirm(); close(); };
+  btnNao.onclick = () => { close(); };
+}
+
+function showToast(msg) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerHTML = `<span>✨</span> ${msg}`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function isBloqueado(mIdx, fIdx){
+  if(mIdx===0) return false;
+  const mAnt = ACERVO[mIdx-1];
+  return fIdx===0 ? !mAnt.fases.every(f=>progresso[f.id]?.concluida) : false;
+}
+function calcStars(){
+  if(tentativas===1&&!dicaUsada) return 3;
+  if(tentativas<=2&&!dicaUsada)  return 2;
+  return 1;
+}
+function calcPts(stars, secs, blocos){
+  const base = blocos * 100;
+  const bonus = stars===3?300:stars===2?150:0;
+  const tempo = Math.max(0, 500 - secs*5);
+  return base + bonus + tempo;
+}
+function fmtTempo(s){
+  return `${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+}
+function totalFases(){return ACERVO.reduce((s,m)=>s+m.fases.length,0);}
+function fasesConcluidasTotal(){return Object.values(progresso).filter(v=>v.concluida).length;}
+function totalEstrelas(){return Object.values(progresso).reduce((s,v)=>s+(v.stars||0),0);}
+
+// ═══════════════════════════════════════════════════════════════
+//  STATS BAR
+// ═══════════════════════════════════════════════════════════════
+function renderStats(){
+  const bar = document.getElementById('statsBar');
+  const conc = fasesConcluidasTotal();
+  const tot  = totalFases();
+  const est  = totalEstrelas();
+  const pts  = Object.values(progresso).reduce((s,v)=>s+(v.pts||0),0);
+  bar.innerHTML=`
+    <div class="stat-pill"><span class="sp-icon">🎮</span><span class="sp-val">${conc}/${tot}</span><span class="sp-lbl">Fases</span></div>
+    <div class="stat-pill"><span class="sp-icon">⭐</span><span class="sp-val">${est}</span><span class="sp-lbl">Estrelas</span></div>
+    <div class="stat-pill"><span class="sp-icon">🏆</span><span class="sp-val">${pts.toLocaleString('pt-BR')}</span><span class="sp-lbl">Pontos</span></div>
+    <div class="stat-pill"><span class="sp-icon">👤</span><span class="sp-val">${nomeJogador||'?'}</span><span class="sp-lbl">Jogador</span></div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  FILTRO
+// ═══════════════════════════════════════════════════════════════
+let filtroAtivo = 'todos';
+function filtrar(btn){
+  document.querySelectorAll('.filtro-btn').forEach(b=>b.classList.remove('ativo'));
+  btn.classList.add('ativo');
+  filtroAtivo = btn.dataset.filtro;
+  renderMenu(false);
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RENDER MENU
+// ═══════════════════════════════════════════════════════════════
+function renderMenu(full=true){
+  if(full){ renderStats(); }
+  const grid = document.getElementById('mundosGrid');
+  grid.innerHTML='';
+
+  ACERVO.forEach((mundo,mIdx)=>{
+    if(filtroAtivo!=='todos' && mundo.dif!==filtroAtivo) return;
+
+    const conc   = mundo.fases.filter(f=>progresso[f.id]?.concluida).length;
+    const pct    = Math.round((conc/mundo.fases.length)*100);
+    const bloq   = isBloqueado(mIdx,0);
+
+    const div = document.createElement('div');
+    div.className='mundo';
+    div.style.animationDelay=`${mIdx*0.07}s`;
+    div.style.borderTop=`4px solid ${mundo.cor}`;
+    if(bloq) div.style.opacity='0.45';
+
+    const fasesHTML = mundo.fases.map((f,fIdx)=>{
+      const fb   = isBloqueado(mIdx,fIdx) || (fIdx>0 && isBloqueado(mIdx,0));
+      const fc   = !!progresso[f.id]?.concluida;
+      const st   = progresso[f.id]?.stars||0;
+      const nov  = !fc && !fb && fIdx===0 && conc===0 && mIdx===0 ? '<span class="fase-novo">NOVO</span>':
+                   !fc && !fb && fIdx===conc ? '<span class="fase-novo">▶</span>':'';
+      const sStr = fc?'★'.repeat(st)+'☆'.repeat(3-st):'○○○';
+      return `<button class="fase-btn ${fb?'bloqueada':''} ${fc?'concluida':''}"
+        onclick="iniciarFase(${mIdx},'${f.id}')">
+        ${nov}
+        <span class="fase-emoji">${fb?'🔒':f.icon}</span>
+        <span class="fase-nome">${f.nome}</span>
+        <span class="fase-stars">${sStr}</span>
+        <span class="fase-num">Fase ${fIdx+1}</span>
+      </button>`;
+    }).join('');
+
+    div.innerHTML=`
+      <div class="mundo-header">
+        <div class="mundo-ico">${mundo.ico}</div>
+        <div class="mundo-info">
+          <h2>${mundo.nome}<span class="dif-tag tag-${mundo.dif}">${mundo.tag}</span></h2>
+          <p>${mundo.fases.length} fases • ${conc} concluídas</p>
+        </div>
+        <div class="mundo-prog">
+          <div class="mundo-prog-txt">${pct}%</div>
+          <div class="mundo-prog-bar">
+            <div class="mundo-prog-fill" style="width:${pct}%;background:${mundo.cor}"></div>
+          </div>
+        </div>
+      </div>
+      <div class="fases-row">${fasesHTML}</div>`;
+    grid.appendChild(div);
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  INICIAR FASE
+// ═══════════════════════════════════════════════════════════════
+function iniciarFase(mIdx, faseId){
+  mundoAtual = ACERVO[mIdx];
+  faseAtual  = mundoAtual.fases.find(f=>f.id===faseId);
+  if(!faseAtual) return;
+  tentativas=0; dicaUsada=false;
+
+  const fIdx = mundoAtual.fases.indexOf(faseAtual);
+  const pct  = ((fIdx+1)/mundoAtual.fases.length)*100;
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progLbl').textContent=`${fIdx+1}/${mundoAtual.fases.length}`;
+
+  document.getElementById('fiIcon').textContent = faseAtual.icon;
+  document.getElementById('fiNome').textContent = faseAtual.nome;
+  document.getElementById('fiDesc').textContent = faseAtual.desc;
+  document.getElementById('fiBadge').textContent= `${mundoAtual.ico} ${mundoAtual.nome}`;
+
+  document.getElementById('dicaBox').style.display='none';
+  document.getElementById('feedbackErro').style.display='none';
+
+  iniciarTimer();
+  embaralhar();
+  irView('jogo');
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  TIMER
+// ═══════════════════════════════════════════════════════════════
+function iniciarTimer(){
+  clearInterval(timerInt);
+  timerSeg=0;
+  atualizarTimer();
+  timerInt=setInterval(()=>{
+    timerSeg++;
+    atualizarTimer();
+  },1000);
+}
+function atualizarTimer(){
+  const el=document.getElementById('timerNum');
+  el.textContent=fmtTempo(timerSeg);
+  el.className='timer-num'+(timerSeg>60?' urgente':'');
+}
+function pararTimer(){ clearInterval(timerInt); }
+
+// ═══════════════════════════════════════════════════════════════
+//  RENDER BLOCOS
+// ═══════════════════════════════════════════════════════════════
+function renderBlocos(){
+  const zona=document.getElementById('zonadrop');
+  zona.innerHTML='';
+  ordemAtual.forEach((id,idx)=>{
+    const d=faseAtual.blocos.find(b=>b.id===id);
+    const el=document.createElement('div');
+    el.className=`bloco bc-${idx%16}`;
+    el.dataset.id=id; el.dataset.idx=idx; el.draggable=true;
+    el.innerHTML=`<div class="b-num">${idx+1}</div><span class="b-emoji">${d.e}</span><span class="b-texto">${d.t}</span><span class="b-drag">⠿</span>`;
+    el.addEventListener('dragstart',onDragStart);
+    el.addEventListener('dragover', onDragOver);
+    el.addEventListener('dragenter',onDragEnter);
+    el.addEventListener('dragleave',onDragLeave);
+    el.addEventListener('drop',     onDrop);
+    el.addEventListener('dragend',  onDragEnd);
+    el.addEventListener('touchstart',onTouchStart,{passive:true});
+    el.addEventListener('touchmove', onTouchMove, {passive:false});
+    el.addEventListener('touchend',  onTouchEnd);
+    zona.appendChild(el);
+  });
+  document.getElementById('feedbackErro').style.display='none';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  DRAG & DROP
+// ═══════════════════════════════════════════════════════════════
+function onDragStart(e){dragSrcIdx=+this.dataset.idx;this.classList.add('dragging');e.dataTransfer.effectAllowed='move';}
+function onDragOver(e){e.preventDefault();e.dataTransfer.dropEffect='move';}
+function onDragEnter(e){e.preventDefault();if(+this.dataset.idx!==dragSrcIdx)this.classList.add('drag-over');}
+function onDragLeave(){this.classList.remove('drag-over');}
+function onDrop(e){
+  e.preventDefault();
+  const dest=+this.dataset.idx;
+  if(dragSrcIdx!==null&&dragSrcIdx!==dest){trocar(dragSrcIdx,dest);somDrag();}
+  this.classList.remove('drag-over');
+}
+function onDragEnd(){this.classList.remove('dragging');dragSrcIdx=null;}
+
+// ─── TOUCH ───
+function onTouchStart(e){
+  const t=e.touches[0];touchSrcIdx=+this.dataset.idx;
+  const r=this.getBoundingClientRect();
+  touchOffX=t.clientX-r.left;touchOffY=t.clientY-r.top;
+  touchGhost=this.cloneNode(true);
+  touchGhost.style.cssText=`position:fixed;z-index:999;width:${r.width}px;pointer-events:none;opacity:0.85;left:${t.clientX-touchOffX}px;top:${t.clientY-touchOffY}px;margin:0;transform:scale(1.05);transition:none;`;
+  document.body.appendChild(touchGhost);
+  this.style.opacity='0.35';
+}
+function onTouchMove(e){
+  e.preventDefault();
+  const t=e.touches[0];
+  if(touchGhost){touchGhost.style.left=`${t.clientX-touchOffX}px`;touchGhost.style.top=`${t.clientY-touchOffY}px`;}
+  const under=document.elementFromPoint(t.clientX,t.clientY)?.closest('.bloco');
+  document.querySelectorAll('.bloco').forEach(b=>b.classList.remove('drag-over'));
+  if(under&&+under.dataset.idx!==touchSrcIdx)under.classList.add('drag-over');
+}
+function onTouchEnd(e){
+  if(touchGhost){touchGhost.remove();touchGhost=null;}
+  const t=e.changedTouches[0];
+  const under=document.elementFromPoint(t.clientX,t.clientY)?.closest('.bloco');
+  document.querySelectorAll('.bloco').forEach(b=>{b.classList.remove('drag-over');b.style.opacity='';});
+  if(under){const di=+under.dataset.idx;if(touchSrcIdx!==null&&touchSrcIdx!==di){trocar(touchSrcIdx,di);somDrag();}}
+  touchSrcIdx=null;
+}
+
+function trocar(a,b){
+  [ordemAtual[a],ordemAtual[b]]=[ordemAtual[b],ordemAtual[a]];
+  renderBlocos();
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  LÓGICA DE JOGO
+// ═══════════════════════════════════════════════════════════════
+function embaralhar(){
+  let arr=[...faseAtual.ordem];
+  for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
+  if(arr.every((v,i)=>v===faseAtual.ordem[i]))[arr[0],arr[1]]=[arr[1],arr[0]];
+  ordemAtual=arr;
+  renderBlocos();
+}
+
+function verificar(){
+  tentativas++;
+  const ok=ordemAtual.every((id,i)=>id===faseAtual.ordem[i]);
+  if(ok){
+    pararTimer();
+    somAcerto();
+    const stars=calcStars();
+    const pts=calcPts(stars,timerSeg,faseAtual.blocos.length);
+    const melhor=progresso[faseAtual.id];
+    if(!melhor?.concluida||stars>(melhor.stars||0)){
+      progresso[faseAtual.id]={concluida:true,stars,pts,tempo:timerSeg};
+      salvarProg();
+      atualizarRanking(pts);
+    }
+    mostrarCelebracao(stars,pts);
+  } else {
+    somErro();
+    const fb=document.getElementById('feedbackErro');
+    fb.style.display='block';
+    fb.style.animation='none';void fb.offsetWidth;
+    fb.style.animation='shakeAnim 0.4s ease';
+  }
+}
+
+function mostrarDica(){
+  dicaUsada=true;
+  const db=document.getElementById('dicaBox');
+  db.textContent=`💡 ${faseAtual.dica}`;
+  db.style.display='block';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  RANKING
+// ═══════════════════════════════════════════════════════════════
+function atualizarRanking(ptsNovos){
+  if(!nomeJogador) return;
+  const idx=rankingData.findIndex(r=>r.nome===nomeJogador);
+  const totalPts=Object.values(progresso).reduce((s,v)=>s+(v.pts||0),0);
+  const totalEst=totalEstrelas();
+  const entry={nome:nomeJogador,pts:totalPts,estrelas:totalEst,fases:fasesConcluidasTotal(),data:new Date().toLocaleDateString('pt-BR')};
+  if(idx>=0)rankingData[idx]=entry; else rankingData.push(entry);
+  rankingData.sort((a,b)=>b.pts-a.pts);
+  if(rankingData.length>20)rankingData=rankingData.slice(0,20);
+  salvarRank();
+}
+
+function irRanking(){
+  renderRanking();
+  irView('ranking');
+}
+
+function renderRanking(){
+  const lista=document.getElementById('rankingLista');
+  if(!rankingData.length){
+    lista.innerHTML='<div class="ranking-vazio"><span>🏆</span>Nenhuma pontuação ainda!<br>Complete fases para aparecer aqui.</div>';
+    return;
+  }
+  const medals=['🥇','🥈','🥉'];
+  lista.innerHTML=rankingData.map((r,i)=>{
+    const cls=i===0?'top1':i===1?'top2':i===2?'top3':'';
+    return`<div class="rank-item ${cls}" style="animation-delay:${i*0.06}s">
+      <div class="rank-pos">${i+1}º</div>
+      <div class="rank-medal">${medals[i]||'🎖️'}</div>
+      <div class="rank-info">
+        <div class="rank-nome">${r.nome}</div>
+        <div class="rank-detalhe">⭐${r.estrelas} estrelas • 🎮${r.fases} fases • ${r.data}</div>
+      </div>
+      <div class="rank-pts">${r.pts.toLocaleString('pt-BR')}</div>
+    </div>`;
+  }).join('');
+}
+
+function limparRanking(){
+  if(confirm('Limpar o ranking?')){ rankingData=[]; salvarRank(); renderRanking(); }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  CELEBRAÇÃO
+// ═══════════════════════════════════════════════════════════════
+const MSGS=[
+  "O Robozinho ficou muito feliz! 🤖💙",
+  "Você é incrível! Continue assim! ⭐",
+  "Missão cumprida com sucesso! 🚀",
+  "Que sequência perfeita! 🎯",
+  "O Robô aprendeu tudo com você! 🧠✨",
+  "Você é um gênio da ordenação! 🏆",
+  "Incrível! O Robô está orgulhoso! 🤖❤️",
+];
+
+function mostrarCelebracao(stars,pts){
+  somCelebrar();
+  const emojis=['🥉','🥈','🏆'];
+  document.getElementById('celEmoji').textContent  = emojis[stars-1];
+  document.getElementById('celTitulo').textContent = stars===3?'Perfeito! 3 Estrelas! 🌟':stars===2?'Muito bem! 2 Estrelas!':'Conseguiu! 1 Estrela!';
+  document.getElementById('celMsg').textContent    = MSGS[Math.floor(Math.random()*MSGS.length)];
+  document.getElementById('celStars').textContent  = '★'.repeat(stars)+'☆'.repeat(3-stars);
+  document.getElementById('celTempo').textContent  = `⏱️ Tempo: ${fmtTempo(timerSeg)}`;
+  document.getElementById('celPts').textContent    = `+${pts.toLocaleString('pt-BR')} pontos!`;
+
+  const mIdx=ACERVO.indexOf(mundoAtual);
+  const fIdx=mundoAtual.fases.indexOf(faseAtual);
+  const temProx=fIdx<mundoAtual.fases.length-1||(mIdx<ACERVO.length-1&&!isBloqueado(mIdx+1,0));
+  document.getElementById('btnProxima').style.display=temProx?'':'none';
+
+  gerarConfetes();
+  gerarSparkles();
+  document.getElementById('overlay').classList.add('ativo');
+}
+
+function gerarConfetes(){
+  const modal=document.getElementById('modalCel');
+  modal.querySelectorAll('.confete').forEach(c=>c.remove());
+  const cores=['#8B7FFF','#FF6BAE','#FFE14D','#4EFACC','#4FC8FF','#FF9A3C','#FF6B6B','#52E5A0'];
+  for(let i=0;i<80;i++){
+    const c=document.createElement('div');c.className='confete';
+    c.style.cssText=`left:${Math.random()*100}%;top:-20px;background:${cores[Math.floor(Math.random()*cores.length)]};animation-duration:${1.5+Math.random()*2.5}s;animation-delay:${Math.random()*1.5}s;width:${5+Math.random()*9}px;height:${9+Math.random()*9}px;transform:rotate(${Math.random()*360}deg);border-radius:${Math.random()>0.5?'50%':'3px'};`;
+    modal.appendChild(c);
+    setTimeout(()=>c.remove(),5000);
+  }
+}
+
+function gerarSparkles(){
+  const fw=document.getElementById('celFirework');
+  fw.innerHTML='';
+  for(let i=0;i<24;i++){
+    const s=document.createElement('div');s.className='sparkle';
+    const ang=Math.random()*360;
+    const dist=60+Math.random()*80;
+    const tx=Math.cos(ang*Math.PI/180)*dist+'px';
+    const ty=Math.sin(ang*Math.PI/180)*dist+'px';
+    s.style.cssText=`--tx:${tx};--ty:${ty};left:${40+Math.random()*20}%;top:${20+Math.random()*20}%;width:${4+Math.random()*6}px;height:${4+Math.random()*6}px;border-radius:50%;background:${['#FFE14D','#4EFACC','#FF6BAE','#8B7FFF'][Math.floor(Math.random()*4)]};animation-duration:${0.6+Math.random()*0.4}s;animation-delay:${Math.random()*0.5}s;`;
+    fw.appendChild(s);
+    setTimeout(()=>s.remove(),1500);
+  }
+}
+
+function proximaFase(){
+  document.getElementById('overlay').classList.remove('ativo');
+  const mIdx=ACERVO.indexOf(mundoAtual);
+  const fIdx=mundoAtual.fases.indexOf(faseAtual);
+  if(fIdx<mundoAtual.fases.length-1){
+    iniciarFase(mIdx,mundoAtual.fases[fIdx+1].id);
+  } else if(mIdx<ACERVO.length-1){
+    iniciarFase(mIdx+1,ACERVO[mIdx+1].fases[0].id);
+  } else {
+    irMenu();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  NOME DO JOGADOR
+// ═══════════════════════════════════════════════════════════════
+function pedirNome(){
+  if(!nomeJogador){
+    document.getElementById('overlayNome').classList.add('ativo');
+    setTimeout(()=>document.getElementById('inputNome').focus(),300);
+  }
+}
+function salvarNome(){
+  const val=document.getElementById('inputNome').value.trim();
+  if(!val) return;
+  nomeJogador=val;
+  localStorage.setItem('roboV3nome',nomeJogador);
+  document.getElementById('overlayNome').classList.remove('ativo');
+  renderStats();
+}
+document.getElementById('inputNome').addEventListener('keydown',e=>{ if(e.key==='Enter')salvarNome(); });
+
+// ═══════════════════════════════════════════════════════════════
+//  BRINCABYTES SSO — AUTO-LOGIN
+// ═══════════════════════════════════════════════════════════════
+window.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'BRINCABYTES_LOGIN') {
+    const user = event.data.user;
+    if (user && user.nome) {
+      console.log('BrincaBytes Login Detectado:', user.nome);
+      nomeJogador = user.nome;
+      localStorage.setItem('roboV3nome', nomeJogador);
+      document.getElementById('overlayNome').classList.remove('ativo');
+      renderStats();
+      
+      // Feedback visual opcional
+      if(typeof showToast === 'function') {
+        showToast(`Bem-vindo, ${user.nome}!`);
+      }
+    }
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+//  NAVEGAÇÃO
+// ═══════════════════════════════════════════════════════════════
+function irView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('ativa'));
+  document.getElementById(id).classList.add('ativa');
+  window.scrollTo(0,0);
+}
+function irMenu(){
+  pararTimer();
+  document.getElementById('overlay').classList.remove('ativo');
+  renderMenu();
+  irView('menu');
+}
+
+document.getElementById('overlay').addEventListener('click',function(e){if(e.target===this)this.classList.remove('ativo');});
+
+// ═══════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════
+renderMenu();
+pedirNome();
+</script>
+</body>
+</html>
