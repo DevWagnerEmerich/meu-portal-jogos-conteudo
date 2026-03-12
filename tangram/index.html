@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>TANGRAM - OOP PixiJS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script type="module" crossorigin src="/assets/index-Cvb2BsXJ.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DCgOeI62.css">
+  </head>
+  <body>
+    <!-- Background Orbs (CSS) -->
+    <div id="ambient">
+      <div class="orb orb-a"></div>
+      <div class="orb orb-b"></div>
+      <div class="orb orb-c"></div>
+    </div>
+    
+    <!-- Start Screen Overlay -->
+    <div id="start-screen" style="position:fixed;inset:0;z-index:500;background:var(--bg);display:flex;flex-direction:column;align-items:center;padding:60px 20px;overflow-y:auto;transition:opacity 0.5s; opacity:1;">
+      
+      <!-- Title Area -->
+      <div style="text-align:center;margin-bottom:40px;animation:fade-down 0.8s ease-out;">
+        <div class="solved-gem" style="margin:0 auto 10px;animation:none;transform:scale(1);">✦</div>
+        <h1 style="font-family:'Syne',sans-serif;font-size:3.5rem;font-weight:800;background:linear-gradient(135deg,var(--c1) 0%,var(--c3) 50%,var(--c2) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:0.1em;text-transform:uppercase;">Tangram</h1>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:1rem;color:var(--muted);margin-top:10px;">Bem-vindo, <span id="ss-player-name" style="color:var(--text);font-weight:600;">Visitante</span></p>
+      </div>
+
+      <!-- Categories Container -->
+      <div id="ss-categories" style="width:100%;max-width:800px;display:flex;flex-direction:column;gap:36px;animation:fade-up 1s ease-out;">
+        <!-- Populated dynamically by UI.ts -->
+      </div>
+      
+    </div>
+
+    <!-- Countdown Overlay -->
+    <div id="countdown-overlay" style="position:fixed;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;background:rgba(10,13,20,.6);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity 0.3s;">
+       <div id="cd-number" style="font-family:'Syne',sans-serif;font-weight:800;font-size:8rem;background:linear-gradient(135deg,var(--c1),var(--c4));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 40px rgba(126,184,255,0.4);transform:scale(0.5);opacity:0;transition:all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);">3</div>
+    </div>
+
+    <!-- UI Overlay container -->
+    <div id="app">
+      <header id="header">
+        <div class="wordmark">TANGRAM OOP</div>
+        <div class="h-divider"></div>
+        <div class="challenge-label" id="pill">MODO LIVRE</div>
+        <div id="game-timer" style="margin-left:20px; font-family:'JetBrains Mono',monospace; font-size:1.1rem; font-weight:600; color:var(--text); letter-spacing:0.05em; display:flex; align-items:center; opacity:0; transition:opacity 0.3s;">00:00</div>
+        <div class="h-spacer"></div>
+        <button class="hbtn" id="btn-home" style="margin-right:10px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          Início
+        </button>
+        <button class="hbtn" id="btn-create" style="color: #FFB98A; border-color: rgba(255,185,138,0.3);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+          Salvar Fase
+        </button>
+        <button class="hbtn" id="btn-export" style="color: #5EE2B8; border-color: rgba(94,226,184,0.3);" title="Exportar formas personalizadas como JSON">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Exportar
+        </button>
+        <label class="hbtn" id="btn-import-label" style="color: #C9A0FF; border-color: rgba(201,160,255,0.3); cursor:pointer;" title="Importar um arquivo JSON de formas">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          Importar
+          <input type="file" id="btn-import" accept=".json" style="display:none;">
+        </label>
+        <button class="hbtn" id="btn-hint">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M9 18h6M10 22h4M12 2a7 7 0 0 1 4 12.9V17H8v-2.1A7 7 0 0 1 12 2z"/>
+          </svg>
+          Dica
+        </button>
+        <button class="hbtn glow" id="btn-reset">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+            <path d="M3 3v5h5"/>
+          </svg>
+          Reiniciar
+        </button>
+      </header>
+
+      <aside id="sidebar">
+        <div class="sb-label">DESAFIOS</div>
+        <div class="ch-list" id="ch-list"></div>
+      </aside>
+
+      <div id="board-area">
+        <!-- PixiJS Canvas injects here natively -->
+        <canvas id="gameCanvas"></canvas>
+        
+        <!-- Accuracy Meter -->
+        <div id="accuracy-wrap">
+          <div class="acc-label"><span>Precisão</span><span id="acc-val">0%</span></div>
+          <div class="acc-bar"><div class="acc-fill" id="acc-fill"></div></div>
+        </div>
+        
+        <!-- Leaderboard -->
+        <div id="leaderboard" style="position:absolute; top:24px; right:24px; width:220px; background:rgba(18,21,31,0.7); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:1px solid var(--rim2); border-radius:12px; padding:12px 16px; opacity:0; pointer-events:none; transition:opacity 0.3s; z-index:40;">
+          <div style="font-size:0.65rem; font-weight:700; color:var(--muted); letter-spacing:0.1em; margin-bottom:10px; text-transform:uppercase; display:flex; align-items:center; gap:6px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--c4)" stroke-width="2.5"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Melhores Tempos
+          </div>
+          <div id="lb-records" style="display:flex; flex-direction:column; gap:6px;">
+             <!-- Records injected here -->
+          </div>
+        </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Solved Screen -->
+    <div id="solved">
+      <div class="solved-box">
+        <div class="solved-gem">✦</div>
+        <div class="solved-h">Magistral!</div>
+        <div class="solved-p" id="solved-info">Desafio concluído</div>
+        <div class="solved-btns">
+          <button class="hbtn" id="btn-retry">↻ Novamente</button>
+          <button class="hbtn glow" id="btn-next">Próximo →</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Leaderboard Name Modal -->
+    <div id="name-modal" style="position:fixed;inset:0;z-index:250;display:flex;align-items:center;justify-content:center;background:rgba(8,10,16,.8);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .4s;">
+      <div class="solved-box" style="transform:scale(.9) translateY(20px); transition:transform .5s cubic-bezier(.34,1.56,.64,1); text-align:center; min-width: 300px;">
+        <div class="solved-h" style="font-size:1.6rem; margin-bottom:10px; background:linear-gradient(135deg,var(--c4) 0%,var(--c1) 100%); -webkit-background-clip:text; background-clip:text; color:transparent;">Novo Recorde!</div>
+        <p style="font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--text);margin-bottom:20px;">Você fez um dos melhores tempos. Digite seu nome:</p>
+        
+        <input type="text" id="nm-input" placeholder="Seu Nome" autocomplete="off" style="width:100%; padding:14px; margin-bottom:24px; background:rgba(255,255,255,0.05); border:1px solid var(--rim2); border-radius:10px; color:white; font-family:'Syne',sans-serif; font-size:1.1rem; text-align:center; outline:none; transition:border 0.2s;" onfocus="this.style.borderColor='var(--c4)'" onblur="this.style.borderColor='var(--rim2)'" maxlength="15">
+        
+        <button class="hbtn glow" id="btn-nm-save" style="margin:0 auto; padding:12px 30px; border-color:var(--c4); color:var(--c4);">Salvar Tempo ✔</button>
+      </div>
+    </div>
+
+    <!-- Creator Modal -->
+    <div id="creator-modal" style="position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(8,10,16,.9);backdrop-filter:blur(24px);opacity:0;pointer-events:none;transition:opacity .4s;">
+      <div class="solved-box" style="transform:scale(.9) translateY(20px); transition:transform .5s cubic-bezier(.34,1.56,.64,1); text-align:left; min-width: 320px;">
+        <div class="solved-h" style="font-size:1.8rem; margin-bottom:20px; text-align:center; background:linear-gradient(135deg,var(--c2) 0%,var(--c5) 100%); -webkit-background-clip:text; background-clip:text; color:transparent;">Salvar Nova Fase</div>
+        
+        <div id="cm-step1">
+          <label style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);letter-spacing:.08em; display:block; margin-bottom:10px;">NOME DA FORMA:</label>
+          <input type="text" id="cm-name" placeholder="Ex: Gato Sentado" autocomplete="off" style="width:100%; padding:14px; margin-bottom:24px; background:rgba(255,255,255,0.05); border:1px solid var(--rim2); border-radius:10px; color:white; font-family:'Syne',sans-serif; font-size:1rem; outline:none; transition:border 0.2s;" onfocus="this.style.borderColor='var(--c2)'" onblur="this.style.borderColor='var(--rim2)'">
+          <div class="solved-btns" style="justify-content:space-between;">
+            <button class="hbtn" id="btn-cm-cancel">Cancelar</button>
+            <button class="hbtn glow" id="btn-cm-save" style="border-color:var(--c2); color:var(--c2);">Gerar Código</button>
+          </div>
+        </div>
+
+        <div id="cm-step2" style="display:none; text-align:center;">
+          <div class="solved-gem" style="color:var(--c2); text-shadow:none; margin-bottom:10px; font-size:3rem; animation:none;">✔</div>
+          <p style="font-family:'Syne',sans-serif;font-size:1rem;color:var(--text);margin-bottom:12px;">Forma lida com sucesso!</p>
+          <p style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);margin-bottom:24px;">O código foi copiado. Cole (CTRL+V) no chat para eu adicionar a fase no jogo.</p>
+          <button class="hbtn glow" id="btn-cm-close" style="margin:0 auto; padding:10px 30px;">Pronto</button>
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>
