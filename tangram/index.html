@@ -6,7 +6,28 @@
     <title>TANGRAM - OOP PixiJS</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script type="module" crossorigin src="/tangram/assets/index-qrLbF6tk.js"></script>
+    <script>
+      // Early listener for BrincaBytes login to avoid race conditions with module loading
+      window.__bbUser = null;
+      window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'BRINCABYTES_LOGIN') {
+          console.log('[Tangram] Early BrincaBytes Login Detectado:', event.data.user?.nome);
+          window.__bbUser = event.data.user;
+          try {
+            if (event.data.user && event.data.user.nome) {
+              localStorage.setItem('tangram_last_name', event.data.user.nome);
+            }
+          } catch(e) {}
+          
+          // Update UI if it's already rendered
+          var labelName = document.getElementById('ss-player-name');
+          if (labelName && window.__bbUser && window.__bbUser.nome) {
+            labelName.textContent = window.__bbUser.nome;
+          }
+        }
+      });
+    </script>
+    <script type="module" crossorigin src="/tangram/assets/index-M46f5-sG.js"></script>
     <link rel="stylesheet" crossorigin href="/tangram/assets/index-DCgOeI62.css">
   </head>
   <body>
