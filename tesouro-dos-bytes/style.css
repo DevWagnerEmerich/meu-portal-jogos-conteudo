@@ -1150,7 +1150,7 @@ select.ed-input {
   justify-content: center;
 }
 
-#robo-wrapper svg {
+#robo-svg {
   width: 110px;
   max-height: 140px;
   animation: flutuar 3s ease-in-out infinite;
@@ -2400,12 +2400,13 @@ select.ed-input {
 
   #pet-arena,
   #robo-svg {
-    position: static;
-    margin: 0;
-    width: 6.5rem;
-    height: 6.5rem;
-    max-width: 6.5rem;
-    max-height: 6.5rem;
+    position: static !important;
+    margin: 0 !important;
+    width: 6.5rem !important;
+    height: 6.5rem !important;
+    max-width: 6.5rem !important;
+    max-height: 6.5rem !important;
+    flex-shrink: 0 !important;
   }
 
   #balao {
