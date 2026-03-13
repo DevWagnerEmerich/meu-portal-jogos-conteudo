@@ -7,18 +7,22 @@
   <title>🎮 Tesouro dos Bytes</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@700;900&display=swap"
     rel="stylesheet" />
-  <link rel="stylesheet" href="/tesouro-dos-bytes/style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="em-inicio">
 
   <header id="cab">
-    <div id="titulo-jogo">🎮 TESOURO<br>DOS BYTES</div>
+    <div style="display:flex; align-items:center;">
+      <div id="titulo-jogo" style="margin-right: 1.5rem;">🎮 TESOURO<br>DOS BYTES</div>
+      <button id="btn-home" class="vis" onclick="if(confirm('Tem certeza que deseja voltar? Seu progresso nesta rodada será perdido.')) voltarInicio()" title="Início">
+        <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+    </div>
     <div id="nome-jogador-cab"
       style="font-family:var(--px);font-size:0.55rem;color:var(--cyan);padding:0.4rem 0.9rem;background:#080818;border:0.2rem solid var(--cyan);border-radius:0.8rem;display:none">
       🎮 <span id="txt-nome-jogador"></span></div>
     <div id="placar-wrap">
-      <button id="btn-home" onclick="voltarInicio()">🏠 INÍCIO</button>
       <button id="btn-loja-cab" onclick="abrirLoja()">🛒 LOJA</button>
       <div class="pi vidas"><span id="val-vidas">❤️❤️❤️</span></div>
       <div class="pi ouro"><span class="coin-spin-off">💰</span><span id="val-moedas">0 BM</span></div>
@@ -85,9 +89,7 @@
         <h1>TESOURO<br>DOS BYTES</h1>
         <p>Responda, colecione e divirta-se!</p>
         <div class="hero-stats">
-          <div class="hstat"><span class="sv" id="stat-moedas">0</span><span class="sl">💰 MOEDAS</span></div>
           <div class="hstat"><span class="sv" id="stat-trilhas">0</span><span class="sl">✅ FEITAS</span></div>
-          <div class="hstat"><span class="sv" id="stat-pet">🤖</span><span class="sl">🎙️ APRESENTADOR</span></div>
         </div>
       </div>
     </div>
@@ -140,7 +142,6 @@
       <div id="pet-arena">🐱</div>
       <div id="balao"><span id="balao-txt"></span><span id="balao-cur" class="cursor off"></span></div>
     </div>
-    <div id="trilha-badge"></div>
     <div id="nivel-badge"><span class="nivel-nome" id="nivel-nome-txt"></span></div>
     <div id="painel-quiz">
       <div id="barra-wrap"><span id="barra-label">PROGRESSO</span>
@@ -208,7 +209,7 @@
         <div id="ov-tbar">
           <div class="dot dr"></div>
           <div class="dot dg"></div>
-          <div class="dot db"></div><span id="ov-ttitle">BYTE-BOT // AO VIVO</span>
+          <div class="dot db"></div><span id="ov-ttitle">TUTOR // AO VIVO</span>
         </div>
         <div id="ov-badge"></div>
         <div id="ov-moedas"></div>
@@ -308,8 +309,8 @@
 
   <div id="toast" class="toast"></div>
 
-  <script src="/tesouro-dos-bytes/data.js"></script>
-  <script src="/tesouro-dos-bytes/game.js"></script>
+  <script src="data.js"></script>
+  <script src="game.js"></script>
 </body>
 
 </html>

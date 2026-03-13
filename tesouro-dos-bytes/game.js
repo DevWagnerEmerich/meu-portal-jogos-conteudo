@@ -12,7 +12,7 @@ function getMoedas() { return parseInt(localStorage.getItem('bytes_moedas') || '
 function setMoedas(v) { localStorage.setItem('bytes_moedas', v); }
 function getProgresso(id) { return JSON.parse(localStorage.getItem('bytes_prog_' + id) || '{}'); }
 function setProgresso(id, pct, ac) { const a = getProgresso(id); localStorage.setItem('bytes_prog_' + id, JSON.stringify({ pct: Math.max(pct, a.pct || 0), acertos: Math.max(ac, a.acertos || 0), jogadas: (a.jogadas || 0) + 1 })); }
-function getCustomTrilhas() { return JSON.parse(localStorage.getItem('bytes_custom') || '[]'); }
+function getCustomTrilhas() { try { return JSON.parse(localStorage.getItem('bytes_custom') || '[]'); } catch(e) { console.error('Storage corrompido:', e); return []; } }
 function setCustomTrilhas(arr) { localStorage.setItem('bytes_custom', JSON.stringify(arr)); }
 function getItensComprados() { return JSON.parse(localStorage.getItem('bytes_inventario') || '[]'); }
 function setItensComprados(arr) { localStorage.setItem('bytes_inventario', JSON.stringify(arr)); }
@@ -22,7 +22,12 @@ function getPoderesAtivos() { return JSON.parse(localStorage.getItem('bytes_pode
 function getNomeJogador() { return localStorage.getItem('bytes_nome') || ''; }
 function setNomeJogador(n) { localStorage.setItem('bytes_nome', n); }
 function isFirstVisit() { return !localStorage.getItem('bytes_nome'); }
-function getAllTrilhas() { return [...TRILHAS_FIXAS, ...getCustomTrilhas()]; }
+function getAllTrilhas() { 
+  const custom = getCustomTrilhas();
+  const arrCustom = Array.isArray(custom) ? custom : [];
+  const fixas = typeof TRILHAS_FIXAS !== 'undefined' ? TRILHAS_FIXAS : [];
+  return [...fixas, ...arrCustom]; 
+}
 
 /* ════ PERSONALIDADES DOS APRESENTADORES ════ */
 const PET_PERSONALIDADE = {
@@ -128,17 +133,27 @@ function mostrarSec(sec) { $('sec-trilhas').style.display = sec === 'trilhas' ? 
    TELA INICIAL
 ════════════════════════════════════════ */
 function mostrarTelaInicio() {
+  document.body.classList.add('em-inicio');
+  document.body.classList.remove('em-jogo', 'em-fim');
   showTela('tela-inicio');
   $('tela-fim').style.display = 'none';
   $('overlay').classList.remove('ativo');
   $('btn-home').classList.remove('vis');
   $('btn-loja-cab').classList.remove('vis');
+  
+  const cabBadge = $('cab-trilha-badge');
+  if (cabBadge) cabBadge.style.display = 'none';
+
   moedas = getMoedas(); atualizarMoedas(); atualizarPets();
-  $('stat-moedas').textContent = moedas;
+  const sm = $('stat-moedas'); if (sm) sm.textContent = moedas;
   const todas = getAllTrilhas();
   $('stat-trilhas').textContent = todas.filter(t => getProgresso(t.id).pct === 100).length;
   const wrap = $('trilhas-wrap'); wrap.innerHTML = '';
-  todas.forEach(t => wrap.appendChild(criarCardTrilha(t)));
+  todas.forEach(t => { 
+    try { 
+      if (t && t.id) wrap.appendChild(criarCardTrilha(t));
+    } catch(e) { console.error('Erro trilha:', t, e); }
+  });
   const nova = document.createElement('div'); nova.className = 'card-nova';
   nova.innerHTML = '<span>➕</span><span>CRIAR TRILHA</span>';
   nova.onclick = () => abrirEditor();
@@ -262,12 +277,12 @@ async function iniciarTrilha(id) {
   if (!meta) { toast('Trilha não encontrada!', true); return; }
   if (BANCO[id]) {
     // Embaralha o pool e seleciona 20 perguntas aleatórias — garante variedade em cada repetição
-    const pool = [...BANCO[id].perguntas];
+    const pool = [...BANCO[id].perguntas].filter(Boolean); // .filter(Boolean) remove undefined/null
     embaralharArr(pool);
     PERGUNTAS = pool.slice(0, 20);
-    NIVEIS = BANCO[id].niveis;
+    NIVEIS = BANCO[id].niveis || [];
   }
-  else { PERGUNTAS = meta.perguntas || []; NIVEIS = meta.niveis || []; }
+  else { PERGUNTAS = (meta.perguntas || []).filter(Boolean); NIVEIS = meta.niveis || []; }
   if (!PERGUNTAS.length) { toast('Esta trilha não tem perguntas ainda!', true); return; }
 
   // Poder: vidas extra
@@ -277,21 +292,19 @@ async function iniciarTrilha(id) {
   moedas = getMoedas();
   atualizarMoedas(); atualizarVidas(); atualizarPets();
 
-  showTela('arena');
-  $('tela-fim').style.display = 'none';
-  $('overlay').classList.remove('ativo');
-  $('nivel-badge').style.display = 'none';
-  $('area-resposta').innerHTML = '';
-  $('btn-home').classList.add('vis');
-  $('btn-loja-cab').classList.add('vis');
+  document.body.classList.add('em-jogo');
+  document.body.classList.remove('em-inicio', 'em-fim');
 
-  const tb = $('trilha-badge');
-  tb.style.display = 'block';
-  tb.style.background = `linear-gradient(135deg,${meta.cor}22,${meta.cor}11)`;
-  tb.style.border = `2px solid ${meta.cor}`;
-  tb.style.color = meta.cor;
-  tb.style.boxShadow = `0 0 16px ${meta.cor}44,4px 4px 0 #000`;
-  tb.textContent = meta.emoji + '  TRILHA: ' + meta.nome;
+  $('btn-home').classList.add('vis');
+  showTela('arena');
+
+  const cabBadge = $('cab-trilha-badge');
+  if (cabBadge) {
+    cabBadge.style.display = 'flex';
+    cabBadge.style.borderColor = meta.cor;
+    cabBadge.style.color = meta.cor;
+    cabBadge.textContent = meta.emoji + ' ' + meta.nome.toUpperCase();
+  }
 
   animarRobo('rf');
   await maq($('balao-txt'), $('balao-cur'), getPetFala('saudacao', meta.nome, PERGUNTAS.length), R.bal);
@@ -300,8 +313,10 @@ async function iniciarTrilha(id) {
   await carregarPergunta();
 }
 
-function reiniciarTrilha() { if (trilhaAtual) iniciarTrilha(trilhaAtual); }
-function voltarInicio() { mostrarTelaInicio(); }
+function voltarInicio() {
+  document.body.classList.remove('em-jogo', 'em-fim');
+  mostrarTelaInicio();
+}
 
 /* ════════════════════════════════════════
    JOGO
@@ -309,7 +324,9 @@ function voltarInicio() { mostrarTelaInicio(); }
 async function carregarPergunta() {
   if (idx >= PERGUNTAS.length) { mostrarFim(); return; }
   bloqueado = true;
-  const p = PERGUNTAS[idx]; const total = PERGUNTAS.length;
+  const p = PERGUNTAS[idx];
+  if (!p) { idx++; await carregarPergunta(); return; } // pula elementos inválidos
+  const total = PERGUNTAS.length;
   const nivel = NIVEIS.find(n => n.inicio === idx);
   if (nivel) {
     $('nivel-badge').style.display = 'block';
@@ -536,10 +553,11 @@ async function fecharOverlay() {
 }
 
 function mostrarFim() {
+  document.body.classList.remove('em-jogo', 'em-inicio');
+  document.body.classList.add('em-fim');
   showTela('tela-fim');
   $('tela-fim').style.display = 'block';
   $('btn-home').classList.remove('vis');
-  $('btn-loja-cab').classList.remove('vis');
   atualizarPets();
   const pct = Math.round((acertos / PERGUNTAS.length) * 100);
   const todas = getAllTrilhas();
@@ -651,6 +669,8 @@ function renderizarCamposTipo(tipo, dados = null) {
     div.appendChild(r); c.appendChild(div);
   }
   else if (tipo === 'completar') {
+    const resposta = $('fp-resposta')?.value.trim() || '';
+    if (!resposta) { toast('⚠️ Informe a resposta!', true); return null; }
     const div = document.createElement('div');
     div.innerHTML = `<div class="ed-campo" style="margin-bottom:8px"><span class="ed-label">Resposta correta</span><input id="fp-resposta" class="ed-input" type="text" value="${dados?.resposta || ''}"/></div><div class="ed-campo" style="margin-bottom:8px"><span class="ed-label">Dica (opcional)</span><input id="fp-dica" class="ed-input" type="text" value="${dados?.dica || ''}"/></div>`;
     const r = document.createElement('div'); r.className = 'ed-row'; r.innerHTML = `<div class="ed-campo"><span class="ed-label">Reação acerto</span><input id="fp-rac" class="ed-input" type="text" value="${dados?.reacao_acerto || ''}"/></div><div class="ed-campo"><span class="ed-label">Reação erro</span><input id="fp-rer" class="ed-input" type="text" value="${dados?.reacao_erro || ''}"/></div>`;
@@ -756,6 +776,7 @@ function abrirBoasVindas() {
     if (pet.id === 'robo') { btn.style.borderColor = 'var(--purple)'; btn.style.background = 'rgba(192,132,252,.15)'; }
     grid.appendChild(btn);
   });
+  document.body.classList.add('em-inicio');
   const bv = $('modal-bv');
   bv.style.display = 'flex';
   setTimeout(() => $('bv-nome').focus(), 200);
@@ -776,6 +797,9 @@ function confirmarBoasVindas() {
   atualizarNomeHeader();
   $('modal-bv').style.display = 'none';
   atualizarPets();
+  document.body.classList.remove('em-jogo', 'em-fim');
+  document.body.classList.add('em-inicio');
+  
   mostrarTelaInicio();
 }
 
