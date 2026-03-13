@@ -2402,6 +2402,10 @@ select.ed-input {
   #robo-svg {
     position: static;
     margin: 0;
+    width: 6.5rem;
+    height: 6.5rem;
+    max-width: 6.5rem;
+    max-height: 6.5rem;
   }
 
   #balao {
