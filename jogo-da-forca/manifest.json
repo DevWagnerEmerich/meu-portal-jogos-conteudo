@@ -1,0 +1,36 @@
+{
+  "name": "Forca Mágica 🌟",
+  "short_name": "Forca Mágica",
+  "description": "Jogo da Forca divertido para crianças dos anos iniciais!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFF5F9",
+  "theme_color": "#FF6B9D",
+  "orientation": "portrait-primary",
+  "categories": ["education", "games", "kids"],
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Jogar Animais",
+      "short_name": "Animais",
+      "description": "Jogar com palavras de animais",
+      "url": "/?cat=animais",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
