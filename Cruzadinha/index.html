@@ -1868,31 +1868,59 @@
     let portalUser = null;
     // Prioridade total para o Portal. O Mock só ativa se estivermos offline/local ou se a API falhar.
     const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    const PORTAL_URL = 'https://brincabytes.vercel.app';
 
     async function checkPortalUser() {
-      try {
-        const response = await fetch('/api/user-status');
-        if (!response.ok) throw new Error("API Indisponível");
-        
-        const data = await response.json();
-        if (data && data.loggedIn) {
-          portalUser = data;
-          console.log("Portal BrincaBytes Detectado: ", portalUser.username);
+      // 1. TENTA PEGAR VIA URL (Muitos portais passam dados via QueryParams)
+      const urlParams = new URLSearchParams(window.location.search);
+      const userParam = urlParams.get('username') || urlParams.get('user');
+      if (userParam) {
+          portalUser = { username: userParam, loggedIn: true };
+          console.log("Integração via URL: ", userParam);
           updateUserUI();
           loadSavedActivities();
           return;
-        }
-      } catch (err) {
-        console.warn("Aviso: Não foi possível conectar ao Portal. Usando modo local.");
       }
 
-      // FALLBACK: Só entra aqui se não estiver no Portal (no Vercel solto ou Localhost)
-      if (isLocal || location.hostname.includes('vercel.app')) {
-          portalUser = { username: 'Professor Local (Modo Simulado)', loggedIn: true, isMock: true };
-          updateUserUI();
-          loadSavedActivities();
+      // 2. TENTA CHAMAR A API ABSOLUTA DO PORTAL
+      try {
+        const response = await fetch(`${PORTAL_URL}/api/user-status`, { credentials: 'include' });
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.loggedIn) {
+            portalUser = data;
+            console.log("Portal BrincaBytes Detectado (API Absoluta): ", portalUser.username);
+            updateUserUI();
+            loadSavedActivities();
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn("Aviso: Falha na API absoluta (CORS?). Tentando outros métodos...");
       }
+
+      // 3. TENTA PEDIR DADOS PARA O PORTAL PAI (Iframe Handshake)
+      window.parent.postMessage({ type: 'BRINCABYTES_GET_USER' }, '*');
+
+      // FALLBACK FINAL: Modo Simulado (Espera 2s para ver se o pai responde)
+      setTimeout(() => {
+          if (!portalUser && (isLocal || location.hostname.includes('vercel.app'))) {
+              portalUser = { username: 'Professor Local (Modo Simulado)', loggedIn: true, isMock: true };
+              updateUserUI();
+              loadSavedActivities();
+          }
+      }, 1500);
     }
+
+    // Ouvindo resposta do Portal Pai
+    window.addEventListener('message', (event) => {
+        if (event.data && event.data.type === 'BRINCABYTES_USER_DATA') {
+            portalUser = event.data.user;
+            console.log("Integração via Mensagem: ", portalUser.username);
+            updateUserUI();
+            loadSavedActivities();
+        }
+    });
 
     function updateUserUI() {
       const info = document.getElementById('user-info');
@@ -1905,12 +1933,12 @@
     }
 
     async function saveGameData(key, value) {
-      // Se estamos no Portal Real, salva na nuvem
       if (portalUser && !portalUser.isMock) {
         try {
-          const res = await fetch('/api/game-data', {
+          const res = await fetch(`${PORTAL_URL}/api/game-data`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
             body: JSON.stringify({ gameId: GAME_ID, key, value })
           });
           if (res.ok) return;
@@ -1919,16 +1947,14 @@
         }
       }
       
-      // Fallback para storage local (apenas se o portal falhar ou estiver em mock)
       console.log("Salvando localmente (sem sincronização cloud)");
       localStorage.setItem(`${GAME_ID}_${key}`, JSON.stringify(value));
     }
 
     async function loadGameData(key) {
-      // Tenta carregar do Portal primeiro
       if (portalUser && !portalUser.isMock) {
         try {
-          const res = await fetch(`/api/game-data/${GAME_ID}/${key}`);
+          const res = await fetch(`${PORTAL_URL}/api/game-data/${GAME_ID}/${key}`, { credentials: 'include' });
           if (res.ok) {
             const data = await res.json();
             if (data && data.value) return data.value;
@@ -1938,7 +1964,6 @@
         }
       }
 
-      // Fallback Local
       const local = localStorage.getItem(`${GAME_ID}_${key}`);
       return local ? JSON.parse(local) : null;
     }
