@@ -1533,44 +1533,71 @@
 
   <!-- ══════════ SETUP ══════════ -->
   <div id="setup" class="screen">
-    <div
-      style="flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;background:radial-gradient(ellipse 60% 40% at 50% 0%,#0d2a3a,transparent);">
-      <div class="setup-wrap">
-        <button class="btn-back" onclick="goTo('landing')">← Voltar</button>
-        <div class="setup-hdr">
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;background:radial-gradient(ellipse 60% 40% at 50% 0%,#0d2a3a,transparent);">
+      <div class="setup-wrap" style="max-width:900px; width:100%;">
+        
+        <div id="user-info" style="display:none; text-align:center; padding:0.5rem; background:rgba(45,212,191,0.1); border-radius:1rem; border:1px solid rgba(45,212,191,0.2); font-size:0.85rem; color:var(--teal2); margin-bottom:1rem;"></div>
+        
+        <div class="setup-hdr" style="margin-bottom:1.5rem;">
           <h2>⚙️ Configurar Cruzadinha</h2>
-          <p>Preencha os dados e cole o JSON com a grade e pistas</p>
+          <p>Crie uma nova atividade ou use sua biblioteca</p>
         </div>
-        <div class="setup-panel">
-          <div>
-            <label class="f-label">Disciplina</label>
-            <input id="s-disc" class="f-input" placeholder="Ex: Ciências, História, Matemática, Português…">
-          </div>
-          <div>
-            <label class="f-label">Tema da Cruzadinha</label>
-            <input id="s-tema" class="f-input" placeholder="Ex: Sistema Solar, Revolução Francesa, Frações…">
-          </div>
-          <div>
-            <label class="f-label">Equipes (opcional)</label>
-            <input id="s-equipes" class="f-input" placeholder="Ex: Equipe A, Equipe B"
-              title="Divida os nomes por vírgula">
-          </div>
+        <div style="display:flex; justify-content:center; gap:0.75rem; margin-bottom:1.5rem;">
+          <button class="btn-proj" onclick="abrirBiblioteca()" style="background:var(--card); color:var(--teal); border:1.5px solid var(--teal); max-width:300px; padding:0.6rem 1.2rem;">📚 Abrir Minha Biblioteca</button>
+        </div>
 
-          <!-- IMPORTAR ARQUIVO DE PLANILHA -->
-          <div id="import-upload" style="display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem;">
-            <label class="f-label">Importar arquivo do Computador</label>
-            <div class="upload-box" id="drop-zone" onclick="document.getElementById('s-file').click()">
-              <input type="file" id="s-file" accept=".xlsx,.xls,.csv" style="display:none"
-                onchange="handleFileUpload(event)">
-              <div class="upload-box-icon">📁</div>
-              <div class="upload-box-text" id="upload-txt">Clique para escolher ou arraste seu arquivo .xlsx aqui</div>
+        <div style="display:grid; grid-template-columns: 1fr 1.2fr; gap:1.5rem; width:100%;">
+          
+          <!-- COLUNA ESQUERDA: IMPORTAÇÃO -->
+          <div style="background:var(--card); border:1.5px solid var(--border); border-radius:1.5rem; padding:1.5rem; display:flex; flex-direction:column; gap:1.2rem;">
+            <h3 style="font-size:0.95rem; color:var(--teal); margin:0; display:flex; align-items:center; gap:0.5rem;">📁 <span>Importar Atividade</span></h3>
+            
+            <div class="drop-zone" id="drop-zone" onclick="document.getElementById('s-file').click()" style="flex:1; margin:0; min-height:180px; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+              <input type="file" id="s-file" accept=".xlsx" hidden onchange="handleFileUpload(event)">
+              <div class="drop-icon" style="font-size:2.5rem; margin-bottom:0.8rem;">📂</div>
+              <div id="upload-txt" style="text-align:center;">
+                <span style="font-size:0.85rem; font-weight:700; color:var(--text);">Clique ou arraste seu .xlsx</span>
+                <p style="font-size:0.75rem; color:var(--muted2); margin-top:0.3rem;">Planilha de palavras e dicas</p>
+              </div>
             </div>
 
-            <button class="btn-template" onclick="baixarModeloExcel()">📥 Baixar Planilha Modelo</button>
+            <div style="text-align:center;">
+              <button onclick="baixarModeloExcel()" style="background:none; border:none; color:var(--amber); font-size:0.8rem; cursor:pointer; opacity:0.9; text-decoration:none;">📥 Baixar Planilha Modelo</button>
+            </div>
           </div>
 
-          <div id="s-err" class="err-box"></div>
-          <button class="btn-primary" id="btn-gerar" onclick="processarFormulario()">✅ Iniciar Cruzadinha</button>
+          <!-- COLUNA DIREITA: CONFIGURAÇÕES -->
+          <div style="background:var(--card); border:1.5px solid var(--border); border-radius:1.5rem; padding:1.5rem; display:flex; flex-direction:column; gap:1rem;">
+            <h3 style="font-size:0.95rem; color:var(--teal); margin:0; display:flex; align-items:center; gap:0.5rem;">📝 <span>Configurações</span></h3>
+
+            <div>
+              <label class="f-label">Nome da Atividade</label>
+              <input id="s-nome" class="f-input" placeholder="Ex: Prova de Ciências 7º Ano" style="padding:0.65rem 0.9rem;">
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.8rem;">
+              <div>
+                <label class="f-label">Disciplina</label>
+                <input id="s-disc" class="f-input" placeholder="Ex: Biologia" style="padding:0.65rem 0.9rem;">
+              </div>
+              <div>
+                <label class="f-label">Tema</label>
+                <input id="s-tema" class="f-input" placeholder="Ex: Células" style="padding:0.65rem 0.9rem;">
+              </div>
+            </div>
+
+            <div>
+              <label class="f-label">Equipes (Opcional)</label>
+              <input id="s-equipes" class="f-input" placeholder="Equipe A, Equipe B..." style="padding:0.65rem 0.9rem;">
+            </div>
+          </div>
+
+        </div>
+
+        <div id="s-err" class="err-box" style="margin-top:1rem;"></div>
+
+        <div style="text-align:center; margin-top:1.5rem;">
+          <button id="btn-gerar" class="btn-primary" onclick="processarFormulario()" style="max-width:350px; padding:1.1rem; font-size:1.1rem; border-radius:1.2rem;">🚀 Iniciar Cruzadinha</button>
         </div>
       </div>
     </div>
@@ -1722,6 +1749,80 @@
     </div>
   </div>
 
+  <!-- ══════════ BIBLIOTECA MODAL ══════════ -->
+  <div class="modal-bg" id="biblioteca-modal">
+    <div class="modal-box" style="max-width:960px; width:95vw; height:85vh; display:flex; flex-direction:column; padding: 1.5rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between; margin-bottom:1rem;">
+        <div class="modal-title" style="font-size:1.3rem;">📚 Minha Biblioteca</div>
+        <button class="modal-close" onclick="closeModal('biblioteca-modal')">✕</button>
+      </div>
+      
+      <div style="display:flex; gap:0.75rem; margin-bottom:1rem;">
+        <div style="flex:1; position:relative;">
+            <input type="text" id="lib-search" class="f-input" placeholder="Buscar..." oninput="filtrarBiblioteca()" style="padding-left:2.3rem;">
+            <span style="position:absolute; left:0.8rem; top:52%; transform:translateY(-50%); color:var(--muted); font-size: 0.9rem;">🔍</span>
+        </div>
+        <select id="lib-filter-disc" class="f-input" style="width:180px;" onchange="filtrarBiblioteca()">
+            <option value="">Todas Disciplinas</option>
+        </select>
+      </div>
+
+      <div id="lib-cards-container" style="flex:1; overflow-y:auto; display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:0.75rem; padding-right:0.5rem; align-items: start; align-content: start;">
+        <!-- Cards compactos aqui -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ EDITOR MODAL ══════════ -->
+  <div class="modal-bg" id="editor-modal">
+    <div class="modal-box" style="max-width:800px; width:95vw; height:90vh; display:flex; flex-direction:column; padding: 1.5rem;">
+      <div style="display:flex;align-items:center;justify-content:space-between; margin-bottom:1.2rem;">
+        <div class="modal-title" style="font-size:1.2rem;">✏️ Editar Atividade</div>
+        <button class="modal-close" onclick="closeModal('editor-modal')">✕</button>
+      </div>
+      
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
+        <div style="grid-column: 1 / -1;">
+            <label class="f-label">Nome da Atividade</label>
+            <input id="ed-nome" class="f-input">
+        </div>
+        <div>
+            <label class="f-label">Disciplina</label>
+            <input id="ed-disc" class="f-input">
+        </div>
+        <div>
+            <label class="f-label">Tema</label>
+            <input id="ed-tema" class="f-input">
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+        <label class="f-label" style="margin:0;">Palavras e Dicas</label>
+        <button onclick="adicionarPalavraEditor()" style="background:none; border:none; color:var(--teal); font-weight:700; cursor:pointer; font-size:0.75rem;">+ ADICIONAR PALAVRA</button>
+      </div>
+
+      <div id="ed-list-container" style="flex:1; overflow-y:auto; background:var(--surf); border:1.5px solid var(--border); border-radius:0.75rem; padding:0.5rem; display:flex; flex-direction:column; gap:0.5rem;">
+        <!-- Lista de palavras no editor -->
+      </div>
+
+      <div style="margin-top:1.2rem; display:flex; gap:0.75rem;">
+        <button class="btn-primary" onclick="salvarEdicao()" style="flex:1;">✅ Salvar Alterações</button>
+        <button class="btn-gabarito" onclick="closeModal('editor-modal')" style="flex:0.4;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ CONFIRMAÇÃO DIALOG ══════════ -->
+  <div class="modal-bg" id="confirm-modal">
+    <div class="modal-box" style="max-width:400px; text-align:center; padding:2rem;">
+      <div id="confirm-msg" style="font-size:1.1rem; color:var(--text); margin-bottom:1.5rem; line-height:1.4;">Deseja realmente excluir?</div>
+      <div style="display:flex; gap:1rem;">
+        <button id="confirm-btn-yes" class="btn-primary" style="flex:1; background:var(--red);">Excluir</button>
+        <button onclick="closeModal('confirm-modal')" class="btn-gabarito" style="flex:1;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ══════════ MODAL PROMPT ══════════ -->
   <div id="modal-prompt" class="modal-bg"
     onclick="if(event.target===this) document.getElementById('modal-prompt').classList.remove('open')">
@@ -1761,6 +1862,88 @@
     let projWin = null;
 
     // ═══════════════════════════════════════════════════
+    // INTEGRAÇÃO BRINCABYTES
+    // ═══════════════════════════════════════════════════
+    const GAME_ID = 'cruzadinha-educativa';
+    let portalUser = null;
+    // Prioridade total para o Portal. O Mock só ativa se estivermos offline/local ou se a API falhar.
+    const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+
+    async function checkPortalUser() {
+      try {
+        const response = await fetch('/api/user-status');
+        if (!response.ok) throw new Error("API Indisponível");
+        
+        const data = await response.json();
+        if (data && data.loggedIn) {
+          portalUser = data;
+          console.log("Portal BrincaBytes Detectado: ", portalUser.username);
+          updateUserUI();
+          loadSavedActivities();
+          return;
+        }
+      } catch (err) {
+        console.warn("Aviso: Não foi possível conectar ao Portal. Usando modo local.");
+      }
+
+      // FALLBACK: Só entra aqui se não estiver no Portal (no Vercel solto ou Localhost)
+      if (isLocal || location.hostname.includes('vercel.app')) {
+          portalUser = { username: 'Professor Local (Modo Simulado)', loggedIn: true, isMock: true };
+          updateUserUI();
+          loadSavedActivities();
+      }
+    }
+
+    function updateUserUI() {
+      const info = document.getElementById('user-info');
+      if (info && portalUser) {
+        const isActuallyMock = portalUser.isMock || isLocal;
+        const tag = isActuallyMock ? '<span style="background:var(--amber); color:#000; padding:2px 6px; border-radius:4px; font-size:10px; margin-left:8px;">MODO SIMULADO (NÃO SINCRONIZA)</span>' : '<span style="background:var(--teal); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; margin-left:8px;">CONECTADO AO PORTAL</span>';
+        info.innerHTML = `Olá, <b>${portalUser.username}</b>! ${tag}`;
+        info.style.display = 'block';
+      }
+    }
+
+    async function saveGameData(key, value) {
+      // Se estamos no Portal Real, salva na nuvem
+      if (portalUser && !portalUser.isMock) {
+        try {
+          const res = await fetch('/api/game-data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ gameId: GAME_ID, key, value })
+          });
+          if (res.ok) return;
+        } catch (err) {
+          console.error("Erro ao salvar no Portal:", err);
+        }
+      }
+      
+      // Fallback para storage local (apenas se o portal falhar ou estiver em mock)
+      console.log("Salvando localmente (sem sincronização cloud)");
+      localStorage.setItem(`${GAME_ID}_${key}`, JSON.stringify(value));
+    }
+
+    async function loadGameData(key) {
+      // Tenta carregar do Portal primeiro
+      if (portalUser && !portalUser.isMock) {
+        try {
+          const res = await fetch(`/api/game-data/${GAME_ID}/${key}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.value) return data.value;
+          }
+        } catch (err) {
+          console.error("Erro ao carregar do Portal:", err);
+        }
+      }
+
+      // Fallback Local
+      const local = localStorage.getItem(`${GAME_ID}_${key}`);
+      return local ? JSON.parse(local) : null;
+    }
+
+    // ═══════════════════════════════════════════════════
     // STATE
     // ═══════════════════════════════════════════════════
     let G = {
@@ -1775,13 +1958,205 @@
       uploadData: null
     };
 
-    // ═══════════════════════════════════════════════════
-    // MODO DE IMPORTAÇÃO (TABS) E UPLOAD
-    // ═══════════════════════════════════════════════════
+    async function loadSavedActivities() {
+      if (!portalUser) return;
 
-    // Tabs removidas - Modo único "Arquivo"
+      const activities = await loadGameData('saved_activities') || [];
+      renderBiblioteca(activities);
+      updateFiltrosDisciplina(activities);
+    }
 
-    function handleFileUpload(e) {
+    function updateFiltrosDisciplina(activities) {
+        const select = document.getElementById('lib-filter-disc');
+        if (!select) return;
+        const discs = [...new Set(activities.map(a => a.disc).filter(d => d))];
+        const current = select.value;
+        select.innerHTML = '<option value="">Todas Disciplinas</option>' + discs.map(d => `<option value="${d}" ${d===current?'selected':''}>${d}</option>`).join('');
+    }
+
+    function renderBiblioteca(filteredActivities) {
+      const container = document.getElementById('lib-cards-container');
+      if (!container) return;
+
+      if (filteredActivities.length === 0) {
+        container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:3rem; color:var(--muted2);">Nenhuma atividade encontrada ou salva.</div>';
+        return;
+      }
+
+      container.innerHTML = filteredActivities.map((act, i) => `
+        <div class="mode-card" style="padding:0.75rem; align-items:flex-start; text-align:left; gap:0.25rem; background:var(--card); border:1.5px solid var(--border); height:auto; min-height:0; align-self:start; border-radius:1rem;">
+          <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:0.55rem; background:rgba(45,212,191,0.08); color:var(--teal); padding:1px 6px; border-radius:1rem; border:1px solid rgba(45,212,191,0.15); text-transform:uppercase; letter-spacing:0.02em;">${act.disc}</span>
+            <div style="display:flex; gap:0.3rem;">
+                <button onclick="abrirEditor('${act.nome}', ${act.timestamp})" style="background:none; border:none; color:var(--muted2); opacity:0.8; cursor:pointer; font-size:0.85rem; padding:0.1rem;" title="Editar">✏️</button>
+                <button onclick="deletarAtividadeObj('${act.nome}', ${act.timestamp})" style="background:none; border:none; color:var(--red); opacity:0.6; cursor:pointer; font-size:0.85rem; padding:0.1rem;" title="Deletar">✕</button>
+            </div>
+          </div>
+          <h4 style="font-family:'Syne',sans-serif; font-size:0.85rem; color:var(--text); line-height:1.2; margin-top:0.1rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; width:100%;" title="${act.nome || act.tema}">${act.nome || act.tema}</h4>
+          <p style="font-size:0.65rem; color:var(--muted2); line-height:1.2; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; margin-bottom:0.1rem; min-height:1.2em;">${act.tema}</p>
+          
+          <div style="width:100%; display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:0.5rem; margin-top:0.15rem;">
+            <span style="font-size:0.58rem; color:var(--muted);">${act.data.length} p.</span>
+            <button class="btn-proj" onclick="iniciarAtividadeObj(decodeURIComponent('${encodeURIComponent(JSON.stringify(act))}'))" style="width:auto; padding:0.3rem 0.6rem; font-size:0.65rem; background:linear-gradient(90deg, var(--teal), var(--teal2)); box-shadow:none;">JOGAR</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    let edCurrentActivity = null;
+
+    window.abrirEditor = async function(nome, timestamp) {
+        const activities = await loadGameData('saved_activities') || [];
+        const act = activities.find(a => a.timestamp === timestamp);
+        if (!act) return;
+
+        edCurrentActivity = { ...act };
+        
+        document.getElementById('ed-nome').value = act.nome || act.tema;
+        document.getElementById('ed-disc').value = act.disc || '';
+        document.getElementById('ed-tema').value = act.tema || '';
+        
+        renderPalavrasEditor();
+        document.getElementById('editor-modal').classList.add('open');
+    };
+
+    function renderPalavrasEditor() {
+        const container = document.getElementById('ed-list-container');
+        container.innerHTML = edCurrentActivity.data.map((p, i) => `
+            <div style="display:flex; gap:0.5rem; align-items:center; background:var(--card); padding:0.6rem; border-radius:0.6rem; border:1px solid var(--border);">
+                <input type="text" value="${p.palavra}" class="f-input" style="width:120px; font-weight:700; color:var(--teal);" onchange="edCurrentActivity.data[${i}].palavra = this.value.toUpperCase()">
+                <input type="text" value="${p.texto}" class="f-input" style="flex:1;" onchange="edCurrentActivity.data[${i}].texto = this.value">
+                <select class="f-input" style="width:80px;" onchange="edCurrentActivity.data[${i}].diff = parseInt(this.value)">
+                    <option value="1" ${p.diff==1?'selected':''}>Fácil</option>
+                    <option value="2" ${p.diff==2?'selected':''}>Médio</option>
+                    <option value="3" ${p.diff==3?'selected':''}>Difícil</option>
+                </select>
+                <button onclick="removerPalavraEditor(${i})" style="color:var(--red); background:none; border:none; cursor:pointer; font-weight:700; padding:0.4rem;">✕</button>
+            </div>
+        `).join('');
+    }
+
+    window.adicionarPalavraEditor = function() {
+        edCurrentActivity.data.push({ palavra: 'NOVA', texto: 'Dica aqui...', diff: 1 });
+        renderPalavrasEditor();
+        // Scroll to bottom
+        const container = document.getElementById('ed-list-container');
+        setTimeout(() => container.scrollTop = container.scrollHeight, 50);
+    };
+
+    window.removerPalavraEditor = function(idx) {
+        if (edCurrentActivity.data.length <= 2) { 
+            // Mostra apenas uma mensagem se for impossível remover
+            alert("A cruzadinha precisa de pelo menos 2 palavras."); 
+            return; 
+        }
+        confirmarAcao("Remover esta palavra da lista?", () => {
+            edCurrentActivity.data.splice(idx, 1);
+            renderPalavrasEditor();
+        });
+    };
+
+    window.salvarEdicao = async function() {
+        const nome = document.getElementById('ed-nome').value.trim();
+        const disc = document.getElementById('ed-disc').value.trim();
+        const tema = document.getElementById('ed-tema').value.trim();
+        
+        if (!nome || !disc || !tema) { alert("Preencha todos os campos."); return; }
+
+        let saved = await loadGameData('saved_activities') || [];
+        const idx = saved.findIndex(s => s.timestamp === edCurrentActivity.timestamp);
+        
+        if (idx !== -1) {
+            saved[idx] = {
+                ...edCurrentActivity,
+                nome,
+                disc,
+                tema,
+                timestamp: Date.now() // Atualiza timestamp para subir no topo
+            };
+            await saveGameData('saved_activities', saved);
+            closeModal('editor-modal');
+            loadSavedActivities();
+        }
+    };
+
+    window.filtrarBiblioteca = async function() {
+        const search = document.getElementById('lib-search').value.toLowerCase().trim();
+        const discFilter = document.getElementById('lib-filter-disc').value;
+        const activities = await loadGameData('saved_activities') || [];
+        
+        const filtered = activities.filter(act => {
+            const matchSearch = (act.nome + act.tema + act.disc).toLowerCase().includes(search);
+            const matchDisc = discFilter === "" || act.disc === discFilter;
+            return matchSearch && matchDisc;
+        });
+
+        renderBiblioteca(filtered);
+    }
+
+    window.abrirBiblioteca = () => {
+        document.getElementById('biblioteca-modal').classList.add('open');
+        filtrarBiblioteca(); // Refresh
+    };
+
+    window.confirmarAcao = function(msg, onConfirm) {
+        document.getElementById('confirm-msg').innerText = msg;
+        const btn = document.getElementById('confirm-btn-yes');
+        btn.onclick = () => {
+            onConfirm();
+            closeModal('confirm-modal');
+        };
+        document.getElementById('confirm-modal').classList.add('open');
+    }
+
+    window.deletarAtividadeObj = function(nome, timestamp) {
+      confirmarAcao(`Deseja realmente excluir a atividade "${nome}"?`, async () => {
+        let saved = await loadGameData('saved_activities') || [];
+        saved = saved.filter(s => s.timestamp !== timestamp);
+        await saveGameData('saved_activities', saved);
+        loadSavedActivities();
+      });
+    };
+
+    window.iniciarAtividadeObj = function(actStr) {
+      const act = JSON.parse(actStr);
+      closeModal('biblioteca-modal');
+      
+      document.getElementById('s-nome').value = act.nome || '';
+      document.getElementById('s-disc').value = act.disc;
+      document.getElementById('s-tema').value = act.tema;
+      G.uploadData = act.data;
+      
+      const btn = document.getElementById('btn-gerar');
+      btn.innerHTML = "⚡ Carregando Biblioteca...";
+      setTimeout(() => {
+        processarFormulario(true);
+        btn.innerHTML = "✅ Iniciar Cruzadinha";
+      }, 300);
+    };
+
+    window.iniciarAtividadeSalvaOriginal = async function(idx) {
+      const activities = await loadGameData('saved_activities') || [];
+      const act = activities[idx];
+      if (!act) return;
+      iniciarAtividadeObj(JSON.stringify(act));
+    };
+
+    window.deletarAtividade = function(idx) {
+      confirmarAcao("Deseja realmente excluir esta atividade salva?", async () => {
+        let saved = await loadGameData('saved_activities') || [];
+        saved.splice(idx, 1);
+        await saveGameData('saved_activities', saved);
+        loadSavedActivities();
+      });
+    };
+
+    window.iniciarAtividadeSalva = async function(idx) {
+        // Mantido para compatibilidade
+        iniciarAtividadeSalvaOriginal(idx);
+    };
+
+    async function handleFileUpload(e) {
       const file = e.target.files[0];
       if (!file) return;
       document.getElementById('upload-txt').innerHTML = `Arquivo: <b style="color:var(--teal)">${file.name}</b>`;
@@ -1863,6 +2238,8 @@
         setupProjListener();
         CH.postMessage({ type: 'REQUEST_STATE' });
       });
+    } else {
+      document.addEventListener('DOMContentLoaded', checkPortalUser);
     }
 
     // ═══════════════════════════════════════════════════
@@ -2049,7 +2426,8 @@
     // PROCESSAMENTO E INÍCIO DE JOGO
     // ═══════════════════════════════════════════════════
 
-    async function processarFormulario() {
+    async function processarFormulario(skipSave = false) {
+      const nome = document.getElementById('s-nome').value.trim();
       const disc = document.getElementById('s-disc').value.trim();
       const tema = document.getElementById('s-tema').value.trim();
       const equipesRaw = document.getElementById('s-equipes').value.trim();
@@ -2069,6 +2447,40 @@
           throw new Error("Por favor, importe um arquivo .xlsx válido e não vazio.");
         }
         parsedJSON = gerarLayoutCruzadinha(G.uploadData);
+
+        // ── SALVAR AUTOMATICAMENTE NO PORTAL (Se logado e não for skipSave) ──
+        if (portalUser && !skipSave) {
+          try {
+            let saved = await loadGameData('saved_activities') || [];
+            // Nome final da atividade (usa o tema se o nome estiver vazio)
+            const nomeFinal = nome || tema;
+            
+            // Verifica se já existe uma atividade com o mesmo nome OU mesmos dados
+            const currentHash = JSON.stringify({ disc, tema, data: G.uploadData });
+            const existingIdx = saved.findIndex(s => s.nome === nomeFinal || JSON.stringify({ disc: s.disc, tema: s.tema, data: s.data }) === currentHash);
+            
+            if (existingIdx !== -1) {
+              // Se já existe, apenas atualiza o timestamp e os dados (caso tenha mudado algo)
+              saved[existingIdx] = { nome: nomeFinal, disc, tema, data: G.uploadData, timestamp: Date.now() };
+            } else {
+              // Se é nova, adiciona no topo
+              saved.unshift({
+                nome: nomeFinal,
+                disc,
+                tema,
+                data: G.uploadData,
+                timestamp: Date.now()
+              });
+            }
+
+            // Limita a 20 atividades salvas
+            if (saved.length > 20) saved = saved.slice(0, 20);
+            await saveGameData('saved_activities', saved);
+            loadSavedActivities(); // Atualiza painel por baixo
+          } catch (e) {
+            console.error("Erro ao salvar atividade:", e);
+          }
+        }
 
         // ── CONFIGURA GRADES GLOBAIS ──
         montarGrade(parsedJSON);
