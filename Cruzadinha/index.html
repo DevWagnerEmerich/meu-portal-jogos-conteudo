@@ -1901,15 +1901,6 @@
 
       // 3. TENTA PEDIR DADOS PARA O PORTAL PAI (Iframe Handshake)
       window.parent.postMessage({ type: 'BRINCABYTES_GET_USER' }, '*');
-
-      // FALLBACK FINAL: Modo Simulado (Espera 2s para ver se o pai responde)
-      setTimeout(() => {
-          if (!portalUser && (isLocal || location.hostname.includes('vercel.app'))) {
-              portalUser = { username: 'Professor Local (Modo Simulado)', loggedIn: true, isMock: true };
-              updateUserUI();
-              loadSavedActivities();
-          }
-      }, 1500);
     }
 
     // Ouvindo resposta do Portal Pai
@@ -1924,10 +1915,14 @@
 
     function updateUserUI() {
       const info = document.getElementById('user-info');
-      if (info && portalUser) {
-        const isActuallyMock = portalUser.isMock || isLocal;
-        const tag = isActuallyMock ? '<span style="background:var(--amber); color:#000; padding:2px 6px; border-radius:4px; font-size:10px; margin-left:8px;">MODO SIMULADO (NÃO SINCRONIZA)</span>' : '<span style="background:var(--teal); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; margin-left:8px;">CONECTADO AO PORTAL</span>';
-        info.innerHTML = `Olá, <b>${portalUser.username}</b>! ${tag}`;
+      if (info) {
+        if (portalUser) {
+            const isActuallyMock = portalUser.isMock || isLocal;
+            const tag = isActuallyMock ? '<span style="background:var(--amber); color:#000; padding:2px 6px; border-radius:4px; font-size:10px; margin-left:8px;">MODO LOCAL</span>' : '<span style="background:var(--teal); color:#fff; padding:2px 6px; border-radius:4px; font-size:10px; margin-left:8px;">CONECTADO AO PORTAL</span>';
+            info.innerHTML = `Olá, <b>${portalUser.username}</b>! ${tag}`;
+        } else {
+            info.innerHTML = `⚠️ <span style="color:var(--amber)">Acesse pelo Portal BrincaBytes para sincronizar suas listas na nuvem.</span>`;
+        }
         info.style.display = 'block';
       }
     }
@@ -1946,9 +1941,7 @@
           console.error("Erro ao salvar no Portal:", err);
         }
       }
-      
-      console.log("Salvando localmente (sem sincronização cloud)");
-      localStorage.setItem(`${GAME_ID}_${key}`, JSON.stringify(value));
+      console.warn("Atenção: Salva falhou ou usuário não logado no portal. Sincronização cloud desativada.");
     }
 
     async function loadGameData(key) {
@@ -1963,9 +1956,7 @@
           console.error("Erro ao carregar do Portal:", err);
         }
       }
-
-      const local = localStorage.getItem(`${GAME_ID}_${key}`);
-      return local ? JSON.parse(local) : null;
+      return null;
     }
 
     // ═══════════════════════════════════════════════════
