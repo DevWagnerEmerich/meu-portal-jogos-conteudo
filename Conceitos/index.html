@@ -2125,10 +2125,10 @@ Formate a saída como uma tabela Markdown.
     }
 
     let vCardsCount = 0;
-    function addVisualCard(data = null) {
+    function addVisualCard(data = null, container = null) {
       vCardsCount++;
       const id = Date.now() + Math.random().toString(36).substr(2, 5);
-      const vList = document.getElementById('visual-concept-list');
+      const vList = container || document.getElementById('visual-concept-list');
       const div = document.createElement('div');
       div.className = 'v-card';
       div.id = `vcard-${id}`;
@@ -2151,7 +2151,7 @@ Formate a saída como uma tabela Markdown.
         </div>
       `;
       vList.appendChild(div);
-      setTimeout(() => vList.scrollTop = vList.scrollHeight, 50);
+      if (!container) setTimeout(() => vList.scrollTop = vList.scrollHeight, 50);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -2230,59 +2230,69 @@ Formate a saída como uma tabela Markdown.
       const file = e.target.files[0];
       if (!file) return;
 
+      goTo('loading');
+      document.getElementById('loading-msg').textContent = 'Processando Excel...';
+
       const reader = new FileReader();
       reader.onload = function (evt) {
-        try {
-          const data = new Uint8Array(evt.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
+        setTimeout(() => {
+          try {
+            const data = new Uint8Array(evt.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
 
-          if (workbook.SheetNames.length === 0) throw new Error("A planilha está vazia.");
+            if (workbook.SheetNames.length === 0) throw new Error("A planilha está vazia.");
 
-          // Pegar a primeira aba
-          const firstSheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[firstSheetName];
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const jsonArr = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
 
-          // Converter para array de arrays (pulando a primeira linha de cabeçalho)
-          const jsonArr = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+            let tsvFormatado = "";
+            let conceitosAdicionados = 0;
+            const parsedArray = [];
 
-          let tsvFormatado = "";
-          let conceitosAdicionados = 0;
-
-          // Filtrar linhas vazias e montar String TSV (Tab Separated Values)
-          for (let i = 1; i < jsonArr.length; i++) {
-            const linha = jsonArr[i];
-            // Verifica se tem pelo menos a primeira coluna (Nome) com algum texto válido
-            if (linha && linha.length > 0 && linha[0] && String(linha[0]).trim() !== '') {
-              // Garante que a linha tenha pelo menos 6 colunas, preenchendo vazios com string vazia
-              const cols = [];
-              for (let c = 0; c < 6; c++) {
-                cols.push(linha[c] !== undefined ? String(linha[c]).trim() : "");
+            for (let i = 1; i < jsonArr.length; i++) {
+              const linha = jsonArr[i];
+              if (linha && linha.length > 0 && linha[0] && String(linha[0]).trim() !== '') {
+                const cols = [];
+                for (let c = 0; c < 6; c++) {
+                  cols.push(linha[c] !== undefined ? String(linha[c]).trim() : "");
+                }
+                tsvFormatado += cols.join('\t') + '\n';
+                parsedArray.push({
+                  nome: cols[0], dica1: cols[1], dica2: cols[2], dica3: cols[3], dica4: cols[4],
+                  proibidas: cols[5].split(',').map(s => s.trim()).filter(Boolean)
+                });
+                conceitosAdicionados++;
               }
-              tsvFormatado += cols.join('\t') + '\n';
-              conceitosAdicionados++;
             }
+
+            if (conceitosAdicionados === 0) {
+              goTo('setup');
+              showToast("Nenhum dado encontrado no Excel!", 'error');
+              return;
+            }
+
+            document.getElementById('s-json-data').value = tsvFormatado;
+            
+            // Popula também os cards visuais de forma otimizada
+            const vList = document.getElementById('visual-concept-list');
+            vList.innerHTML = '';
+            vCardsCount = 0;
+            const fragment = document.createDocumentFragment();
+            parsedArray.forEach(p => addVisualCard(p, fragment));
+            vList.appendChild(fragment);
+
+            setEntryTab('visual');
+            goTo('setup');
+            showToast(`Sucesso! Foram importados ${conceitosAdicionados} conceitos!`, 'success');
+
+          } catch (error) {
+            console.error(error);
+            goTo('setup');
+            showToast("Erro ao carregar o Excel.", 'error');
           }
-
-          if (conceitosAdicionados === 0) {
-            showToast("Nenhum dado encontrado no Excel! Verifique se você preencheu o arquivo a partir da segunda linha.", 'error');
-            return;
-          }
-
-          // Preenche a Text Area
-          document.getElementById('s-json-data').value = tsvFormatado;
-
-          // Muda para a TAB de Texto automaticamente
-          setEntryTab('texto');
-
-          showToast(`Sucesso! Foram importados ${conceitosAdicionados} conceitos do seu Excel!`, 'success');
-
-        } catch (error) {
-          console.error(error);
-          showToast("Ocorreu um erro ao carregar o Excel. Você tem certeza que é um arquivo .xlsx válido?", 'error');
-        }
-
-        // Limpar o input file para permitir selecionar o mesmo arquivo novamente
-        e.target.value = null;
+          e.target.value = null;
+        }, 100);
       };
       reader.readAsArrayBuffer(file);
     }
@@ -3091,24 +3101,31 @@ Formate a saída como uma tabela Markdown.
       if (item.titulo) document.getElementById('s-tema').value = item.titulo;
       
       if (item.data) {
-        // Popula tanto o texto quanto o visual
-        document.getElementById('s-json-data').value = item.data;
+        goTo('loading');
+        document.getElementById('loading-msg').textContent = 'Carregando lista...';
         
-        // Limpar cards visuais e repopular
-        const vList = document.getElementById('visual-concept-list');
-        vList.innerHTML = '';
-        vCardsCount = 0;
-        
-        const parsed = parseUserInput(item.data);
-        if (Array.isArray(parsed)) {
-          parsed.forEach(p => addVisualCard(p));
-          setEntryTab('visual');
-        } else {
-          setEntryTab('texto');
-        }
+        setTimeout(() => {
+          document.getElementById('s-json-data').value = item.data;
+          const vList = document.getElementById('visual-concept-list');
+          vList.innerHTML = '';
+          vCardsCount = 0;
+          
+          const parsed = parseUserInput(item.data);
+          if (Array.isArray(parsed)) {
+            const fragment = document.createDocumentFragment();
+            parsed.forEach(p => addVisualCard(p, fragment));
+            vList.appendChild(fragment);
+            setEntryTab('visual');
+          } else {
+            setEntryTab('texto');
+          }
+          goTo('setup');
+          bbCloseLibrary();
+          showToast(`"${item.titulo || 'Lista'}" carregada! ✅`, 'success');
+        }, 100);
+      } else {
+        bbCloseLibrary();
       }
-      bbCloseLibrary();
-      showToast(`"${item.titulo || 'Lista'}" carregada com sucesso! ✅`, 'success');
     }
 
     function bbExcluirItem(idx) {
