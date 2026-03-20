@@ -236,17 +236,17 @@ class ShopView {
         overlay.querySelector('#btnConfirmContrib').onclick = async () => {
             const val = parseInt(input.value, 10);
             if (isNaN(val) || val <= 0) {
-                alert('Digite um valor válido!');
+                this.showAlert('Atenção', 'Digite um valor válido!');
                 return;
             }
             if (val > playerCoins) {
-                alert('Saldo insuficiente!');
+                this.showAlert('Saldo Insuficiente', `Você precisa de 🟡 ${val.toLocaleString('pt-BR')} moedas, mas tem apenas 🟡 ${playerCoins.toLocaleString('pt-BR')}.`);
                 return;
             }
             if (val > remaining) {
-                if (!confirm(`O valor digitado (${val}) é maior que o restante necessário (${remaining}). Deseja pagar apenas o restante?`)) return;
+                this.showAlert('Limite Excedido', `O valor máximo necessário para completar a meta é 🟡 ${remaining.toLocaleString('pt-BR')}.`);
                 input.value = remaining;
-                return; // Let user click confirm again or just proceed with remaining
+                return;
             }
 
             if (GamificationService.spendCoins(val)) {
@@ -254,10 +254,25 @@ class ShopView {
                 const playerName = AuthService.player.nome || 'Anônimo';
                 await CommunityService.contribute(AuthService.player.uid, playerName, val);
                 close();
+                this.showAlert('Sucesso!', 'Sua contribuição foi registrada. Obrigado!');
             }
         };
 
         input.onkeydown = (e) => { if (e.key === 'Enter') overlay.querySelector('#btnConfirmContrib').onclick(); };
+    }
+
+    showAlert(title, message) {
+        const overlay = document.createElement('div');
+        overlay.className = 'overlay-nome on';
+        overlay.style.zIndex = '3000';
+        overlay.innerHTML = `
+            <div class="modal-nome" style="max-width:300px; text-align:center">
+                <h3 style="margin-top:0; color:var(--ouro)">${title}</h3>
+                <p style="font-size:0.9rem; margin-bottom:20px; opacity:0.9">${message}</p>
+                <button class="btn-gami" style="width:100%; padding:10px" onclick="this.closest('.overlay-nome').remove()">OK</button>
+            </div>
+        `;
+        document.body.appendChild(overlay);
     }
 }
 
