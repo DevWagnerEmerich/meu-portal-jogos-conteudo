@@ -150,14 +150,9 @@ class ShopView {
         card.className = `shop-item collective ${isComplete ? 'complete' : ''}`;
         
         const actionHtml = isComplete 
-            ? `<div class="si-complete-msg">🏆 Meta Atingida!</div>`
+            ? `<div class="si-status esgotado" style="color:var(--ouro); font-weight:900; background:rgba(255,215,0,0.1); padding:10px; border-radius:8px; border:2px solid var(--ouro); text-align:center">🔥 ESGOTADO!</div>`
             : `
-                <div class="si-contrib-btns">
-                    <button class="btn-contrib" data-amt="1000">🪙 1k</button>
-                    <button class="btn-contrib" data-amt="10000">🪙 10k</button>
-                    <button class="btn-shop buy btn-custom-pay" style="flex:1.5; padding:8px; margin:0">💳 Pagar Valor</button>
-                </div>
-                <button class="btn-contrib pay-rest" data-amt="${remaining}" style="width:100%; margin-top:5px; background:rgba(255,215,0,0.2)">💰 Pagar Restante</button>
+                <button class="btn-shop buy btn-custom-pay" style="width:100%; padding:12px; margin:0; font-size:1rem">💳 Contribuir Agora</button>
               `;
 
         card.innerHTML = `
