@@ -11,20 +11,20 @@
   <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
   <style>
     :root {
-      --bg: #080c14;
-      --surf: #0f1623;
-      --card: #161e2e;
-      --border: #1e2d45;
-      --border2: #2a3d5a;
+      --bg: #0b0f1a;
+      --surf: #111827;
+      --card: #1a2235;
+      --border: #1f2f48;
+      --border2: #2d4060;
       --gold: #f0b429;
       --gold2: #fcd34d;
       --cyan: #22d3ee;
       --green: #34d399;
       --red: #f87171;
       --purple: #a78bfa;
-      --text: #e8edf5;
-      --muted: #5a7296;
-      --muted2: #8aa0bc;
+      --text: #e2eaf5;
+      --muted: #4d6480;
+      --muted2: #7a9ab8;
 
       --pts5-c: #f0b429;
       --pts5-bg: #f0b42918;
@@ -208,18 +208,32 @@
 
     .setup-header {
       text-align: center;
+      margin-bottom: 1.5rem;
     }
 
     .setup-header h2 {
       font-family: 'Syne', sans-serif;
-      font-size: 2rem;
+      font-size: 2.2rem;
       font-weight: 800;
     }
 
     .setup-header p {
       color: var(--muted2);
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       margin-top: 0.3rem;
+    }
+
+    #user-info {
+      display: none;
+      text-align: center;
+      padding: 0.6rem;
+      background: rgba(240, 180, 41, 0.1);
+      border-radius: 1rem;
+      border: 1px solid rgba(240, 180, 41, 0.2);
+      font-size: 0.85rem;
+      color: var(--gold2);
+      margin-bottom: 1.2rem;
+      animation: fadein 0.5s ease;
     }
 
     .setup-panel {
@@ -1785,43 +1799,76 @@
      TELA 2 — SETUP
 ════════════════════════════════════════════════════ -->
   <div id="setup" class="screen">
-    <div
-      style="flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;background:radial-gradient(ellipse 60% 40% at 50% 0%,#0d2040,transparent)">
-      <div class="setup-wrap">
-        <button class="setup-back" onclick="goTo('landing')">← Voltar</button>
-        <!-- BrincaBytes: Banner de status -->
-        <div id="bb-status-banner">⏳ Conectando ao Portal BrincaBytes...</div>
-        <!-- BrincaBytes: Botão abrir biblioteca -->
-        <button id="btn-bb-library" onclick="bbOpenLibrary()" disabled>📚 Abrir Minha Biblioteca</button>
-        <div class="setup-header">
-          <h2>⚙️ Configurar Jogo</h2>
-          <p>Cole abaixo os conceitos copiados do <b>Excel</b>, <b>ChatGPT</b> ou <b>XML</b>.</p>
-          <div style="display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap; margin-top:0.8rem;">
-            <button onclick="mostrarPromptHelper()"
-              style="background:var(--card); border:1.5px solid var(--border); color:var(--text); padding:0.5rem 1rem; border-radius:1rem; cursor:pointer; font-size:0.8rem; font-weight:600;"><span
-                style="color:var(--gold)">✨</span> Como pedir para a IA?</button>
-            <button onclick="baixarTemplateExcel()"
-              style="background:var(--card); border:1.5px solid var(--border); color:var(--text); padding:0.5rem 1rem; border-radius:1rem; cursor:pointer; font-size:0.8rem; font-weight:600;">📥
-              Baixar Arquivo Excel Modelo</button>
-            <label
-              style="background:linear-gradient(135deg, var(--green), #059669); border:none; color:#000; padding:0.5rem 1rem; border-radius:1rem; cursor:pointer; font-size:0.8rem; font-weight:700; display:flex; align-items:center;">
-              <input type="file" id="excel-upload" accept=".xlsx, .xls" style="display:none"
-                onchange="processarExcel(event)">
-              📂 Carregar Excel Preenchido
-            </label>
-          </div>
+    <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;background:radial-gradient(ellipse 60% 40% at 50% 0%,#0d1a31,transparent)">
+      <div class="setup-wrap" style="max-width:950px; width:100%;">
+        
+        <div id="user-info"></div>
+
+        <div class="setup-header" style="position:relative; margin-bottom:1.5rem;">
+          <button class="setup-back" onclick="goTo('landing')" style="position:absolute; left:0; top:50%; transform:translateY(-50%); opacity:0.6; background:none; border:none; color:var(--text); cursor:pointer; font-weight:600;">← Voltar</button>
+          <h2>⚙️ Configurar Atividade</h2>
+          <p>Prepare seus conceitos ou utilize sua biblioteca salva no Portal</p>
         </div>
-        <div class="setup-panel">
-          <div>
-            <label class="field-label">Título da Aula (Público)</label>
-            <input id="s-tema" class="field-input" placeholder="Ex: Biologia - Citologia Básica">
+
+        <div style="display:flex; justify-content:center; gap:0.75rem; margin-bottom:1.5rem;">
+          <button id="btn-bb-library" onclick="bbOpenLibrary()" style="width:100%; max-width:320px; padding:0.75rem; border:1.5px solid var(--gold); border-radius:1rem; background:var(--card); color:var(--gold); font-family:'Plus Jakarta Sans',sans-serif; font-size:0.95rem; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:0.6rem; transition:all 0.2s;" disabled>📚 Abrir Minha Biblioteca</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1.3fr; gap:1.5rem; width:100%; align-items: start;">
+          
+          <!-- COLUNA ESQUERDA: IMPORTAÇÃO E IA -->
+          <div style="display:flex; flex-direction:column; gap:1rem;">
+            <div style="background:var(--card); border:1.5px solid var(--border); border-radius:1.5rem; padding:1.5rem; display:flex; flex-direction:column; gap:1.2rem;">
+              <h3 style="font-size:1rem; color:var(--gold); margin:0; display:flex; align-items:center; gap:0.5rem;">✨ <span>IA e Importação</span></h3>
+              
+              <button onclick="mostrarPromptHelper()" style="background:rgba(240,180,41,0.08); border:1.5px solid rgba(240,180,41,0.2); color:var(--gold2); padding:0.8rem; border-radius:1rem; cursor:pointer; font-size:0.85rem; font-weight:600; text-align:left; display:flex; gap:0.6rem; align-items:center;">
+                <span style="font-size:1.2rem;">🤖</span>
+                <div>
+                  <div style="font-weight:700;">Gerar com IA (ChatGPT)</div>
+                  <div style="font-size:0.7rem; opacity:0.8;">Veja como pedir para a IA criar conceitos</div>
+                </div>
+              </button>
+
+              <div style="background:var(--surf); border:1.5px dashed var(--border2); border-radius:1rem; padding:1.2rem; text-align:center; position:relative;">
+                <input type="file" id="excel-upload" accept=".xlsx, .xls" style="position:absolute; inset:0; opacity:0; cursor:pointer;" onchange="processarExcel(event)">
+                <div style="font-size:2rem; margin-bottom:0.5rem;">📂</div>
+                <div style="font-size:0.85rem; font-weight:700; color:var(--text);">Carregar Excel</div>
+                <p style="font-size:0.7rem; color:var(--muted2); margin-top:0.2rem;">Arraste ou clique para selecionar</p>
+              </div>
+
+              <div style="text-align:center;">
+                <button onclick="baixarTemplateExcel()" style="background:none; border:none; color:var(--cyan); font-size:0.75rem; cursor:pointer; font-weight:600; text-decoration:underline;">📥 Baixar Planilha Modelo</button>
+              </div>
+            </div>
+
+            <div style="background:rgba(34,211,238,0.05); border:1px solid rgba(34,211,238,0.1); border-radius:1rem; padding:1rem;">
+              <div style="color:var(--cyan); font-size:0.75rem; font-weight:700; margin-bottom:0.4rem; display:flex; align-items:center; gap:0.4rem;">💡 Dica Rápida</div>
+              <p style="font-size:0.72rem; color:var(--muted2); line-height:1.4; margin:0;">Você pode gerenciar as equipes no painel à direita após preencher os conceitos.</p>
+            </div>
           </div>
-          <!-- Tabs Mode Select -->
-          <div class="tabs-row">
-            <button id="btn-tab-visual" class="tab-btn active" onclick="setEntryTab('visual')">✨ Preencher
-              Manualmente</button>
-            <button id="btn-tab-texto" class="tab-btn" onclick="setEntryTab('texto')">📋 Colar Tabela/Texto</button>
-          </div>
+
+          <!-- COLUNA DIREITA: CONCEITOS E CONFIG -->
+          <div class="setup-panel" style="margin:0; border-radius:1.5rem; padding:1.5rem;">
+            <div style="margin-bottom:1.5rem;">
+              <label class="field-label" style="color:var(--gold);">Equipes para o Jogo</label>
+              <select id="s-eq" class="field-input" style="background:var(--surf); padding:0.75rem;">
+                <option value="2">2 equipes</option>
+                <option value="3">3 equipes</option>
+                <option value="4" selected>4 equipes</option>
+                <option value="5">5 equipes</option>
+                <option value="6">6 equipes</option>
+              </select>
+            </div>
+
+            <div style="margin-bottom:1rem;">
+              <label class="field-label">Título da Atividade</label>
+              <input id="s-tema" class="field-input" placeholder="Ex: Biologia - Citologia Básica" style="background:var(--surf); padding:0.75rem;">
+            </div>
+
+            <div class="tabs-row" style="margin-bottom:1.2rem;">
+              <button id="btn-tab-visual" class="tab-btn active" onclick="setEntryTab('visual')" style="flex:1;">✨ Manual</button>
+              <button id="btn-tab-texto" class="tab-btn" onclick="setEntryTab('texto')" style="flex:1;">📋 Colar Texto</button>
+            </div>
 
           <div id="panel-texto" style="display:none;">
             <div style="display:flex; justify-content:space-between; align-items:flex-end;">
@@ -1841,24 +1888,20 @@ Dica 4: Usina de energia...
 Proibidas: energia, ATP, usina"></textarea>
           </div>
 
-          <div id="panel-visual" style="display:flex; flex-direction:column; gap:1rem;">
+          <div id="panel-visual" style="display:flex; flex-direction:column; gap:1rem; margin-top:1rem;">
             <div id="visual-concept-list" class="visual-list"></div>
-            <button class="btn-add-v" onclick="addVisualCard()">➕ Adicionar Novo Conceito</button>
+            <button class="btn-add-v" onclick="addVisualCard()" style="background:var(--surf); border:1.5px dashed var(--border2); color:var(--muted2); padding:0.8rem; border-radius:1rem; cursor:pointer; font-size:0.85rem; font-weight:600; transition:all 0.15s;" onmouseover="this.style.borderColor='var(--gold)'; this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)'; this.style.color='var(--muted2)'">➕ Adicionar Novo Conceito</button>
           </div>
-          <div class="grid2" style="grid-template-columns: 1fr;">
-            <div>
-              <label class="field-label">Equipes</label>
-              <select id="s-eq" class="field-input">
-                <option value="2">2 equipes</option>
-                <option value="3">3 equipes</option>
-                <option value="4" selected>4 equipes</option>
-                <option value="5">5 equipes</option>
-                <option value="6">6 equipes</option>
-              </select>
-            </div>
-          </div>
-          <div id="s-err" class="err-box"></div>
-          <button class="btn-primary" id="btn-gerar" onclick="gerarJogo()">✅ Iniciar Jogo</button>
+        </div>
+      </div>
+
+        <div id="s-err" class="err-box" style="margin-top:1rem;"></div>
+        
+        <div style="text-align:center; margin-top:2rem; display:flex; flex-direction:column; align-items:center; gap:0.8rem;">
+          <button class="btn-primary" id="btn-gerar" onclick="gerarJogo()" style="max-width:400px; padding:1.2rem; font-size:1.1rem; border-radius:1.2rem; box-shadow:0 10px 25px rgba(240,180,41,0.25);">🚀 Iniciar Atividade</button>
+          
+          <!-- BrincaBytes: Botão salvar opcional se estiver logado -->
+          <button id="bb-btn-save" class="bb-btn-save" onclick="bbSaveCurrentList()" style="background:none; border:none; color:var(--muted2); font-size:0.8rem; cursor:pointer; font-weight:600; text-decoration:underline;" disabled>💾 Salvar esta lista na Biblioteca</button>
         </div>
       </div>
     </div>
@@ -2984,18 +3027,18 @@ Formate a saída como uma tabela Markdown.
     });
 
     function bbUpdateBanner() {
-      const banner = document.getElementById('bb-status-banner');
+      const banner = document.getElementById('user-info');
       const btnLib = document.getElementById('btn-bb-library');
       const btnSave = document.getElementById('bb-btn-save');
       if (!banner) return;
       if (bbConnected && bbUser) {
-        banner.classList.add('connected');
-        banner.innerHTML = `Olá, <strong>${bbUser.username}</strong>! <span class="bb-badge"><span class="bb-dot"></span> CONECTADO AO PORTAL</span>`;
+        banner.style.display = 'block';
+        banner.innerHTML = `Olá, <strong>${bbUser.username}</strong>! <span class="bb-badge" style="background:rgba(52,211,153,0.12); border:1px solid rgba(52,211,153,0.3); color:#34d399; font-size:0.68rem; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; padding:0.15rem 0.65rem; border-radius:2rem; margin-left:0.5rem;"><span class="bb-dot" style="display:inline-block; width:7px; height:7px; border-radius:50%; background:#34d399; box-shadow:0 0 6px #34d399; margin-right:4px;"></span> CONECTADO AO PORTAL</span>`;
         if (btnLib) btnLib.disabled = false;
         if (btnSave) btnSave.disabled = false;
       } else {
-        banner.classList.remove('connected');
-        banner.innerHTML = '🟡 Modo Local — faça login no Portal para salvar listas';
+        banner.style.display = 'none';
+        banner.innerHTML = '';
         if (btnLib) btnLib.disabled = true;
         if (btnSave) btnSave.disabled = true;
       }
