@@ -3,6 +3,7 @@ import GameEngine, { GameState } from '../core/GameEngine.js';
 import GamificationService from '../services/GamificationService.js';
 import { ShopItems } from '../data/ShopItems.js';
 import SoundEngine from '../services/SoundEngine.js';
+import CommunityService from '../services/CommunityService.js';
 
 class ShopView {
     constructor() {
@@ -47,6 +48,12 @@ class ShopView {
 
         EventBus.on('gamification:loaded', () => this.refreshUI());
         EventBus.on('gamification:updated', () => this.refreshUI());
+        
+        // Subscribe to real-time community goal
+        CommunityService.subscribe(() => {
+            const activeTab = this.container.querySelector('.cat-btn.ativo')?.dataset.type;
+            if (activeTab === 'community') this.renderGrid('community');
+        });
     }
 
     show() {
@@ -71,6 +78,11 @@ class ShopView {
         const items = ShopItems.filter(i => i.type === type);
 
         items.forEach(item => {
+            if (item.isCollective) {
+                this.renderCommunityItem(grid, item);
+                return;
+            }
+
             const isOwned = data.inventory.includes(item.id);
             const isEquipped = data.equipped[type] === item.id;
 
@@ -124,6 +136,68 @@ class ShopView {
                 this.renderGrid(type);
             });
         });
+    }
+
+    renderCommunityItem(grid, item) {
+        const communityData = CommunityService.getData();
+        const goal = item.price || 1000000;
+        const paid = communityData.total_paid || 0;
+        const pct = Math.min(100, Math.floor((paid / goal) * 100));
+        const remaining = Math.max(0, goal - paid);
+        const isComplete = paid >= goal;
+
+        const card = document.createElement('div');
+        card.className = `shop-item collective ${isComplete ? 'complete' : ''}`;
+        
+        const actionHtml = isComplete 
+            ? `<div class="si-complete-msg">🏆 Meta Atingida!</div>`
+            : `
+                <div class="si-contrib-btns">
+                    <button class="btn-contrib" data-amt="1000">🪙 1k</button>
+                    <button class="btn-contrib" data-amt="10000">🪙 10k</button>
+                    <button class="btn-contrib" data-amt="${remaining}">💰 Pagar Restante</button>
+                </div>
+              `;
+
+        card.innerHTML = `
+            <div class="si-icon" style="border-radius:12px; overflow:hidden">
+                <img src="${item.thumb}" style="width:100%; height:100%; object-fit:cover">
+            </div>
+            <div class="si-info">
+                <h4>${item.name}</h4>
+                <p>${item.desc}</p>
+                <div class="si-progress-container">
+                    <div class="si-progress-fill" style="width:${pct}%"></div>
+                </div>
+                <div class="si-progress-text">
+                    <span>${pct}%</span>
+                    <span>Meta: ${goal.toLocaleString('pt-BR')}</span>
+                </div>
+                <div class="si-last-contributor">
+                    👤 Último a pagar: ${communityData.last_contributor}
+                </div>
+            </div>
+            <div class="si-actions" style="flex-direction:column; gap:8px">
+                ${actionHtml}
+            </div>
+        `;
+
+        // Bind contribution clicks
+        card.querySelectorAll('.btn-contrib').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const amount = parseInt(btn.dataset.amt, 10);
+                if (GamificationService.spendCoins(amount)) {
+                    SoundEngine.ok();
+                    const playerName = AuthService.player.nome || 'Anônimo';
+                    await CommunityService.contribute(AuthService.player.uid, playerName, amount);
+                    // Subscription will trigger re-render
+                } else {
+                    alert('Moedas insuficientes!');
+                }
+            });
+        });
+
+        grid.appendChild(card);
     }
 }
 

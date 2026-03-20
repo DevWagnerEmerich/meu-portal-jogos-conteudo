@@ -13,6 +13,7 @@ import AuthService from './services/AuthService.js';
 import RankingService from './services/RankingService.js';
 import ProgressService from './services/ProgressService.js';
 import SoundEngine from './services/SoundEngine.js';
+import CommunityService from './services/CommunityService.js';
 import GameController from './controllers/GameController.js';
 import QuestionBank from './data/QuestionBank.js';
 import { LANG_META, LANGS } from './data/LanguageMeta.js';
@@ -479,6 +480,7 @@ document.getElementById('overlay')?.addEventListener('click', function (e) {
 
     await initFirebase();
     await GamificationService.init();
+    CommunityService.init(RankingService.getDb ? RankingService.getDb() : null); // We need access to DB
     AchievementSystem.init();
 
     // Load saved progress for guest/auth player

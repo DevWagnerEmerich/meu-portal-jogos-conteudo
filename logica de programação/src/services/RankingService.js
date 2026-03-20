@@ -21,6 +21,8 @@ class RankingService {
         this.#db = firestoreDb;
     }
 
+    getDb() { return this.#db; }
+
     /**
      * Subscribe to real-time ranking updates.
      * Callback receives array of rank entries sorted by pts desc.
