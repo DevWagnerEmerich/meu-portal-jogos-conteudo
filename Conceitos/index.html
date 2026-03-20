@@ -1592,7 +1592,164 @@
       }
     }
   </style>
+
+  <style>
+    /* ═══════════════════ BRINCABYTES INTEGRATION ═══════════════════ */
+    #bb-status-banner {
+      display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+      padding: 0.55rem 1.4rem; border-radius: 2rem;
+      border: 1.5px solid #4d6480; background: #0f1623;
+      font-size: 0.82rem; font-weight: 600; color: #5a7296;
+      width: fit-content; margin: 0 auto; transition: all 0.4s ease;
+    }
+    #bb-status-banner.connected {
+      border-color: #34d399; color: #e8edf5;
+      background: linear-gradient(135deg, rgba(52,211,153,0.08), #0f1623);
+      box-shadow: 0 0 18px rgba(52,211,153,0.15);
+    }
+    #bb-status-banner .bb-badge {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.3);
+      color: #34d399; font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 0.15rem 0.65rem; border-radius: 2rem;
+    }
+    #bb-status-banner .bb-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #34d399; box-shadow: 0 0 6px #34d399;
+      animation: bbpulse 1.8s ease-in-out infinite;
+    }
+    @keyframes bbpulse { 0%,100%{opacity:0.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.3)} }
+    #btn-bb-library {
+      width: 100%; padding: 0.72rem;
+      border: 1.5px solid #1e2d45; border-radius: 0.8rem;
+      background: #161e2e; color: #5a7296;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.9rem; font-weight: 600; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+      transition: all 0.2s;
+    }
+    #btn-bb-library:hover {
+      border-color: #f0b429; color: #f0b429;
+      background: rgba(240,180,41,0.06);
+    }
+    #btn-bb-library:disabled { opacity: 0.35; cursor: not-allowed; }
+    /* Modal */
+    #bb-library-modal {
+      display: none; position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center; padding: 1.5rem;
+    }
+    #bb-library-modal.open { display: flex; animation: fadein 0.2s ease; }
+    .bb-modal-box {
+      background: #0f1623; border: 1.5px solid #1e2d45;
+      border-radius: 1.25rem; width: 100%; max-width: 600px; max-height: 80vh;
+      display: flex; flex-direction: column; overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+      animation: popin 0.25s cubic-bezier(0.175,0.885,0.32,1.275);
+    }
+    .bb-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.1rem 1.4rem; border-bottom: 1.5px solid #1e2d45;
+    }
+    .bb-modal-title { font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 800; color: #e8edf5; }
+    .bb-modal-close {
+      background: transparent; border: none; color: #5a7296;
+      font-size: 1.2rem; cursor: pointer; padding: 0.2rem 0.5rem;
+      border-radius: 0.4rem; transition: color 0.15s; line-height: 1;
+    }
+    .bb-modal-close:hover { color: #f87171; }
+    .bb-modal-filters {
+      display: flex; gap: 0.75rem;
+      padding: 0.9rem 1.4rem; border-bottom: 1px solid #1e2d45;
+    }
+    .bb-search-input {
+      flex: 1; background: #080c14; border: 1.5px solid #1e2d45;
+      border-radius: 0.6rem; padding: 0.6rem 0.9rem;
+      color: #e8edf5; font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.85rem; outline: none; transition: border-color 0.2s;
+    }
+    .bb-search-input:focus { border-color: #f0b429; }
+    .bb-search-input::placeholder { color: #5a7296; }
+    .bb-filter-select {
+      background: #080c14; border: 1.5px solid #1e2d45;
+      border-radius: 0.6rem; padding: 0.6rem 0.9rem;
+      color: #8aa0bc; font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.82rem; outline: none; cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .bb-filter-select:focus { border-color: #f0b429; }
+    .bb-modal-list {
+      flex: 1; overflow-y: auto; padding: 0.75rem 1rem;
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .bb-empty-state {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 2rem; color: #5a7296; font-size: 0.88rem; text-align: center;
+    }
+    .bb-list-item {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #161e2e; border: 1.5px solid #1e2d45;
+      border-radius: 0.75rem; padding: 0.85rem 1rem;
+      cursor: pointer; transition: all 0.15s; gap: 0.75rem;
+    }
+    .bb-list-item:hover { border-color: #f0b429; background: rgba(240,180,41,0.05); }
+    .bb-item-info { flex: 1; min-width: 0; }
+    .bb-item-title { font-size: 0.9rem; font-weight: 600; color: #e8edf5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bb-item-meta { font-size: 0.72rem; color: #5a7296; margin-top: 0.2rem; }
+    .bb-item-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
+    .bb-btn-load {
+      padding: 0.35rem 0.8rem; border: 1px solid rgba(240,180,41,0.3);
+      border-radius: 0.5rem; background: rgba(240,180,41,0.1);
+      color: #f0b429; font-size: 0.75rem; font-weight: 700;
+      cursor: pointer; transition: all 0.15s;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .bb-btn-load:hover { background: rgba(240,180,41,0.2); border-color: rgba(240,180,41,0.5); }
+    .bb-btn-del {
+      padding: 0.35rem 0.7rem; border: 1px solid rgba(248,113,113,0.2);
+      border-radius: 0.5rem; background: transparent; color: #f87171;
+      font-size: 0.75rem; cursor: pointer; transition: all 0.15s;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .bb-btn-del:hover { background: rgba(248,113,113,0.12); }
+    .bb-modal-footer {
+      padding: 0.75rem 1.4rem; border-top: 1px solid #1e2d45;
+      display: flex; justify-content: flex-end; gap: 0.6rem;
+    }
+    .bb-btn-save {
+      padding: 0.6rem 1.2rem; border: none; border-radius: 0.6rem;
+      background: linear-gradient(135deg, #f0b429, #fcd34d);
+      color: #0a0c10; font-family: 'Syne', sans-serif;
+      font-size: 0.9rem; font-weight: 700; cursor: pointer;
+      transition: all 0.15s; display: flex; align-items: center; gap: 0.4rem;
+    }
+    .bb-btn-save:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(240,180,41,0.4); }
+    .bb-btn-save:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  </style>
 </head>
+
+  <!-- ════════════ MODAL BIBLIOTECA BRINCABYTES ════════════ -->
+  <div id="bb-library-modal">
+    <div class="bb-modal-box">
+      <div class="bb-modal-header">
+        <div class="bb-modal-title">📚 Minha Biblioteca</div>
+        <button class="bb-modal-close" onclick="bbCloseLibrary()">✕</button>
+      </div>
+      <div class="bb-modal-filters">
+        <input class="bb-search-input" id="bb-search" type="text" placeholder="🔍 Buscar..." oninput="bbRenderLibrary()">
+        <select class="bb-filter-select" id="bb-filter-disciplina" onchange="bbRenderLibrary()">
+          <option value="">Todas as Disciplinas</option>
+        </select>
+      </div>
+      <div class="bb-modal-list" id="bb-modal-list">
+        <div class="bb-empty-state">Nenhuma atividade encontrada ou salva.</div>
+      </div>
+      <div class="bb-modal-footer">
+        <button class="bb-btn-save" id="bb-btn-save" onclick="bbSaveCurrentList()" disabled>💾 Salvar Lista Atual</button>
+      </div>
+    </div>
+  </div>
 
 <body>
   <div id="toast-container"></div>
@@ -1632,6 +1789,10 @@
       style="flex:1;display:flex;align-items:center;justify-content:center;padding:2rem;background:radial-gradient(ellipse 60% 40% at 50% 0%,#0d2040,transparent)">
       <div class="setup-wrap">
         <button class="setup-back" onclick="goTo('landing')">← Voltar</button>
+        <!-- BrincaBytes: Banner de status -->
+        <div id="bb-status-banner">⏳ Conectando ao Portal BrincaBytes...</div>
+        <!-- BrincaBytes: Botão abrir biblioteca -->
+        <button id="btn-bb-library" onclick="bbOpenLibrary()" disabled>📚 Abrir Minha Biblioteca</button>
         <div class="setup-header">
           <h2>⚙️ Configurar Jogo</h2>
           <p>Cole abaixo os conceitos copiados do <b>Excel</b>, <b>ChatGPT</b> ou <b>XML</b>.</p>
@@ -2794,6 +2955,177 @@ Formate a saída como uma tabela Markdown.
       }
       setTimeout(() => { wrap.innerHTML = ''; }, 4000);
     }
+
+    // ════════════════════════════════════════════════════
+    // BRINCABYTES PORTAL INTEGRATION — Handshake v5
+    // ════════════════════════════════════════════════════
+    const BB_GAME_ID = 'adivinhe-conceito';
+    let bbUser = null;
+    let bbConnected = false;
+    let bbLibraryData = [];
+
+    // Solicitar identidade ao Portal pai
+    try { window.parent.postMessage({ type: 'BRINCABYTES_GET_USER' }, '*'); } catch(e){}
+
+    // Listener de respostas do Portal 
+    window.addEventListener('message', (event) => {
+      const { type, user, success, value, key } = event.data;
+      if (type === 'BRINCABYTES_USER_DATA') {
+        bbUser = user;
+        bbConnected = !!(user && user.loggedIn);
+        bbUpdateBanner();
+        if (bbConnected) bbLoadLibrary();
+      }
+      if (type === 'BRINCABYTES_LOAD_RESULT' && key === 'biblioteca') {
+        bbLibraryData = value ? (Array.isArray(value) ? value : [value]) : [];
+        bbRenderLibrary();
+        bbPopulateDisciplinas();
+      }
+    });
+
+    function bbUpdateBanner() {
+      const banner = document.getElementById('bb-status-banner');
+      const btnLib = document.getElementById('btn-bb-library');
+      const btnSave = document.getElementById('bb-btn-save');
+      if (!banner) return;
+      if (bbConnected && bbUser) {
+        banner.classList.add('connected');
+        banner.innerHTML = `Olá, <strong>${bbUser.username}</strong>! <span class="bb-badge"><span class="bb-dot"></span> CONECTADO AO PORTAL</span>`;
+        if (btnLib) btnLib.disabled = false;
+        if (btnSave) btnSave.disabled = false;
+      } else {
+        banner.classList.remove('connected');
+        banner.innerHTML = '🟡 Modo Local — faça login no Portal para salvar listas';
+        if (btnLib) btnLib.disabled = true;
+        if (btnSave) btnSave.disabled = true;
+      }
+    }
+
+    function bbLoadLibrary() {
+      try { window.parent.postMessage({ type: 'BRINCABYTES_LOAD_DATA', gameId: BB_GAME_ID, key: 'biblioteca' }, '*'); } catch(e){}
+    }
+
+    function bbOpenLibrary() {
+      if (!bbConnected) return;
+      document.getElementById('bb-library-modal').classList.add('open');
+      bbRenderLibrary();
+    }
+
+    function bbCloseLibrary() {
+      document.getElementById('bb-library-modal').classList.remove('open');
+    }
+
+    function bbPopulateDisciplinas() {
+      const sel = document.getElementById('bb-filter-disciplina');
+      if (!sel) return;
+      const disciplinas = [...new Set(bbLibraryData.map(i => i.disciplina).filter(Boolean))];
+      sel.innerHTML = '<option value="">Todas as Disciplinas</option>' +
+        disciplinas.map(d => `<option value="${d}">${d}</option>`).join('');
+    }
+
+    function bbRenderLibrary() {
+      const list = document.getElementById('bb-modal-list');
+      if (!list) return;
+      const search = (document.getElementById('bb-search')?.value || '').toLowerCase();
+      const disciplina = document.getElementById('bb-filter-disciplina')?.value || '';
+      let items = bbLibraryData.filter(item => {
+        const matchSearch = !search ||
+          (item.titulo || '').toLowerCase().includes(search) ||
+          (item.disciplina || '').toLowerCase().includes(search);
+        const matchDisc = !disciplina || item.disciplina === disciplina;
+        return matchSearch && matchDisc;
+      });
+      if (items.length === 0) {
+        list.innerHTML = '<div class="bb-empty-state">Nenhuma atividade encontrada ou salva.</div>';
+        return;
+      }
+      list.innerHTML = items.map((item, idx) => `
+        <div class="bb-list-item">
+          <div class="bb-item-info">
+            <div class="bb-item-title">${item.titulo || 'Sem título'}</div>
+            <div class="bb-item-meta">${item.disciplina || ''}${item.disciplina && item.savedAt ? ' · ' : ''}${item.savedAt ? new Date(item.savedAt).toLocaleDateString('pt-BR') : ''}</div>
+          </div>
+          <div class="bb-item-actions">
+            <button class="bb-btn-load" onclick="bbCarregarItem(${idx})">📂 Carregar</button>
+            <button class="bb-btn-del" onclick="bbExcluirItem(${idx})">🗑️</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function bbCarregarItem(idx) {
+      const item = bbLibraryData[idx];
+      if (!item) return;
+      if (item.titulo) document.getElementById('s-tema').value = item.titulo;
+      if (item.data) {
+        setEntryTab('texto');
+        document.getElementById('s-json-data').value = item.data;
+      }
+      bbCloseLibrary();
+      showToast(`"${item.titulo || 'Lista'}" carregada com sucesso! ✅`, 'success');
+    }
+
+    function bbExcluirItem(idx) {
+      if (!confirm('Deseja excluir esta lista da sua biblioteca?')) return;
+      bbLibraryData.splice(idx, 1);
+      bbSaveBiblioteca(bbLibraryData);
+      bbRenderLibrary();
+      bbPopulateDisciplinas();
+      showToast('Lista excluída.', 'success');
+    }
+
+    function bbSaveCurrentList() {
+      if (!bbConnected) return showToast('Você precisa estar conectado ao Portal para salvar.', 'error');
+      const titulo = document.getElementById('s-tema')?.value?.trim();
+      if (!titulo) return showToast('Preencha o Título da Aula antes de salvar.', 'error');
+      let dataToSave = '';
+      if (entryMode === 'texto') {
+        dataToSave = document.getElementById('s-json-data')?.value?.trim() || '';
+      } else {
+        const linhas = [];
+        for (const c of document.querySelectorAll('.v-card')) {
+          const nome = c.querySelector('.vc-nome')?.value?.trim() || '';
+          if (!nome) continue;
+          linhas.push([
+            nome,
+            c.querySelector('.vc-d1')?.value?.trim() || '',
+            c.querySelector('.vc-d2')?.value?.trim() || '',
+            c.querySelector('.vc-d3')?.value?.trim() || '',
+            c.querySelector('.vc-d4')?.value?.trim() || '',
+            c.querySelector('.vc-proibidas')?.value?.trim() || ''
+          ].join('\t'));
+        }
+        dataToSave = linhas.join('\n');
+      }
+      if (!dataToSave) return showToast('Nenhum dado encontrado para salvar.', 'error');
+      const existingIdx = bbLibraryData.findIndex(i => i.titulo === titulo);
+      const entry = { titulo, disciplina: '', data: dataToSave, savedAt: Date.now() };
+      if (existingIdx >= 0) bbLibraryData[existingIdx] = entry;
+      else bbLibraryData.unshift(entry);
+      bbSaveBiblioteca(bbLibraryData);
+    }
+
+    function bbSaveBiblioteca(data) {
+      try {
+        window.parent.postMessage({
+          type: 'BRINCABYTES_SAVE_DATA',
+          gameId: BB_GAME_ID,
+          key: 'biblioteca',
+          value: data
+        }, '*');
+        showToast('Lista salva na Biblioteca! ✅', 'success');
+      } catch(e) {
+        showToast('Erro ao salvar. Tente novamente.', 'error');
+      }
+    }
+
+    // Fechar modal clicando no backdrop
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('bb-library-modal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'bb-library-modal') bbCloseLibrary();
+      });
+    });
+
   </script>
 </body>
 
