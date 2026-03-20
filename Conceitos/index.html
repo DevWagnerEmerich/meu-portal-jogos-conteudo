@@ -1804,104 +1804,90 @@
         
         <div id="user-info"></div>
 
-        <div class="setup-header" style="position:relative; margin-bottom:1.5rem;">
+        <div class="setup-header" style="position:relative; margin-bottom:1.5rem; text-align:center;">
           <button class="setup-back" onclick="goTo('landing')" style="position:absolute; left:0; top:50%; transform:translateY(-50%); opacity:0.6; background:none; border:none; color:var(--text); cursor:pointer; font-weight:600;">← Voltar</button>
-          <h2>⚙️ Configurar Atividade</h2>
-          <p>Prepare seus conceitos ou utilize sua biblioteca salva no Portal</p>
+          <h2 style="font-size:1.4rem; margin-bottom:0.2rem;">⚙️ Configurar Atividade</h2>
         </div>
 
-        <div style="display:flex; justify-content:center; gap:0.75rem; margin-bottom:1.5rem;">
-          <button id="btn-bb-library" onclick="bbOpenLibrary()" style="width:100%; max-width:320px; padding:0.75rem; border:1.5px solid var(--gold); border-radius:1rem; background:var(--card); color:var(--gold); font-family:'Plus Jakarta Sans',sans-serif; font-size:0.95rem; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:0.6rem; transition:all 0.2s;" disabled>📚 Abrir Minha Biblioteca</button>
-        </div>
-
-        <div style="display:grid; grid-template-columns: 1fr 1.3fr; gap:1.5rem; width:100%; align-items: start;">
+        <div style="display:grid; grid-template-columns: 340px 1fr; gap:1.5rem; width:100%; align-items: start;">
           
-          <!-- COLUNA ESQUERDA: IMPORTAÇÃO E IA -->
-          <div style="display:flex; flex-direction:column; gap:1rem;">
-            <div style="background:var(--card); border:1.5px solid var(--border); border-radius:1.5rem; padding:1.5rem; display:flex; flex-direction:column; gap:1.2rem;">
-              <h3 style="font-size:1rem; color:var(--gold); margin:0; display:flex; align-items:center; gap:0.5rem;">✨ <span>IA e Importação</span></h3>
+          <!-- COLUNA ESQUERDA: CONFIGURAÇÃO E FERRAMENTAS -->
+          <div style="display:flex; flex-direction:column; gap:1.2rem;">
+            
+            <!-- Bloco 1: Identificação -->
+            <div style="background:var(--card); border:1.5px solid var(--border); border-radius:1.5rem; padding:1.5rem; display:flex; flex-direction:column; gap:1rem;">
+              <h3 style="font-size:0.85rem; color:var(--muted); margin:0; text-transform:uppercase; letter-spacing:0.1em;">📋 Atividade</h3>
               
-              <button onclick="mostrarPromptHelper()" style="background:rgba(240,180,41,0.08); border:1.5px solid rgba(240,180,41,0.2); color:var(--gold2); padding:0.8rem; border-radius:1rem; cursor:pointer; font-size:0.85rem; font-weight:600; text-align:left; display:flex; gap:0.6rem; align-items:center;">
-                <span style="font-size:1.2rem;">🤖</span>
-                <div>
-                  <div style="font-weight:700;">Gerar com IA (ChatGPT)</div>
-                  <div style="font-size:0.7rem; opacity:0.8;">Veja como pedir para a IA criar conceitos</div>
-                </div>
+              <div>
+                <label class="field-label" style="font-size:0.75rem; margin-bottom:0.4rem;">Título da Aula</label>
+                <input id="s-tema" class="field-input" placeholder="Ex: Biologia - Citologia Básica" style="background:var(--surf); padding:0.7rem; border-radius:0.8rem;">
+              </div>
+
+              <div>
+                <label class="field-label" style="font-size:0.75rem; margin-bottom:0.4rem;">Equipes</label>
+                <select id="s-eq" class="field-input" style="background:var(--surf); padding:0.7rem; border-radius:0.8rem;">
+                  <option value="2">2 equipes</option>
+                  <option value="3">3 equipes</option>
+                  <option value="4" selected>4 equipes</option>
+                  <option value="5">5 equipes</option>
+                  <option value="6">6 equipes</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Bloco 2: Ferramentas e Importação -->
+            <div style="background:var(--card); border:1.5px solid var(--border); border-radius:1.5rem; padding:1.5rem; display:flex; flex-direction:column; gap:1rem;">
+              <h3 style="font-size:0.85rem; color:var(--muted); margin:0; text-transform:uppercase; letter-spacing:0.1em;">⚡ Ações Rápidas</h3>
+              
+              <button id="btn-bb-library" onclick="bbOpenLibrary()" style="width:100%; padding:0.75rem; border:1.5px solid var(--gold); border-radius:1rem; background:rgba(240,180,41,0.05); color:var(--gold); font-family:'Plus Jakarta Sans',sans-serif; font-size:0.85rem; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:0.6rem; transition:all 0.2s;" disabled>📚 Minha Biblioteca</button>
+
+              <button onclick="mostrarPromptHelper()" style="background:var(--surf); border:1.5px solid var(--border); color:var(--text); padding:0.7rem; border-radius:1rem; cursor:pointer; font-size:0.8rem; font-weight:600; text-align:left; display:flex; gap:0.6rem; align-items:center;">
+                <span style="font-size:1.1rem;">🤖</span>
+                <span>Gerar com IA (ChatGPT)</span>
               </button>
 
-              <div style="background:var(--surf); border:1.5px dashed var(--border2); border-radius:1rem; padding:1.2rem; text-align:center; position:relative;">
+              <div style="background:var(--surf); border:1.5px dashed var(--border2); border-radius:1rem; padding:1rem; text-align:center; position:relative;">
                 <input type="file" id="excel-upload" accept=".xlsx, .xls" style="position:absolute; inset:0; opacity:0; cursor:pointer;" onchange="processarExcel(event)">
-                <div style="font-size:2rem; margin-bottom:0.5rem;">📂</div>
-                <div style="font-size:0.85rem; font-weight:700; color:var(--text);">Carregar Excel</div>
-                <p style="font-size:0.7rem; color:var(--muted2); margin-top:0.2rem;">Arraste ou clique para selecionar</p>
+                <div style="font-size:1.2rem; margin-bottom:0.2rem;">📂</div>
+                <div style="font-size:0.8rem; font-weight:700;">Importar Excel</div>
               </div>
 
               <div style="text-align:center;">
-                <button onclick="baixarTemplateExcel()" style="background:none; border:none; color:var(--cyan); font-size:0.75rem; cursor:pointer; font-weight:600; text-decoration:underline;">📥 Baixar Planilha Modelo</button>
+                <button onclick="baixarTemplateExcel()" style="background:none; border:none; color:var(--cyan); font-size:0.7rem; cursor:pointer; font-weight:600; text-decoration:underline; opacity:0.8;">Baixar Planilha Modelo</button>
               </div>
             </div>
 
-            <div style="background:rgba(34,211,238,0.05); border:1px solid rgba(34,211,238,0.1); border-radius:1rem; padding:1rem;">
-              <div style="color:var(--cyan); font-size:0.75rem; font-weight:700; margin-bottom:0.4rem; display:flex; align-items:center; gap:0.4rem;">💡 Dica Rápida</div>
-              <p style="font-size:0.72rem; color:var(--muted2); line-height:1.4; margin:0;">Você pode gerenciar as equipes no painel à direita após preencher os conceitos.</p>
+            <div style="background:rgba(34,211,238,0.05); border:1px solid rgba(34,211,238,0.1); border-radius:1rem; padding:0.8rem;">
+              <p style="font-size:0.68rem; color:var(--muted2); line-height:1.4; margin:0;">💡 <b>Dica:</b> Você pode editar esses conceitos a qualquer momento antes de clicar em Iniciar.</p>
             </div>
           </div>
 
-          <!-- COLUNA DIREITA: CONCEITOS E CONFIG -->
-          <div class="setup-panel" style="margin:0; border-radius:1.5rem; padding:1.5rem;">
-            <div style="margin-bottom:1.5rem;">
-              <label class="field-label" style="color:var(--gold);">Equipes para o Jogo</label>
-              <select id="s-eq" class="field-input" style="background:var(--surf); padding:0.75rem;">
-                <option value="2">2 equipes</option>
-                <option value="3">3 equipes</option>
-                <option value="4" selected>4 equipes</option>
-                <option value="5">5 equipes</option>
-                <option value="6">6 equipes</option>
-              </select>
+          <!-- COLUNA DIREITA: EDITOR DE CONCEITOS -->
+          <div class="setup-panel" style="margin:0; border-radius:1.5rem; padding:1.5rem; display:flex; flex-direction:column; gap:1.2rem;">
+            
+            <div class="tabs-row">
+              <button id="btn-tab-visual" class="tab-btn active" onclick="setEntryTab('visual')" style="flex:1; border-radius:0.8rem;">✨ Editor Visual</button>
+              <button id="btn-tab-texto" class="tab-btn" onclick="setEntryTab('texto')" style="flex:1; border-radius:0.8rem;">📋 Modo Texto</button>
             </div>
 
-            <div style="margin-bottom:1rem;">
-              <label class="field-label">Título da Atividade</label>
-              <input id="s-tema" class="field-input" placeholder="Ex: Biologia - Citologia Básica" style="background:var(--surf); padding:0.75rem;">
+            <div id="panel-texto" style="display:none;">
+              <textarea id="s-json-data" class="field-input"
+                style="min-height:380px; font-family:'JetBrains Mono', monospace; font-size:0.8rem; line-height:1.6; background:var(--surf); border-radius:1rem;"
+                placeholder="Cole aqui a tabela do ChatGPT ou dados do Excel..."></textarea>
             </div>
 
-            <div class="tabs-row" style="margin-bottom:1.2rem;">
-              <button id="btn-tab-visual" class="tab-btn active" onclick="setEntryTab('visual')" style="flex:1;">✨ Manual</button>
-              <button id="btn-tab-texto" class="tab-btn" onclick="setEntryTab('texto')" style="flex:1;">📋 Colar Texto</button>
+            <div id="panel-visual" style="display:flex; flex-direction:column; gap:1rem;">
+              <div id="visual-concept-list" class="visual-list" style="max-height:450px;"></div>
+              <button class="btn-add-v" onclick="addVisualCard()" style="background:var(--surf); border:1.5px dashed var(--border2); color:var(--muted2); padding:0.8rem; border-radius:1rem; cursor:pointer; font-size:0.85rem; font-weight:600; transition:all 0.15s;" onmouseover="this.style.borderColor='var(--gold)'; this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)'; this.style.color='var(--muted2)'">➕ Adicionar Novo Conceito</button>
             </div>
-
-          <div id="panel-texto" style="display:none;">
-            <div style="display:flex; justify-content:space-between; align-items:flex-end;">
-              <label class="field-label">Conceitos (Cole aqui)</label>
-              <span style="font-size:0.65rem; color:var(--muted2); margin-bottom:0.5rem; text-align:right;">Aceita
-                Excel, tabela do ChatGPT ou XML</span>
-            </div>
-            <textarea id="s-json-data" class="field-input"
-              style="min-height:160px; font-family:'Plus Jakarta Sans', sans-serif; font-size:0.85rem; line-height:1.4;"
-              placeholder="Você também pode colar formato em bloco, por exemplo:
-
-Conceito: Mitocôndria
-Dica 1: Organela...
-Dica 2: Fica na célula...
-Dica 3: Consome oxigênio...
-Dica 4: Usina de energia...
-Proibidas: energia, ATP, usina"></textarea>
-          </div>
-
-          <div id="panel-visual" style="display:flex; flex-direction:column; gap:1rem; margin-top:1rem;">
-            <div id="visual-concept-list" class="visual-list"></div>
-            <button class="btn-add-v" onclick="addVisualCard()" style="background:var(--surf); border:1.5px dashed var(--border2); color:var(--muted2); padding:0.8rem; border-radius:1rem; cursor:pointer; font-size:0.85rem; font-weight:600; transition:all 0.15s;" onmouseover="this.style.borderColor='var(--gold)'; this.style.color='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)'; this.style.color='var(--muted2)'">➕ Adicionar Novo Conceito</button>
           </div>
         </div>
-      </div>
 
         <div id="s-err" class="err-box" style="margin-top:1rem;"></div>
         
         <div style="text-align:center; margin-top:2rem; display:flex; flex-direction:column; align-items:center; gap:0.8rem;">
           <button class="btn-primary" id="btn-gerar" onclick="gerarJogo()" style="max-width:400px; padding:1.2rem; font-size:1.1rem; border-radius:1.2rem; box-shadow:0 10px 25px rgba(240,180,41,0.25);">🚀 Iniciar Atividade</button>
           
-          <!-- BrincaBytes: Botão salvar opcional se estiver logado -->
-          <button id="bb-btn-save" class="bb-btn-save" onclick="bbSaveCurrentList()" style="background:none; border:none; color:var(--muted2); font-size:0.8rem; cursor:pointer; font-weight:600; text-decoration:underline;" disabled>💾 Salvar esta lista na Biblioteca</button>
         </div>
       </div>
     </div>
@@ -2139,7 +2125,7 @@ Formate a saída como uma tabela Markdown.
     }
 
     let vCardsCount = 0;
-    function addVisualCard() {
+    function addVisualCard(data = null) {
       vCardsCount++;
       const id = Date.now() + Math.random().toString(36).substr(2, 5);
       const vList = document.getElementById('visual-concept-list');
@@ -2152,16 +2138,16 @@ Formate a saída como uma tabela Markdown.
           <button type="button" class="btn-rm-card" onclick="this.closest('.v-card').remove()">🗑️ Remover</button>
         </div>
         <div class="v-row">
-          <div><label class="v-label">Nome do Conceito / Resposta</label><input class="v-input vc-nome" placeholder="Ex: Mitocôndria"></div>
-          <div><label class="v-label">Palavras Proibidas (vírgulas)</label><input class="v-input vc-proibidas" placeholder="Ex: energia, atp, célula"></div>
+          <div><label class="v-label">Nome do Conceito / Resposta</label><input class="v-input vc-nome" placeholder="Ex: Mitocôndria" value="${data?.nome || ''}"></div>
+          <div><label class="v-label">Palavras Proibidas (vírgulas)</label><input class="v-input vc-proibidas" placeholder="Ex: energia, atp, célula" value="${data?.proibidas?.join?.(', ') || data?.proibidas || ''}"></div>
         </div>
         <div class="v-row">
-          <div><label class="v-label">Dica 1 (Difícil / Geral)</label><input class="v-input vc-d1" placeholder="Dica 1"></div>
-          <div><label class="v-label">Dica 2 (Média)</label><input class="v-input vc-d2" placeholder="Dica 2"></div>
+          <div><label class="v-label">Dica 1 (Difícil / Geral)</label><input class="v-input vc-d1" placeholder="Dica 1" value="${data?.dica1 || ''}"></div>
+          <div><label class="v-label">Dica 2 (Média)</label><input class="v-input vc-d2" placeholder="Dica 2" value="${data?.dica2 || ''}"></div>
         </div>
         <div class="v-row">
-          <div><label class="v-label">Dica 3 (Fácil)</label><input class="v-input vc-d3" placeholder="Dica 3"></div>
-          <div><label class="v-label">Dica 4 (Quase dada)</label><input class="v-input vc-d4" placeholder="Dica 4"></div>
+          <div><label class="v-label">Dica 3 (Fácil)</label><input class="v-input vc-d3" placeholder="Dica 3" value="${data?.dica3 || ''}"></div>
+          <div><label class="v-label">Dica 4 (Quase dada)</label><input class="v-input vc-d4" placeholder="Dica 4" value="${data?.dica4 || ''}"></div>
         </div>
       `;
       vList.appendChild(div);
@@ -2384,6 +2370,9 @@ Formate a saída como uma tabela Markdown.
         state.disciplina = "";
         state.serie = "";
         state.tema = tema;
+ 
+        // BrincaBytes: Salvar automaticamente se estiver conectado
+        if (bbConnected) bbSaveCurrentList(true);
 
         setTimeout(() => { // delay visual mínimo
           document.getElementById('btn-gerar').disabled = false;
@@ -3100,9 +3089,23 @@ Formate a saída como uma tabela Markdown.
       const item = bbLibraryData[idx];
       if (!item) return;
       if (item.titulo) document.getElementById('s-tema').value = item.titulo;
+      
       if (item.data) {
-        setEntryTab('texto');
+        // Popula tanto o texto quanto o visual
         document.getElementById('s-json-data').value = item.data;
+        
+        // Limpar cards visuais e repopular
+        const vList = document.getElementById('visual-concept-list');
+        vList.innerHTML = '';
+        vCardsCount = 0;
+        
+        const parsed = parseUserInput(item.data);
+        if (Array.isArray(parsed)) {
+          parsed.forEach(p => addVisualCard(p));
+          setEntryTab('visual');
+        } else {
+          setEntryTab('texto');
+        }
       }
       bbCloseLibrary();
       showToast(`"${item.titulo || 'Lista'}" carregada com sucesso! ✅`, 'success');
@@ -3117,8 +3120,8 @@ Formate a saída como uma tabela Markdown.
       showToast('Lista excluída.', 'success');
     }
 
-    function bbSaveCurrentList() {
-      if (!bbConnected) return showToast('Você precisa estar conectado ao Portal para salvar.', 'error');
+    function bbSaveCurrentList(silent = false) {
+      if (!bbConnected) return;
       const titulo = document.getElementById('s-tema')?.value?.trim();
       if (!titulo) return showToast('Preencha o Título da Aula antes de salvar.', 'error');
       let dataToSave = '';
@@ -3145,10 +3148,10 @@ Formate a saída como uma tabela Markdown.
       const entry = { titulo, disciplina: '', data: dataToSave, savedAt: Date.now() };
       if (existingIdx >= 0) bbLibraryData[existingIdx] = entry;
       else bbLibraryData.unshift(entry);
-      bbSaveBiblioteca(bbLibraryData);
+      bbSaveBiblioteca(bbLibraryData, silent);
     }
 
-    function bbSaveBiblioteca(data) {
+    function bbSaveBiblioteca(data, silent = false) {
       try {
         window.parent.postMessage({
           type: 'BRINCABYTES_SAVE_DATA',
@@ -3156,9 +3159,9 @@ Formate a saída como uma tabela Markdown.
           key: 'biblioteca',
           value: data
         }, '*');
-        showToast('Lista salva na Biblioteca! ✅', 'success');
+        if (!silent) showToast('Lista salva na Biblioteca! ✅', 'success');
       } catch(e) {
-        showToast('Erro ao salvar. Tente novamente.', 'error');
+        if (!silent) showToast('Erro ao salvar. Tente novamente.', 'error');
       }
     }
 
