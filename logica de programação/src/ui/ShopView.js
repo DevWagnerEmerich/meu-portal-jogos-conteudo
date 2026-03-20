@@ -19,6 +19,8 @@ class ShopView {
                 <button class="cat-btn ativo" data-type="avatar">Robôs</button>
                 <button class="cat-btn" data-type="background">Temas</button>
                 <button class="cat-btn" data-type="title">Títulos</button>
+                <button class="cat-btn" data-type="special">Extras</button>
+                <button class="cat-btn" data-type="community">🌍 Comunidade</button>
             </div>
             <div class="shop-grid" id="shopGrid"></div>
         `;
@@ -78,7 +80,9 @@ class ShopView {
             const actionHtml = isEquipped
                 ? `<button class="btn-shop equipped" disabled>Equipado</button>`
                 : isOwned
-                    ? `<button class="btn-shop equip" data-id="${item.id}">Equipar</button>`
+                    ? (item.type === 'special' || item.type === 'community'
+                        ? `<button class="btn-shop owned" disabled>Adquirido</button>`
+                        : `<button class="btn-shop equip" data-id="${item.id}">Equipar</button>`)
                     : `<button class="btn-shop buy" data-id="${item.id}" data-price="${item.price}">🟡 ${item.price}</button>`;
 
             card.innerHTML = `
