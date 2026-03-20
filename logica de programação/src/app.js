@@ -466,6 +466,17 @@ document.getElementById('overlay')?.addEventListener('click', function (e) {
 
 // ── INIT ─────────────────────────────────────────────────────
 (async () => {
+    // --- DATA BUSTER (v1_reset_full) ---
+    const DATA_VERSION = 'v1_reset_full';
+    const currentVersion = localStorage.getItem('cc_data_version');
+    if (currentVersion !== DATA_VERSION) {
+        console.log('[App] Data version mismatch. Resetting local progress for V2 economy...');
+        localStorage.removeItem('cc_prog');
+        localStorage.removeItem('cc_gami');
+        localStorage.removeItem('cc_rank');
+        localStorage.setItem('cc_data_version', DATA_VERSION);
+    }
+
     await initFirebase();
     await GamificationService.init();
     AchievementSystem.init();

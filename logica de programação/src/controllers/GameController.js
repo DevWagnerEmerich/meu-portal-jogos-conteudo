@@ -98,10 +98,13 @@ class GameController {
             const starBonus = stars === 3 ? 15 : stars === 2 ? 5 : 0;
             const timeBonus = StateManager.timerSecs < 10 ? 10 : 0;
             const comboBonus = StateManager.combo > 0 ? (StateManager.combo + 1) * 2 : 0;
-            const earnedCoins = baseCoins + starBonus + timeBonus + comboBonus;
+            let earnedCoins = baseCoins + starBonus + timeBonus + comboBonus;
 
-            // Only add coins if they haven't beaten this level before to avoid infinite farming? 
-            // We want to encourage replayability, so let's always give coins, maybe just baseCoins if already completed.
+            // [RESTORE] Amuleto de Ouro Multiplier (2x)
+            if (AuthService.player.hasItem('special_amulet')) {
+                earnedCoins *= 2;
+            }
+
             const uid = AuthService.player.uid;
             const prevProg = AuthService.player.getProgress(lang, question.id);
             const finalCoins = prevProg && prevProg.concluida ? Math.floor(earnedCoins / 2) : earnedCoins;

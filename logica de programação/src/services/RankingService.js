@@ -13,7 +13,7 @@ class RankingService {
     #db = null;  // Firestore instance
     #unsubscribe = null;
     #localKey = 'cc_rank';
-    #collection = 'ranking';
+    #collection = 'ranking_v2';
     #limit = 50;
 
     /** Initialize with Firestore instance */

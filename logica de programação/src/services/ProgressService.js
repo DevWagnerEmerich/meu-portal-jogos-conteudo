@@ -33,7 +33,7 @@ class ProgressService {
 
             for (const lang of langs) {
                 const snap = await getDocs(
-                    collection(this.#db, `progress/${uid}/languages/${lang}/questions`)
+                    collection(this.#db, `progress_v2/${uid}/languages/${lang}/questions`)
                 );
                 snap.docs.forEach(d => { result[`${lang}:${d.id}`] = d.data(); });
             }
@@ -66,7 +66,7 @@ class ProgressService {
             const { doc, setDoc } =
                 await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
             await setDoc(
-                doc(this.#db, `progress/${uid}/languages/${lang}/questions/${qId}`),
+                doc(this.#db, `progress_v2/${uid}/languages/${lang}/questions/${qId}`),
                 data,
                 { merge: true }
             );
@@ -89,7 +89,7 @@ class ProgressService {
 
         try {
             const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-            const snap = await getDoc(doc(this.#db, `progress/${uid}/gamification/profile`));
+            const snap = await getDoc(doc(this.#db, `progress_v2/${uid}/gamification/profile`));
 
             if (snap.exists()) {
                 const data = snap.data();
@@ -111,7 +111,7 @@ class ProgressService {
 
         try {
             const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-            await setDoc(doc(this.#db, `progress/${uid}/gamification/profile`), fullData, { merge: true });
+            await setDoc(doc(this.#db, `progress_v2/${uid}/gamification/profile`), fullData, { merge: true });
             EventBus.emit('gamification:saved', fullData);
         } catch (err) {
             console.error('[ProgressService] saveGamification failed:', err);

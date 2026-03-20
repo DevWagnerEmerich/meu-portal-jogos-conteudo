@@ -95,6 +95,23 @@
     }
 }
 
+@keyframes neonPulse {
+    from {
+        text-shadow: 0 0 10px #ff00de, 0 0 20px #ff00de;
+        color: #fff;
+    }
+
+    to {
+        text-shadow: 0 0 20px #ff00de, 0 0 40px #ff00de;
+        color: #ff00de;
+    }
+}
+
+.title-neon {
+    animation: neonPulse 1.5s infinite alternate !important;
+    font-weight: 800;
+}
+
 @keyframes confDrop {
     0% {
         transform: translateY(-20px) rotate(0deg);
