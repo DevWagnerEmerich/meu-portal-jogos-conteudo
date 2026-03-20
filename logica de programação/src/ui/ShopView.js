@@ -89,13 +89,13 @@ class ShopView {
             const card = document.createElement('div');
             card.className = `shop-item ${isOwned ? 'owned' : ''} ${isEquipped ? 'equipped' : ''}`;
 
-            const actionHtml = isEquipped
-                ? `<button class="btn-shop equipped" disabled>Equipado</button>`
-                : isOwned
-                    ? (item.type === 'special' || item.type === 'community'
-                        ? `<button class="btn-shop owned" disabled>Adquirido</button>`
-                        : `<button class="btn-shop equip" data-id="${item.id}">Equipar</button>`)
-                    : `<button class="btn-shop buy" data-id="${item.id}" data-price="${item.price}">🟡 ${item.price}</button>`;
+            const actionHtml = (item.type === 'special' && isOwned)
+                ? `<button class="btn-shop owned" disabled>Adquirido</button>`
+                : isEquipped
+                    ? `<button class="btn-shop equipped" disabled>Equipado</button>`
+                    : isOwned
+                        ? `<button class="btn-shop equip" data-id="${item.id}">Equipar</button>`
+                        : `<button class="btn-shop buy" data-id="${item.id}" data-price="${item.price}">🟡 ${item.price}</button>`;
 
             card.innerHTML = `
                 <div class="si-icon">${item.icon}</div>
