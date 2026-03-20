@@ -117,13 +117,13 @@ class ShopView {
                 const id = btn.dataset.id;
                 const price = parseInt(btn.dataset.price, 10);
                 if (GamificationService.getData().coins >= price) {
-                    if (confirm(`Comprar este item por ${price} Coins?`)) {
-                        SoundEngine.drag(); // Or a custom buy sound
+                    this.showConfirm('Confirmar Compra', `Deseja comprar este item por 🟡 ${price.toLocaleString('pt-BR')}?`, () => {
+                        SoundEngine.ok();
                         GamificationService.buyItem(id);
                         this.renderGrid(type);
-                    }
+                    });
                 } else {
-                    alert('Moedas insuficientes!');
+                    this.showAlert('Saldo Insuficiente', `Você precisa de 🟡 ${price.toLocaleString('pt-BR')} moedas.`);
                 }
             });
         });
@@ -188,7 +188,7 @@ class ShopView {
                     await CommunityService.contribute(AuthService.player.uid, playerName, amount);
                     // Subscription will trigger re-render
                 } else {
-                    alert('Moedas insuficientes!');
+                    this.showAlert('Saldo Insuficiente', 'Você não tem moedas suficientes para esta contribuição.');
                 }
             });
         });
@@ -273,6 +273,27 @@ class ShopView {
             </div>
         `;
         document.body.appendChild(overlay);
+    }
+
+    showConfirm(title, message, onConfirm) {
+        const overlay = document.createElement('div');
+        overlay.className = 'overlay-nome on';
+        overlay.style.zIndex = '3000';
+        overlay.innerHTML = `
+            <div class="modal-nome" style="max-width:300px; text-align:center">
+                <h3 style="margin-top:0; color:var(--ouro)">${title}</h3>
+                <p style="font-size:0.9rem; margin-bottom:20px; opacity:0.9">${message}</p>
+                <div style="display:flex; gap:10px">
+                    <button class="btn-jback" style="flex:1" onclick="this.closest('.overlay-nome').remove()">Não</button>
+                    <button class="btn-gami" id="btnConf" style="flex:1; padding:10px">Sim</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        overlay.querySelector('#btnConf').onclick = () => {
+            overlay.remove();
+            onConfirm();
+        };
     }
 }
 
