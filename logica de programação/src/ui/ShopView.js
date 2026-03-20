@@ -155,8 +155,9 @@ class ShopView {
                 <div class="si-contrib-btns">
                     <button class="btn-contrib" data-amt="1000">🪙 1k</button>
                     <button class="btn-contrib" data-amt="10000">🪙 10k</button>
-                    <button class="btn-contrib" data-amt="${remaining}">💰 Pagar Restante</button>
+                    <button class="btn-shop buy btn-custom-pay" style="flex:1.5; padding:8px; margin:0">💳 Pagar Valor</button>
                 </div>
+                <button class="btn-contrib pay-rest" data-amt="${remaining}" style="width:100%; margin-top:5px; background:rgba(255,215,0,0.2)">💰 Pagar Restante</button>
               `;
 
         card.innerHTML = `
@@ -197,7 +198,71 @@ class ShopView {
             });
         });
 
+        card.querySelector('.btn-custom-pay')?.addEventListener('click', () => {
+            this.showContributionModal(item);
+        });
+
         grid.appendChild(card);
+    }
+
+    showContributionModal(item) {
+        const communityData = CommunityService.getData();
+        const goal = item.price || 1000000;
+        const paid = communityData.total_paid || 0;
+        const remaining = Math.max(0, goal - paid);
+        const playerCoins = GamificationService.getData().coins;
+
+        const overlay = document.createElement('div');
+        overlay.className = 'overlay-nome on'; // Reusing standard overlay styles
+        overlay.style.zIndex = '2000';
+        overlay.innerHTML = `
+            <div class="modal-nome" style="max-width:320px">
+                <h3 style="margin-top:0; color:var(--ouro)">💰 Contribuir</h3>
+                <p style="font-size:0.85rem; margin-bottom:15px; opacity:0.8">
+                    Quanto deseja doar para <b>${item.name}</b>?<br>
+                    <small>Seu saldo: 🟡 ${playerCoins.toLocaleString('pt-BR')}</small>
+                </p>
+                <input type="number" id="inputContrib" placeholder="Ex: 5000" 
+                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--ouro); color:#fff; border-radius:8px; margin-bottom:15px">
+                <div style="display:flex; gap:10px">
+                    <button class="btn-jback" id="btnCancelContrib" style="flex:1">Cancelar</button>
+                    <button class="btn-gami" id="btnConfirmContrib" style="flex:2; padding:10px">Confirmar</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+        const input = overlay.querySelector('#inputContrib');
+        input.focus();
+
+        const close = () => overlay.remove();
+
+        overlay.querySelector('#btnCancelContrib').onclick = close;
+        overlay.querySelector('#btnConfirmContrib').onclick = async () => {
+            const val = parseInt(input.value, 10);
+            if (isNaN(val) || val <= 0) {
+                alert('Digite um valor válido!');
+                return;
+            }
+            if (val > playerCoins) {
+                alert('Saldo insuficiente!');
+                return;
+            }
+            if (val > remaining) {
+                if (!confirm(`O valor digitado (${val}) é maior que o restante necessário (${remaining}). Deseja pagar apenas o restante?`)) return;
+                input.value = remaining;
+                return; // Let user click confirm again or just proceed with remaining
+            }
+
+            if (GamificationService.spendCoins(val)) {
+                SoundEngine.ok();
+                const playerName = AuthService.player.nome || 'Anônimo';
+                await CommunityService.contribute(AuthService.player.uid, playerName, val);
+                close();
+            }
+        };
+
+        input.onkeydown = (e) => { if (e.key === 'Enter') overlay.querySelector('#btnConfirmContrib').onclick(); };
     }
 }
 
