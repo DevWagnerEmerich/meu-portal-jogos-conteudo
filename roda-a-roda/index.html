@@ -49,24 +49,38 @@
         </select>
       </div>
 
+      <!-- SEÇÃO 3: FONTE DE DADOS -->
+      <div class="input-group bb-group">
+        <label class="improved-label">Importar/Carregar Dados:</label>
         <div class="button-row">
-            <button id="download-template-initial" class="improved-button secondary-btn">Modelo Excel</button>
-            <button id="load-csv-initial" class="improved-button">Carregar Arquivo</button>
-            <button id="btn-bb-library-initial" class="bb-btn-library" disabled>📚 Biblioteca</button>
-            <button id="bb-btn-save-initial" class="bb-btn-save" disabled>💾 Salvar Lista</button>
+            <button id="download-template-initial" class="bb-clean-btn secondary" title="Baixar Modelo Excel">📂 Modelo</button>
+            <button id="load-csv-initial" class="bb-clean-btn primary" title="Carregar arquivo local">📁 Carregar</button>
+            <button id="btn-bb-library-initial" class="bb-clean-btn portal" disabled title="Acessar Biblioteca BrincaBytes">📚 Biblioteca</button>
         </div>
-
         <input type="file" id="csv-upload-initial" accept=".csv, .xlsx, .xls" style="display: none;" aria-hidden="true">
-        <span id="csv-status-initial">Nenhuma planilha carregada.</span>
+        <small id="csv-status-initial">Nenhuma planilha carregada.</small>
       </div>
 
-
-      <div class="input-group">
-        <label for="theme-initial" class="improved-label">Escolha um tema:</label>
-        <select id="theme-initial" class="improved-select" disabled aria-disabled="true">
-          <option value="" selected>Carregue uma planilha primeiro</option>
-        </select>
+      <!-- SEÇÃO 4: SALVAR NA BIBLIOTECA -->
+      <div class="input-group bb-group" id="bb-save-section">
+        <label for="bb-list-name-initial" class="improved-label">Salvar na Biblioteca:</label>
+        <div class="bb-save-row">
+            <input type="text" id="bb-list-name-initial" class="improved-input" placeholder="Nome da lista para o portal">
+            <button id="bb-btn-save-initial" class="bb-btn-save" disabled>💾 Salvar</button>
+        </div>
       </div>
+
+      <!-- SEÇÃO 5: FINALIZAÇÃO -->
+      <div class="input-group theme-start-row">
+        <div class="theme-select-col">
+            <label for="theme-initial" class="improved-label">Tema:</label>
+            <select id="theme-initial" class="improved-select" disabled>
+                <option value="">Carregue uma planilha primeiro</option>
+            </select>
+        </div>
+        <button id="start-game-btn" class="improved-button primary-btn start-btn" disabled>INICIAR JOGO 🚀</button>
+      </div>
+
 
 
 

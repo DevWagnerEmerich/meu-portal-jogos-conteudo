@@ -1141,8 +1141,17 @@ class RodaARodaGame {
                     if (context === 'initial') {
                         if (sel) { sel.disabled = false; sel.removeAttribute('aria-disabled'); }
                         if (this.csvStatusInitial) this.csvStatusInitial.textContent = `"${file.name}" carregado.`;
+                        
+                        // Sugerir nome da lista baseado no arquivo
+                        const listNameInput = document.getElementById('bb-list-name-initial');
+                        if (listNameInput) {
+                            listNameInput.value = file.name.split('.')[0];
+                            listNameInput.dataset.manual = "true";
+                        }
+                        
                         this.checkInitialConfigReady();
                     } else {
+
                         if (this.csvStatusIngame) this.csvStatusIngame.textContent = `"${file.name}" carregado.`;
                         if (this.currentTheme && !this.userDatabase.find(t => t.theme === this.currentTheme.theme)) {
                             this.showToast("Atenção: O tema atual não está na nova planilha.", "info", 6000);
@@ -1389,6 +1398,18 @@ class RodaARodaGame {
         const btnSaveInitial = document.getElementById('bb-btn-save-initial');
         if (btnSaveInitial) btnSaveInitial.onclick = () => this.bbSaveCurrentList();
 
+        // Sincronizar campo de nome da lista com título do jogo
+        const listNameInput = document.getElementById('bb-list-name-initial');
+        if (listNameInput && this.gameTitleInput) {
+            this.gameTitleInput.addEventListener('input', () => {
+                if (!listNameInput.dataset.manual) listNameInput.value = this.gameTitleInput.value;
+            });
+            listNameInput.addEventListener('input', () => {
+                listNameInput.dataset.manual = "true";
+            });
+        }
+
+
 
         // Fechar modal clicando no backdrop
         const libModal = document.getElementById('bb-library-modal');
@@ -1421,6 +1442,10 @@ class RodaARodaGame {
             if (btnLibIngame) { btnLibIngame.disabled = false; btnLibIngame.removeAttribute('aria-disabled'); }
             if (btnSaveIngame) { btnSaveIngame.disabled = false; btnSaveIngame.removeAttribute('aria-disabled'); }
             if (btnSaveInitial) { btnSaveInitial.disabled = false; btnSaveInitial.removeAttribute('aria-disabled'); }
+            
+            // Mostrar seção de salvamento apenas se conectado
+            const saveSection = document.getElementById('bb-save-section');
+            if (saveSection) saveSection.style.display = 'block';
         } else {
             if (footer) {
                 footer.style.display = 'flex';
@@ -1430,7 +1455,11 @@ class RodaARodaGame {
             if (btnLibIngame) { btnLibIngame.disabled = true; btnLibIngame.setAttribute('aria-disabled', 'true'); }
             if (btnSaveIngame) { btnSaveIngame.disabled = true; btnSaveIngame.setAttribute('aria-disabled', 'true'); }
             if (btnSaveInitial) { btnSaveInitial.disabled = true; btnSaveInitial.setAttribute('aria-disabled', 'true'); }
+
+            const saveSection = document.getElementById('bb-save-section');
+            if (saveSection) saveSection.style.display = 'none';
         }
+
 
     }
 
@@ -1518,7 +1547,15 @@ class RodaARodaGame {
             return;
         }
 
-        const titulo = this.gameTitleInput?.value?.trim() || "Minha Lista Roda a Roda";
+        let titulo = this.gameTitleInput?.value?.trim() || "Minha Lista Roda a Roda";
+
+        
+        // Priorizar o campo de nome específico se estivermos na tela inicial
+        const listNameInput = document.getElementById('bb-list-name-initial');
+        if (listNameInput && listNameInput.value.trim()) {
+            titulo = listNameInput.value.trim();
+        }
+
         const entry = {
             titulo: titulo,
             data: JSON.stringify(this.userDatabase),

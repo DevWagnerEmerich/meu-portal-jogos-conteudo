@@ -1464,30 +1464,83 @@ body.dark-mode .status-indicator {
 /* ... mais estilos de dark-mode podem ser necessários para cobrir tudo ... */
 
 /* ============================================================
-   BRINCABYTES PORTAL INTEGRATION - REFINED
+   BRINCABYTES PORTAL INTEGRATION - REFINED V3 (SOLID & SIMPLE)
    ============================================================ */
+
+#initial-config-modal .improved-start-modal {
+    max-width: 800px;
+    width: 95%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.bb-group {
+    background: rgba(0, 123, 255, 0.03);
+    border: 1px solid rgba(0, 123, 255, 0.1) !important;
+    border-radius: 12px;
+    padding: 15px !important;
+    margin-bottom: 20px !important;
+}
 
 .button-row {
     display: flex;
-    gap: 10px;
-    margin-top: 5px;
-    margin-bottom: 15px;
+    gap: 12px;
+    margin: 10px 0;
 }
-.button-row .improved-button, 
-.button-row .bb-btn-library,
-.button-row .bb-btn-save {
+
+.bb-clean-btn {
     flex: 1;
-    margin: 0;
-    padding: 10px 4px;
-    font-size: 0.8rem;
-    height: 48px;
+    height: 50px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;
-    text-align: center;
-    line-height: 1.1;
+    gap: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+.bb-clean-btn.secondary { background: #f1f5f9; color: #475569; }
+.bb-clean-btn.primary { background: #22c55e; color: #fff; }
+.bb-clean-btn.portal { background: #3b82f6; color: #fff; }
+.bb-clean-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+.bb-clean-btn:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+
+.bb-save-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+.bb-save-row .improved-input { flex: 1; margin: 0; }
+.bb-save-row .bb-btn-save {
+    width: 140px;
+    height: 50px;
+    padding: 0;
+    margin: 0;
+    border-radius: 8px;
 }
 
+.theme-start-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 20px;
+    margin-top: 10px;
+    border: none !important;
+    padding-bottom: 0 !important;
+}
+.theme-select-col { flex: 1; }
+.start-btn {
+    flex: 1;
+    height: 65px;
+    margin: 0 !important;
+    font-size: 1.2rem !important;
+    background: linear-gradient(135deg, #007bff, #0056b3) !important;
+    box-shadow: 0 8px 20px rgba(0, 123, 255, 0.3) !important;
+}
 
 .bb-footer {
     margin-top: 25px;
@@ -1500,27 +1553,21 @@ body.dark-mode .status-indicator {
     justify-content: center;
     gap: 10px;
 }
-.dark-mode .bb-footer {
-    border-top-color: rgba(255,255,255,0.1);
-    color: #aaa;
-}
+.dark-mode .bb-footer { border-top-color: rgba(255,255,255,0.1); color: #aaa; }
 
 .bb-badge {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: rgba(40, 167, 69, 0.1);
-    border: 1px solid rgba(40, 167, 69, 0.2);
-    color: #28a745;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    color: #16a34a;
     font-size: 0.7rem;
     font-weight: 700;
     padding: 2px 8px;
     border-radius: 12px;
 }
-.bb-dot {
-    width: 6px; height: 6px; background: #28a745; border-radius: 50%;
-    box-shadow: 0 0 5px #28a745;
-}
+.bb-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 5px #22c55e; }
 
 /* Modal Biblioteca */
 #bb-library-modal {
@@ -1534,7 +1581,6 @@ body.dark-mode .status-indicator {
     padding: 20px;
 }
 #bb-library-modal.open { display: flex; }
-
 .bb-modal-box {
     background: #fff; width: 100%; max-width: 550px;
     border-radius: 20px; overflow: hidden;
@@ -1543,33 +1589,27 @@ body.dark-mode .status-indicator {
     max-height: 85vh; border: 1px solid #eee;
 }
 .dark-mode .bb-modal-box { background: #0f172a; border-color: #1e293b; color: #f1f5f9; }
-
 .bb-modal-header {
     padding: 18px 24px; background: linear-gradient(135deg, #0056b3, #007bff);
     color: #fff; display: flex; justify-content: space-between; align-items: center;
 }
 .bb-modal-header h2 { margin: 0; font-size: 1.25rem; font-weight: 700; }
 .bb-btn-close { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; opacity: 0.8; }
-.bb-btn-close:hover { opacity: 1; }
-
 .bb-modal-body { padding: 20px; overflow-y: auto; }
 .bb-search-bar input {
     width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid #ddd;
     margin-bottom: 20px; transition: 0.2s;
 }
 .dark-mode .bb-search-bar input { background: #1e293b; border-color: #334155; color: #fff; }
-
 .bb-list-container { display: flex; flex-direction: column; gap: 10px; }
 .bb-list-item {
     background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
     padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;
 }
 .dark-mode .bb-list-item { background: rgba(255,255,255,0.03); border-color: #1e293b; }
-
 .bb-item-name { font-weight: 700; color: #0056b3; font-size: 0.95rem; }
 .dark-mode .bb-item-name { color: #38bdf8; }
 .bb-item-meta { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
-
 .bb-item-actions { display: flex; gap: 8px; }
 .bb-btn-load { background: #007bff; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; }
 .bb-btn-del { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 5px 8px; border-radius: 6px; cursor: pointer; }
@@ -1578,12 +1618,8 @@ body.dark-mode .status-indicator {
     background: linear-gradient(135deg, #fbbf24, #f59e0b);
     color: #000; border: none; padding: 14px; border-radius: 12px;
     font-weight: 700; cursor: pointer; transition: 0.3s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
 }
-.bb-btn-save:hover { filter: brightness(1.1); transform: translateY(-2px); }
+.bb-btn-save:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-2px); }
 .bb-btn-save:disabled { opacity: 0.5; filter: grayscale(1); transform: none; }
-
-.bb-btn-library {
-    background: rgba(0, 123, 255, 0.05); color: #007bff; border: 1.5px solid #007bff;
-    border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.2s;
-}
-.bb-btn-library:hover:not(:disabled) { background: #007bff; color: #fff; }
+
