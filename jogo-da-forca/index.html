@@ -472,8 +472,21 @@ body.theme-high {
 }
 #excel-modal .btn-next:hover { transform:translateY(-2px); box-shadow:0 6px 15px rgba(0,0,0,0.3); }
 
+/* ── CUSTOM CONFIRM MODAL ── */
+.modal-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); backdrop-filter:blur(10px); display:none; align-items:center; justify-content:center; z-index:9999; animation:fadeIn .3s ease; }
+.modal-card { background:#0F0F12; border:2px solid var(--a1); border-radius:1.5rem; width:90%; max-width:400px; padding:2rem; text-align:center; box-shadow:0 0 50px rgba(0,0,0,0.6), 0 0 20px var(--a1_glow); animation:popIn .3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+@keyframes popIn { from { transform:scale(0.8); opacity:0; } to { transform:scale(1); opacity:1; } }
+.modal-title { font-family:'Space Mono',monospace; font-size:1.3rem; color:white; margin-bottom:1rem; letter-spacing:1px; }
+.modal-body { font-size:1rem; color:#A1A1AA; line-height:1.4; margin-bottom:2rem; font-family:'Rajdhani',sans-serif; }
+.modal-btns { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.btn-modal { padding:0.8rem; border-radius:0.8rem; border:none; cursor:pointer; font-weight:700; font-family:'Rajdhani',sans-serif; transition:0.2s; font-size:1rem; }
+.btn-cancel { background:rgba(255,255,255,0.05); color:#71717A; border:1px solid rgba(255,255,255,0.1); }
+.btn-cancel:hover { background:rgba(255,255,255,0.1); color:white; }
+.btn-confirm { background:var(--a1); color:black; box-shadow:0 0 10px var(--a1_glow); }
+.btn-confirm:hover { box-shadow:0 0 20px var(--a1_glow); transform:translateY(-2px); }
 
 /* Toast */
+
 .toast {
   position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px);
   background:#18181B; border:1px solid #27272A; color:#FAFAFA;
@@ -619,6 +632,19 @@ body.theme-high {
   </div>
 </div>
 
+<!-- ══════════ CUSTOM CONFIRM MODAL ══════════ -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal-card">
+    <div class="modal-title" id="confirm-title">Confirmar!</div>
+    <div class="modal-body" id="confirm-msg">Deseja realizar esta ação?</div>
+    <div class="modal-btns">
+      <button class="btn-modal btn-cancel" id="confirm-cancel">Cancelar</button>
+      <button class="btn-modal btn-confirm" id="confirm-ok">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+
 <!-- ══════════ ADMIN PANEL ══════════ -->
 <div class="screen" id="admin">
 
@@ -724,6 +750,24 @@ body.theme-high {
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+function showConfirm(title, msg) {
+  return new Promise((resolve) => {
+    const modal = document.getElementById('confirm-modal');
+    document.getElementById('confirm-title').innerText = title;
+    document.getElementById('confirm-msg').innerText = msg;
+    modal.style.display = 'flex';
+    
+    document.getElementById('confirm-ok').onclick = () => {
+      modal.style.display = 'none';
+      resolve(true);
+    };
+    document.getElementById('confirm-cancel').onclick = () => {
+      modal.style.display = 'none';
+      resolve(false);
+    };
+  });
+}
+
 /* ══════════════════════════════════════════
    BUILT-IN DATA
 ══════════════════════════════════════════ */
@@ -1192,7 +1236,7 @@ function saveCat() {
 }
 
 
-function deleteCat(id) {
+async function deleteCat(id) {
   const data = getCustomCats();
   const cat = data[adminTheme][id];
   
@@ -1208,7 +1252,9 @@ function deleteCat(id) {
     return;
   }
 
-  if (!confirm('Excluir esta categoria? As palavras serão perdidas.')) return;
+  const ok = await showConfirm('Excluir Categoria?', 'As palavras desta categoria serão perdidas permanentemente. Deseja continuar?');
+  if (!ok) return;
+
   delete data[adminTheme][id];
   saveCustomCats(data);
   renderCustomList();
@@ -1216,6 +1262,7 @@ function deleteCat(id) {
   
   if (currentBrincaUser) saveToBrincabytes();
 }
+
 
 
 
