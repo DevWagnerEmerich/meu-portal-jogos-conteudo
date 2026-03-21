@@ -1383,8 +1383,12 @@ class RodaARodaGame {
         const btnLibIngame = document.getElementById('btn-bb-library-ingame');
         if (btnLibIngame) btnLibIngame.onclick = () => this.bbOpenLibrary();
 
-        const btnSave = document.getElementById('bb-btn-save');
-        if (btnSave) btnSave.onclick = () => this.bbSaveCurrentList();
+        const btnSaveIngame = document.getElementById('bb-btn-save');
+        if (btnSaveIngame) btnSaveIngame.onclick = () => this.bbSaveCurrentList();
+
+        const btnSaveInitial = document.getElementById('bb-btn-save-initial');
+        if (btnSaveInitial) btnSaveInitial.onclick = () => this.bbSaveCurrentList();
+
 
         // Fechar modal clicando no backdrop
         const libModal = document.getElementById('bb-library-modal');
@@ -1405,7 +1409,8 @@ class RodaARodaGame {
         const footer = document.getElementById('bb-footer');
         const btnLibInit = document.getElementById('btn-bb-library-initial');
         const btnLibIngame = document.getElementById('btn-bb-library-ingame');
-        const btnSave = document.getElementById('bb-btn-save');
+        const btnSaveIngame = document.getElementById('bb-btn-save');
+        const btnSaveInitial = document.getElementById('bb-btn-save-initial');
 
         if (this.bbConnected && this.bbUser) {
             if (footer) {
@@ -1414,7 +1419,8 @@ class RodaARodaGame {
             }
             if (btnLibInit) { btnLibInit.disabled = false; btnLibInit.removeAttribute('aria-disabled'); }
             if (btnLibIngame) { btnLibIngame.disabled = false; btnLibIngame.removeAttribute('aria-disabled'); }
-            if (btnSave) { btnSave.disabled = false; btnSave.removeAttribute('aria-disabled'); }
+            if (btnSaveIngame) { btnSaveIngame.disabled = false; btnSaveIngame.removeAttribute('aria-disabled'); }
+            if (btnSaveInitial) { btnSaveInitial.disabled = false; btnSaveInitial.removeAttribute('aria-disabled'); }
         } else {
             if (footer) {
                 footer.style.display = 'flex';
@@ -1422,8 +1428,10 @@ class RodaARodaGame {
             }
             if (btnLibInit) { btnLibInit.disabled = true; btnLibInit.setAttribute('aria-disabled', 'true'); }
             if (btnLibIngame) { btnLibIngame.disabled = true; btnLibIngame.setAttribute('aria-disabled', 'true'); }
-            if (btnSave) { btnSave.disabled = true; btnSave.setAttribute('aria-disabled', 'true'); }
+            if (btnSaveIngame) { btnSaveIngame.disabled = true; btnSaveIngame.setAttribute('aria-disabled', 'true'); }
+            if (btnSaveInitial) { btnSaveInitial.disabled = true; btnSaveInitial.setAttribute('aria-disabled', 'true'); }
         }
+
     }
 
 

@@ -93,7 +93,7 @@ body.game-body {
 
 /* --- Modal de Configuração Inicial (MELHORADO) --- */
 #initial-config-modal .improved-start-modal {
-  max-width: 650px;
+  max-width: 800px;
   height: auto;
   max-height: 90vh;
   overflow-y: auto;
@@ -1474,16 +1474,20 @@ body.dark-mode .status-indicator {
     margin-bottom: 15px;
 }
 .button-row .improved-button, 
-.button-row .bb-btn-library {
+.button-row .bb-btn-library,
+.button-row .bb-btn-save {
     flex: 1;
     margin: 0;
-    padding: 10px 5px;
-    font-size: 0.85rem;
-    height: 45px;
+    padding: 10px 4px;
+    font-size: 0.8rem;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
+    text-align: center;
+    line-height: 1.1;
 }
+
 
 .bb-footer {
     margin-top: 25px;
