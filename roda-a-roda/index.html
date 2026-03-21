@@ -58,7 +58,7 @@
             <button id="btn-bb-library-initial" class="bb-clean-btn portal" disabled title="Acessar Biblioteca BrincaBytes">📚 Biblioteca</button>
         </div>
         <input type="file" id="csv-upload-initial" accept=".csv, .xlsx, .xls" style="display: none;" aria-hidden="true">
-        <small id="csv-status-initial">Nenhuma planilha carregada.</small>
+
       </div>
 
       <!-- SEÇÃO 4: SALVAR NA BIBLIOTECA -->
@@ -81,14 +81,9 @@
         <button id="start-game-btn" class="improved-button primary-btn start-btn" disabled>INICIAR JOGO 🚀</button>
       </div>
 
-
-
-
-      <div class="input-group">
-        <button id="start-game-btn" class="improved-button primary-btn" disabled aria-disabled="true">Iniciar Jogo</button>
-      </div>
     </div>
   </div>
+
 
   <div class="game-area" id="game-area" style="display: none;">
 
@@ -320,6 +315,17 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="script.js"></script>
-</body>
+  <!-- Modal de Confirmação/Alerta Customizado -->
+  <div id="bb-custom-modal" class="bb-modal-overlay">
+      <div class="bb-modal-box">
+          <div class="bb-modal-header" id="bb-modal-title-custom">Aviso</div>
+          <div class="bb-modal-body" id="bb-modal-message-custom">Mensagem aqui...</div>
+          <div class="bb-modal-footer">
+              <button id="bb-modal-btn-cancel" class="bb-clean-btn secondary">Cancelar</button>
+              <button id="bb-modal-btn-ok" class="bb-clean-btn primary">OK</button>
+          </div>
+      </div>
+  </div>
 
+</body>
 </html>

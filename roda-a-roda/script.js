@@ -1140,7 +1140,6 @@ class RodaARodaGame {
 
                     if (context === 'initial') {
                         if (sel) { sel.disabled = false; sel.removeAttribute('aria-disabled'); }
-                        if (this.csvStatusInitial) this.csvStatusInitial.textContent = `"${file.name}" carregado.`;
                         
                         // Sugerir nome da lista baseado no arquivo
                         const listNameInput = document.getElementById('bb-list-name-initial');
@@ -1151,6 +1150,7 @@ class RodaARodaGame {
                         
                         this.checkInitialConfigReady();
                     } else {
+
 
                         if (this.csvStatusIngame) this.csvStatusIngame.textContent = `"${file.name}" carregado.`;
                         if (this.currentTheme && !this.userDatabase.find(t => t.theme === this.currentTheme.theme)) {
@@ -1521,7 +1521,6 @@ class RodaARodaGame {
             this.updateThemeSelector(this.themeSelectorInitial, true);
             this.updateThemeSelector(this.themeSelectorIngame, false);
             
-            if (this.csvStatusInitial) this.csvStatusInitial.textContent = `"${item.titulo}" (Biblioteca) carregado.`;
             if (this.csvStatusIngame) this.csvStatusIngame.textContent = `"${item.titulo}" (Biblioteca) carregado.`;
 
             this.bbCloseLibrary();
@@ -1532,13 +1531,45 @@ class RodaARodaGame {
         }
     }
 
-    bbExcluirItem(idx) {
-        if (!confirm('Deseja excluir esta lista da sua biblioteca?')) return;
-        this.bbLibraryData.splice(idx, 1);
-        this.bbSaveBiblioteca(this.bbLibraryData);
-        this.bbRenderLibrary();
-        this.showToast('Lista excluída.', 'success');
+    bbDeleteList(index) {
+        this.showCustomModal("Deseja excluir esta lista da sua biblioteca?", "confirm", () => {
+            this.bbLibraryData.splice(index, 1);
+            this.bbSaveBiblioteca(this.bbLibraryData);
+            this.bbRenderLibrary();
+            this.showToast('Lista excluída.', 'success');
+        });
     }
+
+    showCustomModal(message, type = 'alert', onConfirm = null) {
+        const overlay = document.getElementById('bb-custom-modal');
+        const title = document.getElementById('bb-modal-title-custom');
+        const msg = document.getElementById('bb-modal-message-custom');
+        const btnOk = document.getElementById('bb-modal-btn-ok');
+        const btnCancel = document.getElementById('bb-modal-btn-cancel');
+
+        if (!overlay || !title || !msg || !btnOk || !btnCancel) return;
+
+        title.textContent = type === 'confirm' ? 'Confirmação' : 'Aviso';
+        msg.textContent = message;
+        
+        btnCancel.style.display = type === 'confirm' ? 'flex' : 'none';
+        
+        overlay.classList.add('open');
+
+        const close = () => {
+            overlay.classList.remove('open');
+            btnOk.onclick = null;
+            btnCancel.onclick = null;
+        };
+
+        btnOk.onclick = () => {
+            close();
+            if (onConfirm) onConfirm();
+        };
+        
+        btnCancel.onclick = () => close();
+    }
+
 
     bbSaveCurrentList(silent = false) {
         if (!this.bbConnected) return;
