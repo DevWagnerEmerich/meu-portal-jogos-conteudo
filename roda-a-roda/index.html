@@ -21,15 +21,18 @@
       <button class="mode-button" data-mode="classic">Clássico</button>
       <button class="mode-button" data-mode="quick">Resposta Rápida</button>
       <button class="mode-button" data-mode="concept" disabled aria-disabled="true">Conceitual (Em Breve)</button>
+      
+      <!-- FOOTER BRINCABYTES -->
+      <div id="bb-footer" class="bb-footer" style="display: none;"></div>
     </div>
+
   </div>
 
   <div class="modal" id="initial-config-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="initial-config-title">
     <div class="modal-content improved-start-modal">
       <h2 class="improved-modal-title" id="initial-config-title">Configurar Jogo: Modo Clássico</h2>
       
-      <!-- BRINCABYTES INTEGRATION -->
-      <div id="bb-status-banner" style="display: none;"></div>
+
 
       <div class="input-group">
         <label for="game-title" class="improved-label">Título do Jogo:</label>
@@ -47,19 +50,24 @@
       </div>
 
       <div class="input-group">
-        <button id="download-template-initial" class="improved-button secondary-btn" style="margin-bottom: 10px; width: 100%;">Baixar Modelo (Excel)</button>
-        <button id="load-csv-initial" class="improved-button">Carregar Planilha (.csv, .xlsx)</button>
+        <label class="improved-label">Fonte de Dados:</label>
+        <div class="button-row">
+            <button id="download-template-initial" class="improved-button secondary-btn">Modelo Excel</button>
+            <button id="load-csv-initial" class="improved-button">Carregar Arquivo</button>
+            <button id="btn-bb-library-initial" class="bb-btn-library" disabled>📚 Minha Biblioteca</button>
+        </div>
         <input type="file" id="csv-upload-initial" accept=".csv, .xlsx, .xls" style="display: none;" aria-hidden="true">
         <span id="csv-status-initial">Nenhuma planilha carregada.</span>
       </div>
+
 
       <div class="input-group">
         <label for="theme-initial" class="improved-label">Escolha um tema:</label>
         <select id="theme-initial" class="improved-select" disabled aria-disabled="true">
           <option value="" selected>Carregue uma planilha primeiro</option>
         </select>
-        <button id="btn-bb-library-initial" class="bb-btn-library" disabled title="Acesse sua Biblioteca BrincaBytes">📚 Minha Biblioteca BrincaBytes</button>
       </div>
+
 
 
       <div class="input-group">
@@ -143,11 +151,15 @@
       <div id="tab-csv" class="tab-content active" role="tabpanel" aria-labelledby="tab-csv-button">
         <h3>Trocar Planilha e Tema</h3>
         <div class="input-group">
-          <button id="download-template-ingame" class="improved-button secondary-btn" style="margin-bottom: 10px; width: 100%;">Baixar Modelo (Excel)</button>
-          <button id="load-csv-ingame" class="improved-button">Carregar Nova Planilha (.csv, .xlsx)</button>
+          <label class="improved-label">Fonte de Dados:</label>
+          <div class="button-row">
+              <button id="download-template-ingame" class="improved-button secondary-btn">Modelo Excel</button>
+              <button id="load-csv-ingame" class="improved-button">Carregar Arquivo</button>
+          </div>
           <input type="file" id="csv-upload-ingame" accept=".csv, .xlsx, .xls" style="display: none;" aria-hidden="true">
           <span id="csv-status-ingame">Nenhuma planilha carregada ou a atual está em uso.</span>
         </div>
+
         <div class="input-group">
           <label for="theme-ingame" class="improved-label">Escolha um Tema:</label>
           <select id="theme-ingame" class="improved-select" disabled aria-disabled="true">
@@ -155,10 +167,13 @@
           </select>
         </div>
         <div class="input-group"> 
-          <button id="apply-theme-and-restart-btn" class="improved-button primary-btn" disabled aria-disabled="true">Aplicar Tema e Reiniciar Jogo</button>
-          <button id="btn-bb-library-ingame" class="bb-btn-library" disabled title="Acesse sua Biblioteca BrincaBytes">📚 Minha Biblioteca BrincaBytes</button>
-          <button id="bb-btn-save" class="bb-btn-save" style="margin-top: 10px; width: 100%; justify-content: center;" disabled>💾 Salvar Lista na Biblioteca</button>
+          <div class="button-row">
+              <button id="apply-theme-and-restart-btn" class="improved-button primary-btn" disabled>Aplicar e Reiniciar</button>
+              <button id="btn-bb-library-ingame" class="bb-btn-library" disabled>📚 Minha Biblioteca</button>
+          </div>
+          <button id="bb-btn-save" class="bb-btn-save" style="margin-top: 5px; width: 100%;" disabled>💾 Salvar Lista na Biblioteca BrincaBytes</button>
         </div>
+
 
       </div>
 

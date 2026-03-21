@@ -1462,3 +1462,124 @@ body.dark-mode .status-indicator {
   border-width: 0;
 }
 /* ... mais estilos de dark-mode podem ser necessários para cobrir tudo ... */
+
+/* ============================================================
+   BRINCABYTES PORTAL INTEGRATION - REFINED
+   ============================================================ */
+
+.button-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+.button-row .improved-button, 
+.button-row .bb-btn-library {
+    flex: 1;
+    margin: 0;
+    padding: 10px 5px;
+    font-size: 0.85rem;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bb-footer {
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    font-size: 0.85rem;
+    color: #555;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+.dark-mode .bb-footer {
+    border-top-color: rgba(255,255,255,0.1);
+    color: #aaa;
+}
+
+.bb-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(40, 167, 69, 0.1);
+    border: 1px solid rgba(40, 167, 69, 0.2);
+    color: #28a745;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+.bb-dot {
+    width: 6px; height: 6px; background: #28a745; border-radius: 50%;
+    box-shadow: 0 0 5px #28a745;
+}
+
+/* Modal Biblioteca */
+#bb-library-modal {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0, 5, 20, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 20px;
+}
+#bb-library-modal.open { display: flex; }
+
+.bb-modal-box {
+    background: #fff; width: 100%; max-width: 550px;
+    border-radius: 20px; overflow: hidden;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+    display: flex; flex-direction: column;
+    max-height: 85vh; border: 1px solid #eee;
+}
+.dark-mode .bb-modal-box { background: #0f172a; border-color: #1e293b; color: #f1f5f9; }
+
+.bb-modal-header {
+    padding: 18px 24px; background: linear-gradient(135deg, #0056b3, #007bff);
+    color: #fff; display: flex; justify-content: space-between; align-items: center;
+}
+.bb-modal-header h2 { margin: 0; font-size: 1.25rem; font-weight: 700; }
+.bb-btn-close { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; opacity: 0.8; }
+.bb-btn-close:hover { opacity: 1; }
+
+.bb-modal-body { padding: 20px; overflow-y: auto; }
+.bb-search-bar input {
+    width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid #ddd;
+    margin-bottom: 20px; transition: 0.2s;
+}
+.dark-mode .bb-search-bar input { background: #1e293b; border-color: #334155; color: #fff; }
+
+.bb-list-container { display: flex; flex-direction: column; gap: 10px; }
+.bb-list-item {
+    background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px;
+    padding: 14px 18px; display: flex; justify-content: space-between; align-items: center;
+}
+.dark-mode .bb-list-item { background: rgba(255,255,255,0.03); border-color: #1e293b; }
+
+.bb-item-name { font-weight: 700; color: #0056b3; font-size: 0.95rem; }
+.dark-mode .bb-item-name { color: #38bdf8; }
+.bb-item-meta { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
+
+.bb-item-actions { display: flex; gap: 8px; }
+.bb-btn-load { background: #007bff; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-weight: 600; cursor: pointer; }
+.bb-btn-del { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 5px 8px; border-radius: 6px; cursor: pointer; }
+
+.bb-btn-save {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #000; border: none; padding: 14px; border-radius: 12px;
+    font-weight: 700; cursor: pointer; transition: 0.3s;
+}
+.bb-btn-save:hover { filter: brightness(1.1); transform: translateY(-2px); }
+.bb-btn-save:disabled { opacity: 0.5; filter: grayscale(1); transform: none; }
+
+.bb-btn-library {
+    background: rgba(0, 123, 255, 0.05); color: #007bff; border: 1.5px solid #007bff;
+    border-radius: 10px; font-weight: 700; cursor: pointer; transition: 0.2s;
+}
+.bb-btn-library:hover:not(:disabled) { background: #007bff; color: #fff; }

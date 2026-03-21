@@ -1402,26 +1402,30 @@ class RodaARodaGame {
     }
 
     bbUpdateUI() {
-        const banner = document.getElementById('bb-status-banner');
+        const footer = document.getElementById('bb-footer');
         const btnLibInit = document.getElementById('btn-bb-library-initial');
         const btnLibIngame = document.getElementById('btn-bb-library-ingame');
         const btnSave = document.getElementById('bb-btn-save');
 
         if (this.bbConnected && this.bbUser) {
-            if (banner) {
-                banner.style.display = 'flex';
-                banner.innerHTML = `<div>Olá, <strong>${this.bbUser.username}</strong>!</div> <div class="bb-badge"><span class="bb-dot"></span> CONECTADO</div>`;
+            if (footer) {
+                footer.style.display = 'flex';
+                footer.innerHTML = `<div>Conectado como <strong>${this.bbUser.username}</strong></div> <div class="bb-badge"><span class="bb-dot"></span> ATIVO</div>`;
             }
             if (btnLibInit) { btnLibInit.disabled = false; btnLibInit.removeAttribute('aria-disabled'); }
             if (btnLibIngame) { btnLibIngame.disabled = false; btnLibIngame.removeAttribute('aria-disabled'); }
             if (btnSave) { btnSave.disabled = false; btnSave.removeAttribute('aria-disabled'); }
         } else {
-            if (banner) banner.style.display = 'none';
+            if (footer) {
+                footer.style.display = 'flex';
+                footer.innerHTML = `<div style="opacity:0.6;">Portal BrincaBytes Desconectado</div>`;
+            }
             if (btnLibInit) { btnLibInit.disabled = true; btnLibInit.setAttribute('aria-disabled', 'true'); }
             if (btnLibIngame) { btnLibIngame.disabled = true; btnLibIngame.setAttribute('aria-disabled', 'true'); }
             if (btnSave) { btnSave.disabled = true; btnSave.setAttribute('aria-disabled', 'true'); }
         }
     }
+
 
     bbLoadLibrary() {
         try { window.parent.postMessage({ type: 'BRINCABYTES_LOAD_DATA', gameId: this.bbGameId, key: 'biblioteca' }, '*'); } catch(e){}
