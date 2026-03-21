@@ -626,13 +626,16 @@ body.theme-high {
   <div class="admin-panel" id="admin-panel">
 
     <div class="admin-topbar">
-      <div class="admin-topbar-title">⚙️ Painel do <span>Professor</span></div>
-      <div class="admin-actions">
-        <button class="btn-sm btn-sm-outline" onclick="baixarModeloExcel()" title="Baixar planilha modelo">📥 Modelo Excel</button>
-        <label class="btn-sm btn-sm-outline" title="Importar planilha Excel" style="cursor:pointer; border-color:var(--a1); color:var(--a1);">
-          📂 Importar Excel
-          <input type="file" id="import-excel" accept=".xlsx" onchange="handleExcelUpload(event)" style="display:none"/>
-        </label>
+      <div id="brinca-status" style="width:100%; text-align:center; padding:6px; font-size:0.75rem; margin-bottom:8px;"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+        <div class="admin-topbar-title">⚙️ Painel do <span>Professor</span></div>
+        <div class="admin-actions">
+          <button class="btn-sm btn-sm-outline" onclick="baixarModeloExcel()" title="Baixar planilha modelo">📥 Modelo Excel</button>
+          <label class="btn-sm btn-sm-outline" title="Importar planilha Excel" style="cursor:pointer; border-color:var(--a1); color:var(--a1);">
+            📂 Importar Excel
+            <input type="file" id="import-excel" accept=".xlsx" onchange="handleExcelUpload(event)" style="display:none"/>
+          </label>
+        </div>
       </div>
     </div>
 
@@ -1319,105 +1322,129 @@ const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJ
 let supabaseClient = null;
 let currentBrincaUser = null;
 
+/* ── BRINCABYTES HANDSHAKE V5 ── */
+const BB_GAME_ID = 'jogo-da-forca';
+
 async function initBrincabytes() {
   if (typeof supabase !== 'undefined') {
-    supabaseClient = supabase.createClient(SB_URL, SB_KEY);
+    try { supabaseClient = supabase.createClient(SB_URL, SB_KEY); } catch(e){ console.error("Supabase fail:", e); }
+  }
+  
+  updateBrincaStatus('⏳ Conectando ao Portal...');
+  
+  // Solicita identidade ao Portal pai (se estiver em iframe)
+  try { window.parent.postMessage({ type: 'BRINCABYTES_GET_USER' }, '*'); } catch(e){}
+
+  // Listener de mensagens do Portal
+  window.addEventListener("message", async (e) => {
+    const { type, user, success, value, key, session } = e.data;
     
-    // Check url params for token
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('access_token') || urlParams.get('token');
-    if (token) {
-      const { data } = await supabaseClient.auth.getUser(token);
-      if (data && data.user) {
-        currentBrincaUser = data.user;
-        updateBrincaStatus();
+    // 1. Identidade do Usuário / Sessão Supabase
+    if (type === 'BRINCABYTES_USER_DATA' || type === 'BRINCABYTES_SESSION') {
+      console.log("Handshake v5 recebido:", user || "Session only");
+      if (session && supabaseClient) {
+        try { await supabaseClient.auth.setSession(session); } catch(e){}
       }
-    } else {
-      const { data } = await supabaseClient.auth.getSession();
-      if (data && data.session) {
-        currentBrincaUser = data.session.user;
-        updateBrincaStatus();
+      currentBrincaUser = user || (session ? session.user : null);
+      updateBrincaStatus();
+      if (currentBrincaUser) loadFromBrincabytes();
+    }
+    
+    // 2. Resultado do Carregamento via Proxy (Chave padrão: biblioteca)
+    if (type === 'BRINCABYTES_LOAD_RESULT' && (key === 'biblioteca' || key === 'forca_lists')) {
+      if (value) {
+        const existing = getCustomCats();
+        const imported = value;
+        ['kids', 'middle', 'high'].forEach(t => {
+          if (imported[t]) existing[t] = { ...(existing[t] || {}), ...imported[t] };
+        });
+        saveCustomCats(existing);
+        renderCustomList();
+        if (document.getElementById('home').classList.contains('active')) buildHome(currentTheme);
+        showToast('📦 Biblioteca do Portal sincronizada', 'ok');
       }
     }
+  });
 
-    // Listen for postMessage from parent iframe
-    window.addEventListener("message", async (e) => {
-      // Allow parent window to supply the session automatically
-      if (e.data && e.data.type === 'BRINCABYTES_SESSION' && e.data.session) {
-        await supabaseClient.auth.setSession(e.data.session);
-        const { data } = await supabaseClient.auth.getSession();
-        currentBrincaUser = data?.session?.user || null;
+  // Tenta carregar sessão local
+  if (supabaseClient) {
+    try {
+      const { data } = await supabaseClient.auth.getSession();
+      if (data?.session) {
+        currentBrincaUser = data.session.user;
         updateBrincaStatus();
+        loadFromBrincabytes();
       }
-    });
-
-    supabaseClient.auth.onAuthStateChange((event, session) => {
-      currentBrincaUser = session ? session.user : null;
-      updateBrincaStatus();
-    });
-
-    updateBrincaStatus();
-  } else {
-    document.getElementById('brinca-status').innerHTML = '❌ Supabase SDK não carregou.';
+    } catch(e){}
   }
 }
 
-function updateBrincaStatus() {
+function updateBrincaStatus(msg) {
   const statusEl = document.getElementById('brinca-status');
-  const actionsEl = document.getElementById('brinca-actions');
   if (!statusEl) return;
-  
-  if (currentBrincaUser) {
-    statusEl.innerHTML = `✅ Conectado à nuvem: <strong style="color:white; font-family:'Rajdhani',sans-serif;">${currentBrincaUser.email}</strong>`;
-    actionsEl.style.display = 'flex';
+  if (msg) {
+    statusEl.innerHTML = `<span style="color:#A1A1AA">${msg}</span>`;
+  } else if (currentBrincaUser) {
+    statusEl.innerHTML = `<span style="background:rgba(52,211,153,0.1); border:1px solid rgba(52,211,153,0.2); color:#34D399; padding:4px 14px; border-radius:20px; font-weight:700; font-size:0.7rem;">🟢 CONECTADO: ${currentBrincaUser.username || currentBrincaUser.email}</span>`;
   } else {
-    statusEl.innerHTML = `⚠️ Não conectado ao <strong>Brincabytes</strong> (Salvando localmente)`;
-    actionsEl.style.display = 'none';
+    statusEl.innerHTML = `<span style="color:#71717A; font-size:0.7rem; opacity:0.6;">⚪ Modo Offline (Portal não detectado)</span>`;
   }
 }
 
 async function saveToBrincabytes() {
   if (!currentBrincaUser) return;
+  const data = getCustomCats();
+  
+  // 1. Envia via Proxy do Portal (Padrão Handshake V5)
   try {
-    const dataToSave = getCustomCats();
-    // Salva o pacotão completo do usuário
-    const { error } = await supabaseClient
-      .from('forca_custom_lists')
-      .upsert({ user_id: currentBrincaUser.id, theme: 'all', data: dataToSave }, { onConflict: 'user_id, theme' });
-    if (error) throw error;
+    window.parent.postMessage({
+      type: 'BRINCABYTES_SAVE_DATA',
+      gameId: BB_GAME_ID,
+      key: 'biblioteca',
+      value: data
+    }, '*');
+    showToast('☁️ Salvo na Biblioteca do Portal', 'ok');
   } catch (err) {
-    console.error("Erro no sync automático (save):", err);
+    console.warn("Proxy save error:", err);
+  }
+
+  // 2. Backup no Supabase Global
+  if (supabaseClient) {
+    try {
+      await supabaseClient
+        .from('forca_custom_lists')
+        .upsert({ user_id: currentBrincaUser.id, theme: 'all', data: data }, { onConflict: 'user_id, theme' });
+    } catch (err) { console.warn("Supabase generic save error:", err); }
   }
 }
 
 async function loadFromBrincabytes() {
-  // Chamado no init: carrega TODAS as listas de TODOS os usuários para serem "Global"
+  // 1. Solicita ao Proxy do Portal
   try {
-    const { data, error } = await supabaseClient
-      .from('forca_custom_lists')
-      .select('data');
+    window.parent.postMessage({ type: 'BRINCABYTES_LOAD_DATA', gameId: BB_GAME_ID, key: 'biblioteca' }, '*');
+  } catch(e){}
 
-    if (error) throw error;
-    
-    if (data && data.length > 0) {
-      const existing = getCustomCats();
-      data.forEach(row => {
-        const imported = row.data;
-        ['kids','middle','high'].forEach(t => {
-          if (imported[t]) {
-            // Merge profundo para não sobrescrever listas locais diferentes
-            existing[t] = { ...(existing[t]||{}), ...imported[t] };
-          }
+  // 2. Carrega listas GLOBAIS do Supabase
+  if (supabaseClient) {
+    try {
+      const { data, error } = await supabaseClient.from('forca_custom_lists').select('data');
+      if (!error && data) {
+        const existing = getCustomCats();
+        data.forEach(row => {
+          const imported = row.data;
+          ['kids', 'middle', 'high'].forEach(t => {
+            if (imported[t]) existing[t] = { ...(existing[t] || {}), ...imported[t] };
+          });
         });
-      });
-      saveCustomCats(existing);
-      renderCustomList();
-      if (document.getElementById('home').classList.contains('active')) buildHome(currentTheme);
-    }
-  } catch (err) {
-    console.error("Erro no sync automático (load):", err);
+        saveCustomCats(existing);
+        renderCustomList();
+        if (document.getElementById('home').classList.contains('active')) buildHome(currentTheme);
+      }
+    } catch(e){}
   }
 }
+
+
 
 
 /* ══════════════════════════════════════════
@@ -1429,9 +1456,7 @@ async function loadFromBrincabytes() {
   if(t&&BUILTIN[t]){ chooseTheme(t); if(c){ selectedCat=c; document.querySelectorAll('.cat-btn').forEach(b=>b.classList.toggle('selected',b.dataset.cat===c)); } }
   
   // Inicia integração com Supabase Brincabytes
-  initBrincabytes().then(() => {
-    loadFromBrincabytes(); // Carrega listas globais no início
-  });
+  initBrincabytes();
 })();
 
 /* SW */
