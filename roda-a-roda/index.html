@@ -301,17 +301,15 @@
       </div>
       <div class="bb-modal-body">
         <div class="bb-search-bar">
-          <input type="text" id="bb-search" placeholder="Buscar na biblioteca..." oninput="bbRenderLibrary()">
+          <input type="text" id="bb-lib-search" placeholder="Buscar na biblioteca..." oninput="bbRenderLibrary()">
         </div>
-        <div id="bb-modal-list" class="bb-list-container">
+        <div id="bb-lib-list" class="bb-list-container">
           <!-- Itens da biblioteca serão renderizados aqui -->
         </div>
       </div>
-      <div class="bb-modal-footer">
-        <button class="improved-button secondary-btn" onclick="bbCloseLibrary()">Fechar</button>
-      </div>
     </div>
   </div>
+
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="script.js"></script>
@@ -327,5 +325,20 @@
       </div>
   </div>
 
+  <!-- Modal de Input Customizado (Prompt) -->
+  <div id="bb-prompt-modal" class="bb-modal-overlay">
+      <div class="bb-modal-box">
+          <div class="bb-modal-header" id="bb-prompt-title">Renomear Lista</div>
+          <div class="bb-modal-body">
+              <label for="bb-prompt-input" id="bb-prompt-message" class="improved-label">Digite o novo nome:</label>
+              <input type="text" id="bb-prompt-input" class="improved-input" style="margin-top: 10px;">
+          </div>
+          <div class="bb-modal-footer">
+              <button id="bb-prompt-btn-cancel" class="bb-clean-btn secondary">Cancelar</button>
+              <button id="bb-prompt-btn-ok" class="bb-clean-btn primary">Salvar</button>
+          </div>
+      </div>
+  </div>
+
 </body>
-</html>
+</html>

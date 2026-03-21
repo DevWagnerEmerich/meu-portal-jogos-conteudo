@@ -1423,7 +1423,8 @@ class RodaARodaGame {
         window.bbCloseLibrary = () => this.bbCloseLibrary();
         window.bbRenderLibrary = () => this.bbRenderLibrary();
         window.bbCarregarItem = (idx) => this.bbCarregarItem(idx);
-        window.bbExcluirItem = (idx) => this.bbExcluirItem(idx);
+        window.bbDeleteList = (idx) => this.bbDeleteList(idx);
+        window.bbEditList = (idx) => this.bbEditList(idx);
     }
 
     bbUpdateUI() {
@@ -1459,10 +1460,7 @@ class RodaARodaGame {
             const saveSection = document.getElementById('bb-save-section');
             if (saveSection) saveSection.style.display = 'none';
         }
-
-
     }
-
 
     bbLoadLibrary() {
         try { window.parent.postMessage({ type: 'BRINCABYTES_LOAD_DATA', gameId: this.bbGameId, key: 'biblioteca' }, '*'); } catch(e){}
@@ -1481,28 +1479,28 @@ class RodaARodaGame {
     }
 
     bbRenderLibrary() {
-        const list = document.getElementById('bb-modal-list');
-        if (!list) return;
-        const search = (document.getElementById('bb-search')?.value || '').toLowerCase();
+        const container = document.getElementById('bb-modal-list');
+        if (!container) return;
+        const termo = document.getElementById('bb-search')?.value.toLowerCase() || '';
         
-        let items = this.bbLibraryData.filter(item => {
-            return !search || (item.titulo || '').toLowerCase().includes(search);
-        });
+        const filtered = this.bbLibraryData.map((item, idx) => ({...item, originalIdx: idx}))
+                                          .filter(i => i.titulo.toLowerCase().includes(termo));
 
-        if (items.length === 0) {
-            list.innerHTML = '<div style="padding:40px; text-align:center; opacity:0.5;">Nenhuma lista encontrada.</div>';
+        if (filtered.length === 0) {
+            container.innerHTML = '<div style="padding:40px; text-align:center; opacity:0.5;">Nenhuma lista encontrada.</div>';
             return;
         }
 
-        list.innerHTML = items.map((item, idx) => `
+        container.innerHTML = filtered.map(f => `
             <div class="bb-list-item">
                 <div class="bb-item-info">
-                    <div class="bb-item-name">${item.titulo || 'Sem título'}</div>
-                    <div class="bb-item-meta">${item.savedAt ? new Date(item.savedAt).toLocaleDateString('pt-BR') : ''}</div>
+                    <div class="bb-item-name">${f.titulo || 'Sem título'}</div>
+                    <div class="bb-item-meta">${f.savedAt ? new Date(f.savedAt).toLocaleDateString('pt-BR') : ''}</div>
                 </div>
                 <div class="bb-item-actions">
-                    <button class="bb-btn-load" onclick="bbCarregarItem(${idx})">Abrir</button>
-                    <button class="bb-btn-del" onclick="bbExcluirItem(${idx})">🗑️</button>
+                    <button class="bb-btn-load" onclick="bbCarregarItem(${f.originalIdx})">Abrir</button>
+                    <button class="bb-btn-edit" onclick="bbEditList(${f.originalIdx})" style="background: #fbbf24; color: #000; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer;" title="Renomear Lista">✏️</button>
+                    <button class="bb-btn-del" onclick="bbDeleteList(${f.originalIdx})">🗑️</button>
                 </div>
             </div>
         `).join('');
@@ -1540,6 +1538,19 @@ class RodaARodaGame {
         });
     }
 
+    bbEditList(index) {
+        const item = this.bbLibraryData[index];
+        this.showCustomPrompt("Digite o novo nome para a lista:", "Renomear Lista", item.titulo, (novoNome) => {
+            if (novoNome !== null && novoNome.trim() !== "" && novoNome.trim() !== item.titulo) {
+                item.titulo = novoNome.trim();
+                this.bbSaveBiblioteca(this.bbLibraryData);
+                this.bbRenderLibrary();
+                this.showToast('Lista renomeada com sucesso.', 'success');
+            }
+        });
+    }
+
+
     showCustomModal(message, type = 'alert', onConfirm = null) {
         const overlay = document.getElementById('bb-custom-modal');
         const title = document.getElementById('bb-modal-title-custom');
@@ -1570,6 +1581,40 @@ class RodaARodaGame {
         btnCancel.onclick = () => close();
     }
 
+    showCustomPrompt(message, titleText = 'Entrada', defaultValue = '', onConfirm = null) {
+        const overlay = document.getElementById('bb-prompt-modal');
+        const title = document.getElementById('bb-prompt-title');
+        const msgLabel = document.getElementById('bb-prompt-message');
+        const inputField = document.getElementById('bb-prompt-input');
+        const btnOk = document.getElementById('bb-prompt-btn-ok');
+        const btnCancel = document.getElementById('bb-prompt-btn-cancel');
+
+        if (!overlay || !inputField || !btnOk || !btnCancel) return;
+
+        if (title) title.textContent = titleText;
+        if (msgLabel) msgLabel.textContent = message;
+        
+        inputField.value = defaultValue;
+        overlay.classList.add('open');
+        inputField.focus();
+
+        const close = () => {
+            overlay.classList.remove('open');
+            btnOk.onclick = null;
+            btnCancel.onclick = null;
+        };
+
+        btnOk.onclick = () => {
+            const val = inputField.value;
+            close();
+            if (onConfirm) onConfirm(val);
+        };
+        
+        btnCancel.onclick = () => {
+            close();
+            if (onConfirm) onConfirm(null);
+        };
+    }
 
     bbSaveCurrentList(silent = false) {
         if (!this.bbConnected) return;
