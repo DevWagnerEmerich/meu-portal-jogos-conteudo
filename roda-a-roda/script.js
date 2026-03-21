@@ -1484,7 +1484,7 @@ class RodaARodaGame {
         const termo = document.getElementById('bb-search')?.value.toLowerCase() || '';
         
         const filtered = this.bbLibraryData.map((item, idx) => ({...item, originalIdx: idx}))
-                                          .filter(i => i.titulo.toLowerCase().includes(termo));
+                                          .filter(i => (i.titulo || 'Sem Título').toLowerCase().includes(termo));
 
         if (filtered.length === 0) {
             container.innerHTML = '<div style="padding:40px; text-align:center; opacity:0.5;">Nenhuma lista encontrada.</div>';

@@ -80,9 +80,14 @@
         </div>
         <button id="start-game-btn" class="improved-button primary-btn start-btn" disabled>INICIAR JOGO 🚀</button>
       </div>
-
+      
+      <div style="text-align: center; margin-top: 20px;">
+          <button id="reset-game-btn" class="improved-button secondary-btn" style="border-color: #ef4444; color: #ef4444; margin-bottom: 10px;">Restaurar Jogo Original</button>
+          <button class="improved-button secondary-btn" onclick="window.parent.postMessage({type:'BRINCABYTES_VOLTAR_PORTAL'}, '*');" style="width: 100%; max-width: 300px;">⬅️ Voltar ao Portal</button>
+      </div>
     </div>
   </div>
+
 
 
   <div class="game-area" id="game-area" style="display: none;">
@@ -218,9 +223,14 @@
             <option value="en" disabled aria-disabled="true">Inglês (Em breve)</option>
           </select>
         </div>
+        
+        <div class="input-group" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center;">
+            <button class="improved-button secondary-btn" onclick="window.parent.postMessage({type:'BRINCABYTES_VOLTAR_PORTAL'}, '*');" style="width: 100%; max-width: 300px;">⬅️ Voltar ao Portal</button>
+        </div>
       </div>
 
       <div id="tab-tutorial" class="tab-content" role="tabpanel" aria-labelledby="tab-tutorial-button">
+
         <h3>Tutorial dos Modos de Jogo</h3>
         <div class="tutorial-sub-tabs" role="tablist" aria-label="Navegação do tutorial">
           <button class="sub-tab-link active" data-subtab="tutorial-classic" role="tab" aria-selected="true" aria-controls="tutorial-classic" id="tutorial-classic-button">Clássico</button>
