@@ -106,6 +106,13 @@ class RodaARodaGame {
             fastestReveal: { time: Infinity, word: '', theme: '' },
         };
         this.wordStartTime = 0;
+        
+        // --- BrincaBytes Integration ---
+        this.bbGameId = 'roda-a-roda';
+        this.bbUser = null;
+        this.bbConnected = false;
+        this.bbLibraryData = [];
+
 
         this.WHEEL_SECTIONS = [
             { startAngle: 0, endAngle: 15, value: 1000, type: "money", text: "R$1000" },
@@ -152,7 +159,9 @@ class RodaARodaGame {
         this.setupGameSettingsControls();
         this.checkDarkModePreference();
         this.updateSoundToggleButtons();
+        this.setupBrincaBytes();
     }
+
 
 
 
@@ -193,6 +202,7 @@ class RodaARodaGame {
                 this.tituloRoleta.textContent = this.gameTitle;
                 this.initialConfigModal.style.display = 'none';
                 this.gameArea.style.display = 'flex';
+                this.bbSaveCurrentList(true); // Salva automaticamente no portal (silencioso)
                 this.initGameStructures();
                 this.resetAndStartNewRound();
             }
@@ -1342,6 +1352,189 @@ class RodaARodaGame {
         else h += `<p><strong>Revelação Mais Rápida:</strong> Nenhuma registrada</p>`;
         this.statsDisplayArea.innerHTML = h;
     }
+
+    // ════════════════════════════════════════════════════
+    // BRINCABYTES PORTAL INTEGRATION — Handshake v5
+    // ════════════════════════════════════════════════════
+
+    setupBrincaBytes() {
+        // Solicitar identidade ao Portal pai
+        try { window.parent.postMessage({ type: 'BRINCABYTES_GET_USER' }, '*'); } catch(e){}
+
+        // Listener de respostas do Portal 
+        window.addEventListener('message', (event) => {
+            const { type, user, value, key } = event.data;
+            if (type === 'BRINCABYTES_USER_DATA') {
+                this.bbUser = user;
+                this.bbConnected = !!(user && user.loggedIn);
+                this.bbUpdateUI();
+                if (this.bbConnected) this.bbLoadLibrary();
+            }
+            if (type === 'BRINCABYTES_LOAD_RESULT' && key === 'biblioteca') {
+                this.bbLibraryData = value ? (Array.isArray(value) ? value : [value]) : [];
+                this.bbRenderLibrary();
+            }
+        });
+
+        // Eventos dos botões da biblioteca
+        const btnLibInit = document.getElementById('btn-bb-library-initial');
+        if (btnLibInit) btnLibInit.onclick = () => this.bbOpenLibrary();
+
+        const btnLibIngame = document.getElementById('btn-bb-library-ingame');
+        if (btnLibIngame) btnLibIngame.onclick = () => this.bbOpenLibrary();
+
+        const btnSave = document.getElementById('bb-btn-save');
+        if (btnSave) btnSave.onclick = () => this.bbSaveCurrentList();
+
+        // Fechar modal clicando no backdrop
+        const libModal = document.getElementById('bb-library-modal');
+        if (libModal) {
+            libModal.addEventListener('click', (e) => {
+                if (e.target.id === 'bb-library-modal') this.bbCloseLibrary();
+            });
+        }
+
+        // Expor funções globais para o HTML
+        window.bbCloseLibrary = () => this.bbCloseLibrary();
+        window.bbRenderLibrary = () => this.bbRenderLibrary();
+        window.bbCarregarItem = (idx) => this.bbCarregarItem(idx);
+        window.bbExcluirItem = (idx) => this.bbExcluirItem(idx);
+    }
+
+    bbUpdateUI() {
+        const banner = document.getElementById('bb-status-banner');
+        const btnLibInit = document.getElementById('btn-bb-library-initial');
+        const btnLibIngame = document.getElementById('btn-bb-library-ingame');
+        const btnSave = document.getElementById('bb-btn-save');
+
+        if (this.bbConnected && this.bbUser) {
+            if (banner) {
+                banner.style.display = 'flex';
+                banner.innerHTML = `<div>Olá, <strong>${this.bbUser.username}</strong>!</div> <div class="bb-badge"><span class="bb-dot"></span> CONECTADO</div>`;
+            }
+            if (btnLibInit) { btnLibInit.disabled = false; btnLibInit.removeAttribute('aria-disabled'); }
+            if (btnLibIngame) { btnLibIngame.disabled = false; btnLibIngame.removeAttribute('aria-disabled'); }
+            if (btnSave) { btnSave.disabled = false; btnSave.removeAttribute('aria-disabled'); }
+        } else {
+            if (banner) banner.style.display = 'none';
+            if (btnLibInit) { btnLibInit.disabled = true; btnLibInit.setAttribute('aria-disabled', 'true'); }
+            if (btnLibIngame) { btnLibIngame.disabled = true; btnLibIngame.setAttribute('aria-disabled', 'true'); }
+            if (btnSave) { btnSave.disabled = true; btnSave.setAttribute('aria-disabled', 'true'); }
+        }
+    }
+
+    bbLoadLibrary() {
+        try { window.parent.postMessage({ type: 'BRINCABYTES_LOAD_DATA', gameId: this.bbGameId, key: 'biblioteca' }, '*'); } catch(e){}
+    }
+
+    bbOpenLibrary() {
+        if (!this.bbConnected) return;
+        const modal = document.getElementById('bb-library-modal');
+        if (modal) modal.classList.add('open');
+        this.bbRenderLibrary();
+    }
+
+    bbCloseLibrary() {
+        const modal = document.getElementById('bb-library-modal');
+        if (modal) modal.classList.remove('open');
+    }
+
+    bbRenderLibrary() {
+        const list = document.getElementById('bb-modal-list');
+        if (!list) return;
+        const search = (document.getElementById('bb-search')?.value || '').toLowerCase();
+        
+        let items = this.bbLibraryData.filter(item => {
+            return !search || (item.titulo || '').toLowerCase().includes(search);
+        });
+
+        if (items.length === 0) {
+            list.innerHTML = '<div style="padding:40px; text-align:center; opacity:0.5;">Nenhuma lista encontrada.</div>';
+            return;
+        }
+
+        list.innerHTML = items.map((item, idx) => `
+            <div class="bb-list-item">
+                <div class="bb-item-info">
+                    <div class="bb-item-name">${item.titulo || 'Sem título'}</div>
+                    <div class="bb-item-meta">${item.savedAt ? new Date(item.savedAt).toLocaleDateString('pt-BR') : ''}</div>
+                </div>
+                <div class="bb-item-actions">
+                    <button class="bb-btn-load" onclick="bbCarregarItem(${idx})">Abrir</button>
+                    <button class="bb-btn-del" onclick="bbExcluirItem(${idx})">🗑️</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    bbCarregarItem(idx) {
+        const item = this.bbLibraryData[idx];
+        if (!item || !item.data) return;
+
+        try {
+            const parsedData = JSON.parse(item.data);
+            this.userDatabase = parsedData;
+            this.showToast(`Lista "${item.titulo}" carregada da biblioteca!`, "success");
+            
+            // Atualizar seletores de tema
+            this.updateThemeSelector(this.themeSelectorInitial, true);
+            this.updateThemeSelector(this.themeSelectorIngame, false);
+            
+            if (this.csvStatusInitial) this.csvStatusInitial.textContent = `"${item.titulo}" (Biblioteca) carregado.`;
+            if (this.csvStatusIngame) this.csvStatusIngame.textContent = `"${item.titulo}" (Biblioteca) carregado.`;
+
+            this.bbCloseLibrary();
+            this.checkInitialConfigReady();
+        } catch (e) {
+            console.error("Erro ao carregar dados da biblioteca:", e);
+            this.showToast("Erro ao carregar os dados desta lista.", "error");
+        }
+    }
+
+    bbExcluirItem(idx) {
+        if (!confirm('Deseja excluir esta lista da sua biblioteca?')) return;
+        this.bbLibraryData.splice(idx, 1);
+        this.bbSaveBiblioteca(this.bbLibraryData);
+        this.bbRenderLibrary();
+        this.showToast('Lista excluída.', 'success');
+    }
+
+    bbSaveCurrentList(silent = false) {
+        if (!this.bbConnected) return;
+        if (this.userDatabase.length === 0) {
+            this.showToast("Nenhuma lista carregada para salvar.", "warning");
+            return;
+        }
+
+        const titulo = this.gameTitleInput?.value?.trim() || "Minha Lista Roda a Roda";
+        const entry = {
+            titulo: titulo,
+            data: JSON.stringify(this.userDatabase),
+            savedAt: Date.now()
+        };
+
+        // Evitar duplicatas por título
+        const existingIdx = this.bbLibraryData.findIndex(i => i.titulo === titulo);
+        if (existingIdx >= 0) this.bbLibraryData[existingIdx] = entry;
+        else this.bbLibraryData.unshift(entry);
+
+        this.bbSaveBiblioteca(this.bbLibraryData, silent);
+    }
+
+    bbSaveBiblioteca(data, silent = false) {
+        try {
+            window.parent.postMessage({
+                type: 'BRINCABYTES_SAVE_DATA',
+                gameId: this.bbGameId,
+                key: 'biblioteca',
+                value: data
+            }, '*');
+            if (!silent) this.showToast('Lista salva na sua Biblioteca BrincaBytes! ✅', 'success');
+        } catch(e) {
+            if (!silent) this.showToast('Erro ao salvar no portal.', 'error');
+        }
+    }
+
 }
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -27,6 +27,10 @@
   <div class="modal" id="initial-config-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="initial-config-title">
     <div class="modal-content improved-start-modal">
       <h2 class="improved-modal-title" id="initial-config-title">Configurar Jogo: Modo Clássico</h2>
+      
+      <!-- BRINCABYTES INTEGRATION -->
+      <div id="bb-status-banner" style="display: none;"></div>
+
       <div class="input-group">
         <label for="game-title" class="improved-label">Título do Jogo:</label>
         <input type="text" id="game-title" class="improved-input" placeholder="Digite o título do jogo" value="Roda a Roda">
@@ -54,7 +58,9 @@
         <select id="theme-initial" class="improved-select" disabled aria-disabled="true">
           <option value="" selected>Carregue uma planilha primeiro</option>
         </select>
+        <button id="btn-bb-library-initial" class="bb-btn-library" disabled title="Acesse sua Biblioteca BrincaBytes">📚 Minha Biblioteca BrincaBytes</button>
       </div>
+
 
       <div class="input-group">
         <button id="start-game-btn" class="improved-button primary-btn" disabled aria-disabled="true">Iniciar Jogo</button>
@@ -148,8 +154,12 @@
             <option value="">Carregue uma planilha e selecione um tema</option>
           </select>
         </div>
-        <div class="input-group"> <button id="apply-theme-and-restart-btn" class="improved-button primary-btn" disabled aria-disabled="true">Aplicar Tema e Reiniciar Jogo</button>
+        <div class="input-group"> 
+          <button id="apply-theme-and-restart-btn" class="improved-button primary-btn" disabled aria-disabled="true">Aplicar Tema e Reiniciar Jogo</button>
+          <button id="btn-bb-library-ingame" class="bb-btn-library" disabled title="Acesse sua Biblioteca BrincaBytes">📚 Minha Biblioteca BrincaBytes</button>
+          <button id="bb-btn-save" class="bb-btn-save" style="margin-top: 10px; width: 100%; justify-content: center;" disabled>💾 Salvar Lista na Biblioteca</button>
         </div>
+
       </div>
 
       <div id="tab-stats" class="tab-content" role="tabpanel" aria-labelledby="tab-stats-button">
@@ -258,7 +268,28 @@
   <div class="toast-container" id="toast-container" aria-live="assertive" aria-atomic="true">
     </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- BRINCABYTES LIBRARY MODAL -->
+  <div id="bb-library-modal">
+    <div class="bb-modal-box">
+      <div class="bb-modal-header">
+        <h2>Biblioteca BrincaBytes</h2>
+        <button class="bb-btn-close" onclick="bbCloseLibrary()">×</button>
+      </div>
+      <div class="bb-modal-body">
+        <div class="bb-search-bar">
+          <input type="text" id="bb-search" placeholder="Buscar na biblioteca..." oninput="bbRenderLibrary()">
+        </div>
+        <div id="bb-modal-list" class="bb-list-container">
+          <!-- Itens da biblioteca serão renderizados aqui -->
+        </div>
+      </div>
+      <div class="bb-modal-footer">
+        <button class="improved-button secondary-btn" onclick="bbCloseLibrary()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="script.js"></script>
 </body>
 
