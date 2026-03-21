@@ -1105,7 +1105,15 @@ function openEditCatForm(id) {
   const cat = custom[id]; if(!cat) return;
   
   // Restrição de edição: apenas o autor pode editar (se estiver logado)
-  if (currentBrincaUser && cat.author_id && cat.author_id !== currentBrincaUser.id) {
+  // Comparamos por ID ou por Email/Nome para maior compatibilidade com o portal
+  const user_id = currentBrincaUser ? (currentBrincaUser.id || currentBrincaUser.uid) : null;
+  const user_email = currentBrincaUser ? (currentBrincaUser.email || currentBrincaUser.username) : null;
+  
+  const isAuthor = !cat.author_id || cat.author_id === 'local' || 
+                   (user_id && cat.author_id === user_id) ||
+                   (user_email && cat.author_name === user_email);
+
+  if (!isAuthor) {
     showToast('Apenas o autor pode editar esta categoria.', 'error');
     return;
   }
@@ -1122,6 +1130,7 @@ function openEditCatForm(id) {
   document.getElementById('btn-new-cat').style.display='none';
   document.getElementById('cat-form-wrap').scrollIntoView({behavior:'smooth',block:'start'});
 }
+
 
 
 function cancelForm() {
@@ -1187,7 +1196,14 @@ function deleteCat(id) {
   const data = getCustomCats();
   const cat = data[adminTheme][id];
   
-  if (currentBrincaUser && cat.author_id && cat.author_id !== currentBrincaUser.id) {
+  const user_id = currentBrincaUser ? (currentBrincaUser.id || currentBrincaUser.uid) : null;
+  const user_email = currentBrincaUser ? (currentBrincaUser.email || currentBrincaUser.username) : null;
+  
+  const isAuthor = !cat.author_id || cat.author_id === 'local' || 
+                   (user_id && cat.author_id === user_id) ||
+                   (user_email && cat.author_name === user_email);
+
+  if (!isAuthor) {
     showToast('Apenas o autor pode excluir esta categoria.', 'error');
     return;
   }
@@ -1200,6 +1216,7 @@ function deleteCat(id) {
   
   if (currentBrincaUser) saveToBrincabytes();
 }
+
 
 
 /* ── EXCEL SUPPORT ── */
@@ -1331,6 +1348,9 @@ async function initBrincabytes() {
   }
   
   updateBrincaStatus('⏳ Conectando ao Portal...');
+
+  // Se o portal não responder em 3s, assume offline
+  setTimeout(() => { if (!currentBrincaUser) updateBrincaStatus(); }, 3000);
   
   // Solicita identidade ao Portal pai (se estiver em iframe)
   try { window.parent.postMessage({ type: 'BRINCABYTES_GET_USER' }, '*'); } catch(e){}
@@ -1341,7 +1361,6 @@ async function initBrincabytes() {
     
     // 1. Identidade do Usuário / Sessão Supabase
     if (type === 'BRINCABYTES_USER_DATA' || type === 'BRINCABYTES_SESSION') {
-      console.log("Handshake v5 recebido:", user || "Session only");
       if (session && supabaseClient) {
         try { await supabaseClient.auth.setSession(session); } catch(e){}
       }
