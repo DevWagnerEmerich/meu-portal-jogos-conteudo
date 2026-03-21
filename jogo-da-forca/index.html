@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@600;700;800&family=Orbitron:wght@700;900&family=Rajdhani:wght@500;600;700&family=Space+Mono:wght@700&display=swap" rel="stylesheet"/>
   <title>Forca</title>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { height: 100%; }
@@ -66,11 +67,11 @@ body.theme-high {
 .picker-inner {
   position:relative; z-index:1;
   display:flex; flex-direction:column; align-items:center; gap:24px;
-  width:100%; max-width:520px; padding:36px 20px;
+  width:100%; max-width:650px; padding:36px 20px;
 }
 .picker-title {
   font-family:'Space Mono',monospace;
-  font-size:clamp(1.4rem,5vw,2.1rem); font-weight:700;
+  font-size:clamp(1.7rem,6vw,2.6rem); font-weight:700;
   color:#FAFAFA; text-align:center; letter-spacing:-1px;
 }
 .picker-title span {
@@ -93,13 +94,13 @@ body.theme-high {
 .tc-high:hover   { box-shadow:0 16px 40px #E879F933; border-color:#E879F9; }
 
 .tc-top { display:flex; align-items:center; gap:14px; margin-bottom:8px; }
-.tc-mascot { font-size:2.4rem; }
-.tc-label { font-family:'Space Mono',monospace; font-size:.62rem; letter-spacing:3px; text-transform:uppercase; margin-bottom:3px; }
+.tc-mascot { font-size:3.5rem; }
+.tc-label { font-family:'Space Mono',monospace; font-size:.85rem; letter-spacing:3px; text-transform:uppercase; margin-bottom:3px; }
 .tc-kids .tc-label{color:#FF6B9D} .tc-middle .tc-label{color:#22D3EE} .tc-high .tc-label{color:#E879F9}
-.tc-name { font-size:1.25rem; font-weight:700; color:#FAFAFA; font-family:'Rajdhani',sans-serif; }
-.tc-desc { font-size:.8rem; color:#94A3B8; font-family:'Rajdhani',sans-serif; line-height:1.5; }
+.tc-name { font-size:1.6rem; font-weight:700; color:#FAFAFA; font-family:'Rajdhani',sans-serif; }
+.tc-desc { font-size:1rem; color:#94A3B8; font-family:'Rajdhani',sans-serif; line-height:1.5; }
 .tc-tags { display:flex; flex-wrap:wrap; gap:5px; margin-top:8px; }
-.tc-tag { padding:2px 9px; border-radius:20px; font-size:.68rem; font-family:'Rajdhani',sans-serif; font-weight:600; }
+.tc-tag { padding:2px 9px; border-radius:20px; font-size:.85rem; font-family:'Rajdhani',sans-serif; font-weight:600; }
 .tc-kids .tc-tag  {background:#FF6B9D22;color:#FF6B9D;border:1px solid #FF6B9D44}
 .tc-middle .tc-tag{background:#22D3EE22;color:#22D3EE;border:1px solid #22D3EE44}
 .tc-high .tc-tag  {background:#E879F922;color:#E879F9;border:1px solid #E879F944}
@@ -119,7 +120,7 @@ body.theme-high {
 ══════════════════════════════════════════ */
 #home { justify-content:flex-start; padding-top:24px; }
 
-.home-header { width:100%; max-width:500px; display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+.home-header { width:100%; max-width:650px; display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
 
 .btn-back { padding:10px 22px; border-radius:50px; font-size:1rem; font-weight:800; background:transparent; border:2px solid var(--bdr); color:var(--tx2); transition:all .2s; cursor: pointer; }
 .btn-back:hover { border-color:var(--a1); color:var(--a1); background: var(--bg2); }
@@ -130,7 +131,7 @@ body.theme-high {
 .theme-high   .score-badge{background:transparent;border:2px solid var(--a1);color:var(--a1);font-size:1.1rem}
 
 .home-hero { display:flex; flex-direction:column; align-items:center; margin-bottom:20px; text-align:center; }
-.home-mascot { font-size:4rem; margin-bottom:8px; display:block; }
+.home-mascot { font-size:5.5rem; margin-bottom:8px; display:block; }
 .theme-kids   .home-mascot{animation:bounceMascot 2s ease-in-out infinite}
 .theme-middle .home-mascot{animation:pulseMascot 2.5s ease-in-out infinite}
 .theme-high   .home-mascot{animation:glitchMascot 3s ease-in-out infinite}
@@ -138,23 +139,23 @@ body.theme-high {
 @keyframes pulseMascot{0%,100%{transform:scale(1);filter:drop-shadow(0 0 8px #22D3EE88)}50%{transform:scale(1.1);filter:drop-shadow(0 0 20px #22D3EEcc)}}
 @keyframes glitchMascot{0%,89%,100%{transform:translate(0);filter:drop-shadow(0 0 12px #E879F988)}91%{transform:translate(-3px,1px);filter:hue-rotate(90deg)}93%{transform:translate(3px,-1px);filter:hue-rotate(180deg)}95%{transform:translate(0)}}
 
-.home-title { font-family:var(--fh); font-size:clamp(1.7rem,6vw,2.4rem); font-weight:900; line-height:1.1; margin-bottom:6px; }
+.home-title { font-family:var(--fh); font-size:clamp(2.2rem,8vw,3.5rem); font-weight:900; line-height:1.1; margin-bottom:6px; }
 .theme-kids   .home-title{background:linear-gradient(135deg,#FF6B9D,#A855F7,#3B82F6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .theme-middle .home-title{background:linear-gradient(90deg,#22D3EE,#818CF8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .theme-high   .home-title{background:linear-gradient(90deg,#E879F9,#F0ABFC);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
-.home-sub { font-size:.9rem; color:var(--tx2); font-weight:600; }
+.home-sub { font-size:1.1rem; color:var(--tx2); font-weight:600; }
 
-.cat-section-title { font-size:.68rem; font-family:var(--fh); letter-spacing:3px; text-transform:uppercase; color:var(--a1); margin-bottom:10px; align-self:flex-start; width:100%; max-width:460px; }
+.cat-section-title { font-size:.85rem; font-family:var(--fh); letter-spacing:3px; text-transform:uppercase; color:var(--a1); margin-bottom:10px; align-self:flex-start; width:100%; max-width:650px; }
 
-.cat-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; max-width:460px; margin-bottom:20px; }
-.cat-btn { background:var(--card); border:2px solid var(--bdr); border-radius:14px; padding:14px 10px; display:flex; flex-direction:column; align-items:center; gap:4px; transition:all .22s cubic-bezier(.34,1.56,.64,1); color:var(--tx); font-family:var(--fb); position:relative; }
+.cat-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; max-width:650px; margin-bottom:20px; }
+.cat-btn { background:var(--card); border:2px solid var(--bdr); border-radius:14px; padding:20px 14px; display:flex; flex-direction:column; align-items:center; gap:4px; transition:all .22s cubic-bezier(.34,1.56,.64,1); color:var(--tx); font-family:var(--fb); position:relative; }
 .cat-btn:hover { transform:translateY(-3px); border-color:var(--a1); box-shadow:0 8px 24px var(--sh); }
 .cat-btn.selected { border-color:var(--a1); box-shadow:0 0 0 3px color-mix(in srgb,var(--a1) 20%,transparent); }
 .cat-btn .custom-badge { position:absolute; top:6px; right:8px; font-size:.55rem; font-weight:700; padding:1px 6px; border-radius:10px; background:var(--a1); color:white; letter-spacing:.5px; text-transform:uppercase; }
-.cat-emoji{font-size:1.8rem} .cat-name{font-size:.83rem;font-weight:700} .cat-desc{font-size:.67rem;color:var(--tx2);font-weight:500;text-align:center}
+.cat-emoji{font-size:2.8rem} .cat-name{font-size:1.1rem;font-weight:700} .cat-desc{font-size:.85rem;color:var(--tx2);font-weight:500;text-align:center}
 
-.btn-play { padding:15px 50px; border-radius:50px; font-size:1.05rem; font-weight:800; font-family:var(--fh); color:white; transition:all .25s cubic-bezier(.34,1.56,.64,1); position:relative; overflow:hidden; }
+.btn-play { padding:18px 60px; border-radius:50px; font-size:1.3rem; font-weight:800; font-family:var(--fh); color:white; transition:all .25s cubic-bezier(.34,1.56,.64,1); position:relative; overflow:hidden; }
 .btn-play::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);transform:translateX(-100%);transition:transform .4s}
 .btn-play:hover::after{transform:translateX(100%)}
 .btn-play:hover{transform:translateY(-3px) scale(1.04)}
@@ -189,14 +190,14 @@ body.theme-high {
 .theme-middle .hint-box{background:var(--bg2);border:1px solid var(--bdr);color:var(--tx2)}
 .theme-high   .hint-box{background:var(--bg2);border:1px solid var(--bdr);color:var(--tx2);font-family:'Space Mono',monospace;font-size:.95rem}
 .word-display{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:24px; min-height: 60px;}
-.letter-slot{min-width:44px;height:56px;display:flex;align-items:center;justify-content:center;font-size:2.2rem;font-weight:800;color:var(--tx);font-family:var(--fh)}
+.letter-slot{min-width:50px;height:64px;display:flex;align-items:center;justify-content:center;font-size:2.8rem;font-weight:800;color:var(--tx);font-family:var(--fh)}
 .theme-kids   .letter-slot{border-bottom:4px solid var(--a2)}
 .theme-middle .letter-slot{border-bottom:3px solid var(--a1)}
 .theme-high   .letter-slot{border-bottom:2px solid var(--a1);letter-spacing:2px}
 .letter-slot.revealed{animation:popIn .35s cubic-bezier(.34,1.56,.64,1)}
 @keyframes popIn{from{transform:scale(0) rotate(-15deg);opacity:0}to{transform:scale(1);opacity:1}}
 .keyboard{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-width:600px;width:100%;padding:0; margin-bottom: 2vh;}
-.key-btn{width:56px;height:56px;border-radius:14px;font-size:1.4rem;font-weight:800;font-family:var(--fh);color:var(--tx);transition:all .18s cubic-bezier(.34,1.56,.64,1)}
+.key-btn{width:64px;height:64px;border-radius:14px;font-size:1.8rem;font-weight:800;font-family:var(--fh);color:var(--tx);transition:all .18s cubic-bezier(.34,1.56,.64,1)}
 .theme-kids .key-btn{background:white;border:3px solid #E5E7EB;box-shadow:0 5px 0 #D1D5DB;color:var(--tx)}
 .theme-kids .key-btn:hover:not(:disabled){transform:translateY(-4px);box-shadow:0 9px 0 #D1D5DB}
 .theme-middle .key-btn{background:var(--bg2);border:2px solid var(--bdr);color:var(--tx);font-family:'Orbitron',monospace;font-size:1.1rem}
@@ -250,16 +251,16 @@ body.theme-high {
 .admin-gate {
   position:relative; z-index:1;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
-  min-height:100vh; gap:20px; padding:40px 24px; width:100%; max-width:420px; margin:0 auto;
+  min-height:100vh; gap:20px; padding:40px 24px; width:100%; max-width:550px; margin:0 auto;
 }
-.admin-gate-icon { font-size:3.5rem; filter:drop-shadow(0 0 16px #E879F988); }
-.admin-gate-title { font-family:'Space Mono',monospace; font-size:1.3rem; color:#FAFAFA; text-align:center; }
-.admin-gate-sub   { font-size:.85rem; color:#52525B; font-family:'Rajdhani',sans-serif; text-align:center; }
+.admin-gate-icon { font-size:5rem; filter:drop-shadow(0 0 16px #E879F988); }
+.admin-gate-title { font-family:'Space Mono',monospace; font-size:1.8rem; color:#FAFAFA; text-align:center; }
+.admin-gate-sub   { font-size:1.1rem; color:#52525B; font-family:'Rajdhani',sans-serif; text-align:center; }
 
 .admin-input {
   width:100%; padding:14px 18px; border-radius:12px;
   background:#18181B; border:2px solid #27272A; color:#FAFAFA;
-  font-size:1rem; font-family:'Space Mono',monospace;
+  font-size:1.2rem; font-family:'Space Mono',monospace;
   transition:border-color .2s; letter-spacing:4px; text-align:center;
 }
 .admin-input:focus { border-color:#E879F9; }
@@ -268,7 +269,7 @@ body.theme-high {
 .btn-unlock {
   width:100%; padding:14px; border-radius:12px;
   background:linear-gradient(135deg,#E879F9,#C026D3);
-  color:white; font-size:1rem; font-weight:700;
+  color:white; font-size:1.2rem; font-weight:700;
   font-family:'Space Mono',monospace; letter-spacing:1px;
   box-shadow:0 8px 24px #E879F944; transition:all .2s;
 }
@@ -278,7 +279,7 @@ body.theme-high {
 
 /* Admin panel main */
 .admin-panel {
-  width:100%; max-width:600px; margin:0 auto;
+  width:100%; max-width:850px; margin:0 auto;
   position:relative; z-index:1;
   padding:20px 20px 60px;
 }
@@ -288,7 +289,7 @@ body.theme-high {
   margin-bottom:24px; padding-bottom:16px;
   border-bottom:1px solid #27272A;
 }
-.admin-topbar-title { font-family:'Space Mono',monospace; font-size:1rem; color:#FAFAFA; }
+.admin-topbar-title { font-family:'Space Mono',monospace; font-size:1.3rem; color:#FAFAFA; }
 .admin-topbar-title span { color:#E879F9; }
 
 .admin-actions { display:flex; gap:8px; }
@@ -305,7 +306,7 @@ body.theme-high {
 /* Theme selector tabs */
 .admin-tabs { display:flex; gap:8px; margin-bottom:20px; }
 .admin-tab {
-  flex:1; padding:10px 8px; border-radius:10px; font-size:.72rem;
+  flex:1; padding:10px 8px; border-radius:10px; font-size:1rem;
   font-weight:700; font-family:'Space Mono',monospace; letter-spacing:.5px;
   background:#18181B; border:2px solid #27272A; color:#52525B;
   transition:all .2s; text-align:center;
@@ -317,7 +318,7 @@ body.theme-high {
 
 /* Category list */
 .admin-section-label {
-  font-family:'Space Mono',monospace; font-size:.62rem;
+  font-family:'Space Mono',monospace; font-size:.85rem;
   letter-spacing:3px; text-transform:uppercase; color:#52525B;
   margin-bottom:10px;
 }
@@ -332,10 +333,10 @@ body.theme-high {
 }
 .custom-cat-row:hover { border-color:#333; }
 
-.custom-cat-row .cat-row-emoji { font-size:1.6rem; flex-shrink:0; }
+.custom-cat-row .cat-row-emoji { font-size:2.5rem; flex-shrink:0; }
 .custom-cat-row .cat-row-info  { flex:1; min-width:0; }
-.custom-cat-row .cat-row-name  { font-weight:700; color:#FAFAFA; font-size:.9rem; font-family:'Rajdhani',sans-serif; }
-.custom-cat-row .cat-row-count { font-size:.72rem; color:#52525B; margin-top:2px; }
+.custom-cat-row .cat-row-name  { font-weight:700; color:#FAFAFA; font-size:1.2rem; font-family:'Rajdhani',sans-serif; }
+.custom-cat-row .cat-row-count { font-size:.95rem; color:#52525B; margin-top:2px; }
 
 .cat-row-btns { display:flex; gap:6px; }
 .btn-icon {
@@ -357,18 +358,18 @@ body.theme-high {
   padding:20px; margin-bottom:16px;
 }
 .admin-form-title {
-  font-family:'Space Mono',monospace; font-size:.82rem; color:#E879F9;
+  font-family:'Space Mono',monospace; font-size:1.1rem; color:#E879F9;
   margin-bottom:16px; display:flex; align-items:center; gap:8px;
 }
 
 .form-row { display:flex; gap:10px; margin-bottom:12px; }
 .form-col { display:flex; flex-direction:column; gap:6px; flex:1; }
-.form-label { font-size:.68rem; font-family:'Space Mono',monospace; color:#52525B; letter-spacing:1px; text-transform:uppercase; }
+.form-label { font-size:.85rem; font-family:'Space Mono',monospace; color:#52525B; letter-spacing:1px; text-transform:uppercase; }
 
 .form-input {
   padding:10px 14px; border-radius:10px;
   background:#09090B; border:1px solid #27272A; color:#FAFAFA;
-  font-size:.88rem; font-family:'Rajdhani',sans-serif; font-weight:600;
+  font-size:1.1rem; font-family:'Rajdhani',sans-serif; font-weight:600;
   transition:border-color .2s;
 }
 .form-input:focus { border-color:#E879F9; }
@@ -395,7 +396,7 @@ body.theme-high {
 .btn-save-cat {
   flex:1; padding:12px; border-radius:10px;
   background:linear-gradient(135deg,#E879F9,#C026D3); color:white;
-  font-size:.85rem; font-weight:700; font-family:'Space Mono',monospace;
+  font-size:1.1rem; font-weight:700; font-family:'Space Mono',monospace;
   box-shadow:0 4px 16px #E879F933; transition:all .2s; letter-spacing:.5px;
 }
 .btn-save-cat:hover { transform:translateY(-2px); box-shadow:0 8px 24px #E879F944; }
@@ -444,6 +445,34 @@ body.theme-high {
 }
 .btn-close-admin:hover { transform:scale(1.1); box-shadow:0 8px 28px #E879F966; }
 
+/* Admin Search & Filters */
+.admin-search-row { display:flex; gap:10px; margin-bottom:20px; }
+.search-container { flex:1; position:relative; }
+.search-container span { position:absolute; left:14px; top:50%; transform:translateY(-50%); opacity:.4; font-size:1.1rem; }
+.search-container .form-input { width:100%; padding-left:42px; height:46px; border-radius:14px; background:#09090B; border-color:#27272A; }
+.search-container .form-input:focus { border-color:var(--a1); box-shadow:0 0 0 3px rgba(232,121,249,0.1); }
+
+.filter-btn {
+  height:46px; padding:0 18px; border-radius:14px;
+  background:#18181B; border:1px solid #27272A; color:#A1A1AA;
+  font-family:'Space Mono',monospace; font-size:.85rem; font-weight:700;
+  transition:all .2s; display:flex; align-items:center; gap:8px;
+}
+.filter-btn.active { background:var(--a2); color:white; border-color:var(--a2); box-shadow:0 4px 12px rgba(168,85,247,0.3); }
+.filter-btn:hover:not(.active) { border-color:#555; color:#FAFAFA; }
+
+/* Excel Modal */
+#excel-modal .res-card {
+  background:#09090B; border:1px solid #27272A;
+  box-shadow:0 20px 50px rgba(0,0,0,0.8);
+}
+#excel-modal .btn-next {
+  justify-content:center; height:50px; font-size:1rem; border-radius:12px;
+  transition:transform .2s, box-shadow .2s;
+}
+#excel-modal .btn-next:hover { transform:translateY(-2px); box-shadow:0 6px 15px rgba(0,0,0,0.3); }
+
+
 /* Toast */
 .toast {
   position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(20px);
@@ -466,21 +495,25 @@ body.theme-high {
 @keyframes confettiFall{0%{opacity:1;transform:translateY(0) rotate(0deg)}100%{opacity:0;transform:translateY(110vh) rotate(720deg)}}
 
 @media(max-width:800px){
-  .key-btn{width:46px;height:46px;font-size:1.2rem}
+  .key-btn{width:52px;height:52px;font-size:1.5rem}
   .hint-box{font-size:1rem; padding: 12px 18px;}
   #hangman-svg{width:240px;height:220px}
 }
 @media(max-width:500px){
   .left-panel { min-width: 100%; }
   .right-panel { min-width: 100%; }
-  .key-btn{width:42px;height:42px;font-size:1rem}
-  .letter-slot{min-width:34px;height:46px;font-size:1.6rem}
+  .key-btn{width:46px;height:46px;font-size:1.3rem}
+  .letter-slot{min-width:40px;height:52px;font-size:2rem}
   .hint-box{font-size:0.95rem; padding: 10px 16px;}
   #hangman-svg{width:200px;height:180px}
+  .picker-title{font-size:1.6rem}
+  .tc-mascot{font-size:2.8rem}
+  .home-title{font-size:2rem}
+  .cat-emoji{font-size:2rem}
 }
 @media(max-width:380px){
-  .key-btn{width:36px;height:36px;font-size:.85rem}
-  .letter-slot{min-width:30px;height:42px;font-size:1.3rem}
+  .key-btn{width:40px;height:40px;font-size:1.1rem}
+  .letter-slot{min-width:34px;height:46px;font-size:1.6rem}
   .admin-tabs{gap:5px}
   .admin-tab{font-size:.6rem;padding:8px 4px}
 }
@@ -589,30 +622,17 @@ body.theme-high {
 <!-- ══════════ ADMIN PANEL ══════════ -->
 <div class="screen" id="admin">
 
-  <!-- PASSWORD GATE -->
-  <div class="admin-gate" id="admin-gate">
-    <span class="admin-gate-icon">🔐</span>
-    <div class="admin-gate-title">Painel do Professor</div>
-    <div class="admin-gate-sub">Digite a senha para acessar o modo de edição.<br/>Senha padrão: <strong style="color:#E879F9">1234</strong></div>
-    <input class="admin-input" type="password" id="admin-pwd" placeholder="Digite a senha" maxlength="20"
-      onkeydown="if(event.key==='Enter') tryUnlock()"/>
-    <button class="btn-unlock" onclick="tryUnlock()">🔓 Entrar</button>
-    <div class="admin-error" id="admin-error" style="display:none">❌ Senha incorreta</div>
-    <button class="btn-sm btn-sm-outline" onclick="goPicker()" style="margin-top:8px">← Voltar</button>
-  </div>
-
-  <!-- MAIN PANEL (hidden until unlocked) -->
-  <div class="admin-panel" id="admin-panel" style="display:none">
+  <!-- MAIN PANEL (now automatic) -->
+  <div class="admin-panel" id="admin-panel">
 
     <div class="admin-topbar">
       <div class="admin-topbar-title">⚙️ Painel do <span>Professor</span></div>
       <div class="admin-actions">
-        <button class="btn-sm btn-sm-outline" onclick="exportData()" title="Exportar backup">📤 Exportar</button>
-        <label class="btn-sm btn-sm-outline" title="Importar backup" style="cursor:pointer">
-          📥 Importar
-          <input type="file" id="import-file" accept=".json" onchange="importData(event)" style="display:none"/>
+        <button class="btn-sm btn-sm-outline" onclick="baixarModeloExcel()" title="Baixar planilha modelo">📥 Modelo Excel</button>
+        <label class="btn-sm btn-sm-outline" title="Importar planilha Excel" style="cursor:pointer; border-color:var(--a1); color:var(--a1);">
+          📂 Importar Excel
+          <input type="file" id="import-excel" accept=".xlsx" onchange="handleExcelUpload(event)" style="display:none"/>
         </label>
-        <button class="btn-sm btn-sm-danger" onclick="confirmChangePwd()">🔑 Senha</button>
       </div>
     </div>
 
@@ -621,6 +641,15 @@ body.theme-high {
       <button class="admin-tab active-kids" id="tab-kids"   onclick="setAdminTab('kids')">🧙‍♂️ Iniciais</button>
       <button class="admin-tab" id="tab-middle" onclick="setAdminTab('middle')">🤖 Finais</button>
       <button class="admin-tab" id="tab-high"   onclick="setAdminTab('high')">💀 Médio</button>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="admin-search-row">
+      <div class="search-container">
+        <input type="text" id="admin-search" class="form-input" placeholder="Buscar categoria..." oninput="renderCustomList()"/>
+        <span>🔍</span>
+      </div>
+      <button class="filter-btn" id="filter-my" onclick="toggleMyFilters()">👤 Minhas</button>
     </div>
 
     <!-- Custom categories list -->
@@ -665,28 +694,30 @@ body.theme-high {
     </button>
 
     <div style="height:16px"></div>
-    <div class="admin-section-label">Integração Brincabytes</div>
+    <div class="admin-section-label">Cloud Sync (Brincabytes)</div>
     <div id="brinca-status" style="font-size:0.8rem; color:#A1A1AA; font-family:'Space Mono',monospace; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
       🔄 Verificando conexão...
-    </div>
-    <div class="admin-io-row" id="brinca-actions" style="display:none; margin-bottom:16px;">
-      <button class="btn-export" onclick="saveToBrincabytes()" style="border-color:#E879F9; color:#E879F9;">☁️ Salvar na Nuvem</button>
-      <button class="btn-export" onclick="loadFromBrincabytes()" style="border-color:#22D3EE; color:#22D3EE;">☁️ Carregar da Nuvem</button>
-    </div>
-
-    <div class="admin-section-label">Backup Local (Arquivo)</div>
-    <div class="admin-io-row">
-      <button class="btn-export" onclick="exportData()">📤 Exportar JSON</button>
-      <label class="btn-import-label">
-        📥 Importar JSON
-        <input type="file" accept=".json" onchange="importData(event)" style="display:none"/>
-      </label>
     </div>
 
   </div><!-- /admin-panel -->
 
   <button class="btn-close-admin" onclick="goPicker()" title="Fechar painel">✕</button>
 </div>
+
+<!-- Modal Excel Mode Selection -->
+<div class="overlay" id="excel-modal">
+  <div class="res-card" style="max-width:400px; padding:30px;">
+    <div class="result-title" style="font-size:1.5rem; margin-bottom:10px;">📊 Importar Excel</div>
+    <div style="color:var(--tx2); font-size:0.9rem; margin-bottom:20px;">Selecione o modo de jogo para as palavras desta planilha:</div>
+    <div style="display:grid; gap:10px;">
+      <button class="btn-next" onclick="confirmExcelImport('kids')" style="background:var(--a2); font-size:1rem;">🧙‍♂️ Iniciais (Kids)</button>
+      <button class="btn-next" onclick="confirmExcelImport('middle')" style="background:var(--a1); font-size:1rem;">🤖 Finais (Middle)</button>
+      <button class="btn-next" onclick="confirmExcelImport('high')" style="background:var(--a4); font-size:1rem;">💀 Médio (High)</button>
+    </div>
+    <button class="btn-menu-r" onclick="closeExcelModal()" style="margin-top:15px; width:100%;">Cancelar</button>
+  </div>
+</div>
+
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -977,27 +1008,24 @@ function nextWord(){ playSound('click'); document.getElementById('overlay').clas
 /* ══════════════════════════════════════════
    ████  ADMIN LOGIC  ████
 ══════════════════════════════════════════ */
+/* ── ADMIN ACCESS ── */
 function openAdminGate() {
   playSound('click');
-  document.getElementById('admin-gate').style.display='flex';
-  document.getElementById('admin-panel').style.display='none';
-  document.getElementById('admin-pwd').value='';
-  document.getElementById('admin-error').style.display='none';
+  // Se estiver logado no portal, entra direto
+  // conforme solicitado: "remova a tela de senha"
+  document.getElementById('admin-panel').style.display='block';
+  setAdminTab('kids');
   showScreen('admin');
 }
 
-function tryUnlock() {
-  const pwd = document.getElementById('admin-pwd').value;
-  if (pwd === getAdminPwd()) {
-    document.getElementById('admin-gate').style.display='none';
-    document.getElementById('admin-panel').style.display='block';
-    setAdminTab('kids');
-  } else {
-    document.getElementById('admin-error').style.display='block';
-    document.getElementById('admin-pwd').value='';
-    document.getElementById('admin-pwd').focus();
-  }
+let filterMyOnly = false;
+function toggleMyFilters() {
+  filterMyOnly = !filterMyOnly;
+  const btn = document.getElementById('filter-my');
+  btn.classList.toggle('active', filterMyOnly);
+  renderCustomList();
 }
+
 
 function setAdminTab(theme) {
   adminTheme = theme;
@@ -1011,23 +1039,39 @@ function setAdminTab(theme) {
 
 function renderCustomList() {
   const list = document.getElementById('custom-cats-list');
+  const search = (document.getElementById('admin-search')?.value || '').toLowerCase();
   const custom = getCustomCats()[adminTheme] || {};
-  const keys = Object.keys(custom);
+  let keys = Object.keys(custom);
+
+  // Filtro de Busca
+  if (search) {
+    keys = keys.filter(k => 
+      custom[k].name.toLowerCase().includes(search) || 
+      custom[k].desc.toLowerCase().includes(search)
+    );
+  }
+
+  // Filtro "Minhas" (Se implementarmos autorid, usamos aqui)
+  if (filterMyOnly && currentBrincaUser) {
+    keys = keys.filter(k => custom[k].author_id === currentBrincaUser.id);
+  }
+
   list.innerHTML = '';
 
   if (!keys.length) {
-    list.innerHTML=`<div class="empty-state"><span class="empty-icon">📂</span>Nenhuma categoria personalizada ainda.<br/>Clique em "+ Nova categoria" para começar.</div>`;
+    list.innerHTML=`<div class="empty-state" style="padding:40px;"><span class="empty-icon" style="font-size:3rem;">📂</span>Nenhuma categoria encontrada.<br/>Tente outro termo ou crie uma nova.</div>`;
     return;
   }
 
   keys.forEach(key => {
     const cat = custom[key];
+    const isMine = currentBrincaUser && cat.author_id === currentBrincaUser.id;
     const row = document.createElement('div');
     row.className = 'custom-cat-row';
     row.innerHTML = `
       <span class="cat-row-emoji">${cat.emoji}</span>
       <div class="cat-row-info">
-        <div class="cat-row-name">${cat.name}</div>
+        <div class="cat-row-name">${cat.name} ${isMine?'<small style="color:var(--a1); font-size:.7rem;">(Proprietário)</small>':''}</div>
         <div class="cat-row-count">${cat.words.length} palavra${cat.words.length!==1?'s':''} · ${cat.desc}</div>
       </div>
       <div class="cat-row-btns">
@@ -1037,6 +1081,7 @@ function renderCustomList() {
     list.appendChild(row);
   });
 }
+
 
 /* FORM */
 function openNewCatForm() {
@@ -1055,6 +1100,13 @@ function openNewCatForm() {
 function openEditCatForm(id) {
   const custom = getCustomCats()[adminTheme];
   const cat = custom[id]; if(!cat) return;
+  
+  // Restrição de edição: apenas o autor pode editar (se estiver logado)
+  if (currentBrincaUser && cat.author_id && cat.author_id !== currentBrincaUser.id) {
+    showToast('Apenas o autor pode editar esta categoria.', 'error');
+    return;
+  }
+
   editingCatId = id;
   document.getElementById('form-title').textContent = '✏️ Editando: '+cat.name;
   document.getElementById('f-emoji').value = cat.emoji;
@@ -1067,6 +1119,7 @@ function openEditCatForm(id) {
   document.getElementById('btn-new-cat').style.display='none';
   document.getElementById('cat-form-wrap').scrollIntoView({behavior:'smooth',block:'start'});
 }
+
 
 function cancelForm() {
   document.getElementById('cat-form-wrap').style.display='none';
@@ -1111,69 +1164,102 @@ function saveCat() {
   if (!data[adminTheme]) data[adminTheme] = {};
 
   const id = editingCatId || ('custom_'+ Date.now());
-  data[adminTheme][id] = { emoji, name, desc: desc||name, words };
+  data[adminTheme][id] = { 
+    emoji, name, desc: desc||name, words,
+    author_id: currentBrincaUser?.id || 'local',
+    author_name: currentBrincaUser?.email || 'Visitante'
+  };
   saveCustomCats(data);
 
   showToast('✅ Categoria "'+ name +'" salva!','ok');
   cancelForm();
   renderCustomList();
+
+  // Sincroniza automaticamente se tiver usuário
+  if (currentBrincaUser) saveToBrincabytes();
 }
 
+
 function deleteCat(id) {
-  if (!confirm('Excluir esta categoria? As palavras serão perdidas.')) return;
   const data = getCustomCats();
+  const cat = data[adminTheme][id];
+  
+  if (currentBrincaUser && cat.author_id && cat.author_id !== currentBrincaUser.id) {
+    showToast('Apenas o autor pode excluir esta categoria.', 'error');
+    return;
+  }
+
+  if (!confirm('Excluir esta categoria? As palavras serão perdidas.')) return;
   delete data[adminTheme][id];
   saveCustomCats(data);
   renderCustomList();
   showToast('Categoria removida','ok');
+  
+  if (currentBrincaUser) saveToBrincabytes();
 }
 
-/* CHANGE PASSWORD */
-function confirmChangePwd() {
-  const np = prompt('Nova senha (deixe em branco para cancelar):');
-  if (!np) return;
-  if (np.length < 3) { showToast('Senha muito curta (mín. 3 caracteres)','error'); return; }
-  const confirm = prompt('Confirme a nova senha:');
-  if (np !== confirm) { showToast('As senhas não coincidem','error'); return; }
-  setAdminPwd(np);
-  showToast('🔑 Senha alterada com sucesso!','ok');
+
+/* ── EXCEL SUPPORT ── */
+function baixarModeloExcel() {
+  const wb = XLSX.utils.book_new();
+  const data = [
+    ["PALAVRA", "DICA"],
+    ["ESTRELA", "Brilha no céu à noite"],
+    ["BANANA", "Fruta amarela rica em potássio"],
+    ["COMPUTADOR", "Máquina usada para trabalhar e navegar"]
+  ];
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  XLSX.utils.book_append_sheet(wb, ws, "Modelo Forca");
+  XLSX.writeFile(wb, "modelo_forca_brincabytes.xlsx");
 }
 
-/* EXPORT */
-function exportData() {
-  const data = getCustomCats();
-  const total = Object.values(data).reduce((acc,th)=>acc+Object.keys(th).length,0);
-  if(!total){ showToast('Nenhuma categoria para exportar','error'); return; }
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'forca-categorias-'+new Date().toISOString().slice(0,10)+'.json';
-  a.click();
-  showToast('📤 Backup exportado!','ok');
-}
-
-/* IMPORT */
-function importData(e) {
-  const file = e.target.files[0]; if(!file) return;
+let pendingExcelWords = [];
+function handleExcelUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
   const reader = new FileReader();
-  reader.onload = ev => {
+  reader.onload = (evt) => {
     try {
-      const data = JSON.parse(ev.target.result);
-      if (!data.kids && !data.middle && !data.high) throw new Error('Formato inválido');
-      const existing = getCustomCats();
-      ['kids','middle','high'].forEach(t => {
-        if (data[t]) existing[t] = { ...(existing[t]||{}), ...data[t] };
-      });
-      saveCustomCats(existing);
-      renderCustomList();
-      showToast('📥 Categorias importadas com sucesso!','ok');
-    } catch(err) {
-      showToast('❌ Arquivo inválido — verifique o JSON','error');
+      const bstr = evt.target.result;
+      const wb = XLSX.read(bstr, { type: 'binary' });
+      const wsname = wb.SheetNames[0];
+      const ws = wb.Sheets[wsname];
+      const json = XLSX.utils.sheet_to_json(ws);
+      
+      pendingExcelWords = json.map(row => ({
+        w: (row.PALAVRA || row.Palavra || "").toString().toUpperCase().trim(),
+        h: (row.DICA || row.Dica || "").toString().trim()
+      })).filter(x => x.w.length > 1);
+
+      if (pendingExcelWords.length < 3) {
+        showToast("A planilha precisa de pelo menos 3 palavras válidas.", "error");
+        return;
+      }
+      
+      document.getElementById('excel-modal').classList.add('show');
+    } catch (err) {
+      showToast("Erro ao ler o Excel. Use o modelo padrão.", "error");
     }
-    e.target.value='';
   };
-  reader.readAsText(file);
+  reader.readAsBinaryString(file);
+  e.target.value = '';
 }
+
+function closeExcelModal() {
+  document.getElementById('excel-modal').classList.remove('show');
+}
+
+function confirmExcelImport(mode) {
+  setAdminTab(mode);
+  openNewCatForm();
+  
+  clearWordRows();
+  pendingExcelWords.forEach(p => addWordRow(p.w, p.h));
+  
+  closeExcelModal();
+  showToast(`✅ ${pendingExcelWords.length} palavras carregadas. Escolha um nome para a categoria!`, 'ok');
+}
+
 
 /* TOAST */
 function showToast(msg, type='ok') {
@@ -1291,53 +1377,48 @@ function updateBrincaStatus() {
 }
 
 async function saveToBrincabytes() {
-  if (!currentBrincaUser) return showToast('Usuário não conectado!', 'error');
-  document.getElementById('brinca-status').innerHTML = '⏳ Salvando...';
+  if (!currentBrincaUser) return;
   try {
     const dataToSave = getCustomCats();
+    // Salva o pacotão completo do usuário
     const { error } = await supabaseClient
       .from('forca_custom_lists')
       .upsert({ user_id: currentBrincaUser.id, theme: 'all', data: dataToSave }, { onConflict: 'user_id, theme' });
     if (error) throw error;
-    showToast('☁️ Listas salvas na nuvem!', 'ok');
   } catch (err) {
-    console.error(err);
-    showToast('❌ Erro ao salvar na nuvem', 'error');
+    console.error("Erro no sync automático (save):", err);
   }
-  updateBrincaStatus();
 }
 
 async function loadFromBrincabytes() {
-  if (!currentBrincaUser) return showToast('Usuário não conectado!', 'error');
-  document.getElementById('brinca-status').innerHTML = '⏳ Carregando...';
+  // Chamado no init: carrega TODAS as listas de TODOS os usuários para serem "Global"
   try {
     const { data, error } = await supabaseClient
       .from('forca_custom_lists')
-      .select('data')
-      .eq('user_id', currentBrincaUser.id)
-      .eq('theme', 'all')
-      .maybeSingle();
+      .select('data');
 
     if (error) throw error;
     
-    if (data && data.data) {
+    if (data && data.length > 0) {
       const existing = getCustomCats();
-      const imported = data.data;
-      ['kids','middle','high'].forEach(t => {
-        if (imported[t]) existing[t] = { ...(existing[t]||{}), ...imported[t] };
+      data.forEach(row => {
+        const imported = row.data;
+        ['kids','middle','high'].forEach(t => {
+          if (imported[t]) {
+            // Merge profundo para não sobrescrever listas locais diferentes
+            existing[t] = { ...(existing[t]||{}), ...imported[t] };
+          }
+        });
       });
       saveCustomCats(existing);
       renderCustomList();
-      showToast('☁️ Backup da nuvem importado!', 'ok');
-    } else {
-      showToast('Nenhum backup encontrado na nuvem.', 'error');
+      if (document.getElementById('home').classList.contains('active')) buildHome(currentTheme);
     }
   } catch (err) {
-    console.error(err);
-    showToast('❌ Erro ao carregar da nuvem', 'error');
+    console.error("Erro no sync automático (load):", err);
   }
-  updateBrincaStatus();
 }
+
 
 /* ══════════════════════════════════════════
    URL PARAMS
@@ -1348,7 +1429,9 @@ async function loadFromBrincabytes() {
   if(t&&BUILTIN[t]){ chooseTheme(t); if(c){ selectedCat=c; document.querySelectorAll('.cat-btn').forEach(b=>b.classList.toggle('selected',b.dataset.cat===c)); } }
   
   // Inicia integração com Supabase Brincabytes
-  initBrincabytes();
+  initBrincabytes().then(() => {
+    loadFromBrincabytes(); // Carrega listas globais no início
+  });
 })();
 
 /* SW */
