@@ -1513,7 +1513,16 @@ class RodaARodaGame {
             // Requisita listas comunitárias
             try { window.parent.postMessage({ type: 'BRINCABYTES_LOAD_COMMUNITY_DATA' }, '*'); } catch(e){}
             const container = document.getElementById('bb-lib-community-list');
-            if (container) container.innerHTML = '<div style="padding:40px; text-align:center; opacity:0.5;">Carregando biblioteca pública...</div>';
+            if (container) {
+                container.innerHTML = '<div style="padding:40px; text-align:center; opacity:0.5;">Carregando biblioteca pública...</div>';
+                
+                // MOCK/SIMULAÇÃO: Como o backend do portal ainda não responde, 
+                // preenchemos com as listas locais públicas para fim visual.
+                setTimeout(() => {
+                    this.bbCommunityData = this.bbLibraryData.filter(list => list.isPublic);
+                    this.bbRenderCommunityLibrary();
+                }, 800);
+            }
         }
     }
 
