@@ -1399,7 +1399,10 @@ class RodaARodaGame {
                 this.bbRenderLibrary();
             }
             if (type === 'BRINCABYTES_LOAD_COMMUNITY_RESULT') {
-                console.log("[Handshake Jogo] Processando Dados da Comunidade:", value);
+                console.log("[Handshake Jogo] Dados da Comunidade Recebidos:", value);
+                if (value && typeof value === 'object') {
+                    console.log("[Handshake Jogo] Chaves do objeto 'value':", Object.keys(value));
+                }
                 
                 let dataToRender = [];
                 // Se value for array direto:
@@ -1535,7 +1538,8 @@ class RodaARodaGame {
             document.getElementById('bb-tab-community').style.display = 'block';
             
             // Requisita listas comunitárias (IMPORTANTE: Passar o gameId!)
-            try { window.parent.postMessage({ type: 'BRINCABYTES_LOAD_COMMUNITY_DATA', gameId: this.bbGameId }, '*'); } catch(e){}
+            console.log("[Handshake Jogo] Solicitando Comunidade para:", this.bbGameId);
+            try { window.parent.postMessage({ type: 'BRINCABYTES_LOAD_COMMUNITY_DATA', gameId: this.bbGameId || 'roda-a-roda' }, '*'); } catch(e){}
             const container = document.getElementById('bb-lib-community-list');
             if (container) {
                 container.innerHTML = '<div style="padding:40px; text-align:center; opacity:0.5;">Carregando biblioteca pública...</div>';
