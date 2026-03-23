@@ -112,6 +112,7 @@ class RodaARodaGame {
         this.bbUser = null;
         this.bbConnected = false;
         this.bbLibraryData = [];
+        this.bbCommunityData = [];
 
 
         this.WHEEL_SECTIONS = [
@@ -1379,15 +1380,17 @@ class RodaARodaGame {
     // ════════════════════════════════════════════════════
 
     setupBrincaBytes() {
-        // Solicitar identidade ao Portal pai
-        try { window.parent.postMessage({ type: 'BRINCABYTES_GET_USER' }, '*'); } catch(e){}
-
-        // Listener de respostas do Portal 
+        // Listener de respostas do Portal - Definir ANTES de pedir os dados
         window.addEventListener('message', (event) => {
             const { type, user, value, key } = event.data;
+            if (!type) return;
+
+            console.log(`[Handshake Jogo] Recebeu: ${type}`, event.data);
+
             if (type === 'BRINCABYTES_USER_DATA') {
                 this.bbUser = user;
                 this.bbConnected = !!(user && user.loggedIn);
+                console.log("[Handshake Jogo] Status Conexão:", this.bbConnected, user);
                 this.bbUpdateUI();
                 if (this.bbConnected) this.bbLoadLibrary();
             }
@@ -1401,6 +1404,9 @@ class RodaARodaGame {
                 this.bbRenderCommunityLibrary();
             }
         });
+
+        // Solicitar identidade ao Portal pai Após o listener estar pronto
+        try { window.parent.postMessage({ type: 'BRINCABYTES_GET_USER' }, '*'); } catch(e){}
 
         // Eventos dos botões da biblioteca
         const btnLibInit = document.getElementById('btn-bb-library-initial');
@@ -1547,12 +1553,23 @@ class RodaARodaGame {
     }
 
     bbJogarComunidade(idx) {
+        console.log("Tentando jogar lista comunidade índice:", idx);
         const item = this.bbCommunityData[idx];
-        if (!item || !item.data) return;
+        console.log("Item recuperado:", item);
+        
+        if (!item) {
+            this.showToast("Erro: Lista não encontrada na memória.", "error");
+            return;
+        }
+        if (!item.data) {
+            this.showToast("Erro: A lista pública não possui dados (data vazia).", "error");
+            return;
+        }
 
         try {
-            const parsedData = JSON.parse(item.data);
+            const parsedData = typeof item.data === 'string' ? JSON.parse(item.data) : item.data;
             this.userDatabase = parsedData;
+            console.log("Banco de dados parseado:", this.userDatabase);
             this.showToast(`Lista da comunidade "${item.titulo}" carregada!`, "success");
             
             this.updateThemeSelector(this.themeSelectorInitial, true);
@@ -1568,8 +1585,18 @@ class RodaARodaGame {
     }
 
     bbClonarComunidade(idx) {
+        console.log("Tentando clonar lista comunidade índice:", idx);
         const item = this.bbCommunityData[idx];
-        if (!item || !item.data) return;
+        console.log("Item clonado recuperado:", item);
+
+        if (!item) {
+            this.showToast("Erro: Lista não encontrada para clonar.", "error");
+            return;
+        }
+        if (!item.data) {
+            this.showToast("Erro: A lista não possui dados válidos.", "error");
+            return;
+        }
 
         const clonedItem = JSON.parse(JSON.stringify(item));
         clonedItem.titulo = clonedItem.titulo + " (Cópia)";
