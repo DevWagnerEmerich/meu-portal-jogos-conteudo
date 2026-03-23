@@ -1487,9 +1487,10 @@ class RodaARodaGame {
     }
 
     bbRenderLibrary() {
-        const container = document.getElementById('bb-modal-list');
+        const container = document.getElementById('bb-lib-list');
         if (!container) return;
-        const termo = document.getElementById('bb-search')?.value.toLowerCase() || '';
+        const termo = document.getElementById('bb-lib-search')?.value.toLowerCase() || '';
+
         
         const filtered = this.bbLibraryData.map((item, idx) => ({...item, originalIdx: idx}))
                                           .filter(i => (i.titulo || 'Sem Título').toLowerCase().includes(termo));
