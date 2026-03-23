@@ -183,7 +183,15 @@ class RodaARodaGame {
         });
     }
 
+    goBackToModeSelection() {
+        this.initialConfigModal.style.display = 'none';
+        this.gameModeMenu.style.display = 'flex';
+        this.gameState = "modeSelection";
+        this.updateStatusIndicator();
+    }
+
     setupInitialConfig() {
+
         this.loadCsvInitialButton.addEventListener('click', () => {
             this.csvUploadInitialInput.click();
         });
@@ -1665,4 +1673,5 @@ class RodaARodaGame {
 document.addEventListener('DOMContentLoaded', () => {
 
     window.rodaARodaGame = new RodaARodaGame();
-});
+    window.goBackToModeSelection = () => window.rodaARodaGame.goBackToModeSelection();
+});
