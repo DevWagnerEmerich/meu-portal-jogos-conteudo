@@ -82,8 +82,6 @@
       </div>
       
       <div style="text-align: center; margin-top: 20px;">
-
-          <button id="reset-game-btn" class="improved-button secondary-btn" style="border-color: #ef4444; color: #ef4444; margin-bottom: 10px;">Restaurar Jogo Original</button>
           <button class="improved-button secondary-btn" onclick="goBackToModeSelection()" style="width: 100%; max-width: 300px;">⬅️ Voltar aos Modos</button>
       </div>
     </div>
@@ -307,17 +305,36 @@
   <!-- BRINCABYTES LIBRARY MODAL -->
   <div id="bb-library-modal">
     <div class="bb-modal-box">
-      <div class="bb-modal-header">
+      <div class="bb-modal-header" style="padding-bottom: 0; border-bottom: none;">
         <h2>Biblioteca BrincaBytes</h2>
-        <button class="bb-btn-close" onclick="bbCloseLibrary()">×</button>
+        <button class="bb-btn-close" onclick="bbCloseLibrary()" style="margin-top:-10px;">×</button>
       </div>
-      <div class="bb-modal-body">
-        <div class="bb-search-bar">
-          <input type="text" id="bb-lib-search" placeholder="Buscar na biblioteca..." oninput="bbRenderLibrary()">
+      <div class="bb-tabs">
+        <button class="bb-tab-btn active" id="bb-tab-btn-local" onclick="window.bbSwitchLibraryTab('local')">Minhas Listas</button>
+        <button class="bb-tab-btn" id="bb-tab-btn-community" onclick="window.bbSwitchLibraryTab('community')">🌍 Comunidade</button>
+      </div>
+      <div class="bb-modal-body" style="padding-top: 15px;">
+        
+        <!-- ABA: MINHAS LISTAS -->
+        <div id="bb-tab-local" class="bb-tab-content active">
+          <div class="bb-search-bar">
+            <input type="text" id="bb-lib-search" placeholder="Buscar nas minhas listas..." oninput="bbRenderLibrary()">
+          </div>
+          <div id="bb-lib-list" class="bb-list-container">
+            <!-- Itens da biblioteca local serão renderizados aqui -->
+          </div>
         </div>
-        <div id="bb-lib-list" class="bb-list-container">
-          <!-- Itens da biblioteca serão renderizados aqui -->
+
+        <!-- ABA: COMUNIDADE -->
+        <div id="bb-tab-community" class="bb-tab-content" style="display: none;">
+          <div class="bb-search-bar">
+            <input type="text" id="bb-community-search" placeholder="Buscar na comunidade..." oninput="window.bbRenderCommunityLibrary()">
+          </div>
+          <div id="bb-lib-community-list" class="bb-list-container">
+            <!-- Itens da comunidade serão renderizados aqui -->
+          </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -359,9 +376,15 @@
               <button onclick="window.bbCloseEditor()" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">&times;</button>
           </div>
           <div class="bb-modal-body" style="max-height: 60vh; overflow-y: auto;">
-              <div class="input-group">
+              <div class="input-group" style="border-bottom: none; margin-bottom: 5px; padding-bottom: 0;">
                   <label class="improved-label">Nome da Lista na Biblioteca:</label>
                   <input type="text" id="bb-editor-list-name" class="improved-input">
+              </div>
+              <div class="input-group" style="margin-top: 10px; margin-bottom: 0; padding-bottom: 10px;">
+                  <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #007bff; font-weight: bold;">
+                      <input type="checkbox" id="bb-editor-is-public" style="width: 18px; height: 18px;">
+                      🌍 Compartilhar esta lista publicamente na aba "Comunidade"
+                  </label>
               </div>
               <div class="input-group" style="margin-top: 15px;">
                   <label class="improved-label">Palavras e Dicas:</label>

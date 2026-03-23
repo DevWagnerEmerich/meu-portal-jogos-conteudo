@@ -214,7 +214,6 @@ class RodaARodaGame {
                 this.tituloRoleta.textContent = this.gameTitle;
                 this.initialConfigModal.style.display = 'none';
                 this.gameArea.style.display = 'flex';
-                this.bbSaveCurrentList(true); // Salva automaticamente no portal (silencioso)
                 this.initGameStructures();
                 this.resetAndStartNewRound();
             }
@@ -1396,6 +1395,11 @@ class RodaARodaGame {
                 this.bbLibraryData = value ? (Array.isArray(value) ? value : [value]) : [];
                 this.bbRenderLibrary();
             }
+            if (type === 'BRINCABYTES_LOAD_COMMUNITY_RESULT') {
+                // Nova mensagem implementada no back-end para retornar o DB de listas publicas
+                this.bbCommunityData = value ? (Array.isArray(value) ? value : [value]) : [];
+                this.bbRenderCommunityLibrary();
+            }
         });
 
         // Eventos dos botões da biblioteca
@@ -1491,6 +1495,90 @@ class RodaARodaGame {
         if (modal) modal.classList.remove('open');
     }
 
+    bbSwitchLibraryTab(tab) {
+        document.querySelectorAll('.bb-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.bb-tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.bb-tab-content').forEach(c => c.style.display = 'none');
+        
+        if (tab === 'local') {
+            document.getElementById('bb-tab-btn-local').classList.add('active');
+            document.getElementById('bb-tab-local').classList.add('active');
+            document.getElementById('bb-tab-local').style.display = 'block';
+            this.bbRenderLibrary();
+        } else if (tab === 'community') {
+            document.getElementById('bb-tab-btn-community').classList.add('active');
+            document.getElementById('bb-tab-community').classList.add('active');
+            document.getElementById('bb-tab-community').style.display = 'block';
+            
+            // Requisita listas comunitárias
+            try { window.parent.postMessage({ type: 'BRINCABYTES_LOAD_COMMUNITY_DATA' }, '*'); } catch(e){}
+            const container = document.getElementById('bb-lib-community-list');
+            if (container) container.innerHTML = '<div style="padding:40px; text-align:center; opacity:0.5;">Carregando biblioteca pública...</div>';
+        }
+    }
+
+    bbRenderCommunityLibrary() {
+        const container = document.getElementById('bb-lib-community-list');
+        if (!container) return;
+        const termo = document.getElementById('bb-community-search')?.value.toLowerCase() || '';
+        
+        const filtered = this.bbCommunityData.map((item, idx) => ({...item, originalIdx: idx}))
+                                          .filter(i => (i.titulo || 'Sem Título').toLowerCase().includes(termo));
+
+        if (filtered.length === 0) {
+            container.innerHTML = '<div style="padding:40px; text-align:center; opacity:0.5;">Nenhuma lista pública encontrada.</div>';
+            return;
+        }
+
+        container.innerHTML = filtered.map(f => `
+            <div class="bb-list-item">
+                <div class="bb-item-info">
+                    <div class="bb-item-name">${f.titulo || 'Sem título'} (por ${f.authorName || 'Professor'})</div>
+                    <div class="bb-item-meta">${f.savedAt ? new Date(f.savedAt).toLocaleDateString('pt-BR') : ''}</div>
+                </div>
+                <div class="bb-item-actions">
+                    <button class="bb-btn-load" onclick="bbJogarComunidade(${f.originalIdx})" style="background:#28a745;">▶️ Jogar</button>
+                    <button class="bb-btn-load" onclick="bbClonarComunidade(${f.originalIdx})" style="background:#007bff; margin-left: 5px;" title="Copiar para Minhas Listas">🔄 Clonar</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    bbJogarComunidade(idx) {
+        const item = this.bbCommunityData[idx];
+        if (!item || !item.data) return;
+
+        try {
+            const parsedData = JSON.parse(item.data);
+            this.userDatabase = parsedData;
+            this.showToast(`Lista da comunidade "${item.titulo}" carregada!`, "success");
+            
+            this.updateThemeSelector(this.themeSelectorInitial, true);
+            this.updateThemeSelector(this.themeSelectorIngame, false);
+            if (this.csvStatusIngame) this.csvStatusIngame.textContent = `"${item.titulo}" (Comunidade) carregado.`;
+
+            this.bbCloseLibrary();
+            this.checkInitialConfigReady();
+        } catch (e) {
+            console.error("Erro ao carregar dados comunitários:", e);
+            this.showToast("Erro ao ler os dados da comunidade.", "error");
+        }
+    }
+
+    bbClonarComunidade(idx) {
+        const item = this.bbCommunityData[idx];
+        if (!item || !item.data) return;
+
+        const clonedItem = JSON.parse(JSON.stringify(item));
+        clonedItem.titulo = clonedItem.titulo + " (Cópia)";
+        clonedItem.savedAt = Date.now();
+        clonedItem.isPublic = false; // Começa oculta na minha conta
+
+        this.bbLibraryData.unshift(clonedItem);
+        this.bbSaveBiblioteca(this.bbLibraryData);
+        this.showToast(`Lista clonada para "Minhas Listas"!`, "success");
+    }
+
     bbRenderLibrary() {
         const container = document.getElementById('bb-lib-list');
         if (!container) return;
@@ -1578,6 +1666,9 @@ class RodaARodaGame {
             });
             
             document.getElementById('bb-editor-list-name').value = item.titulo || "";
+            const isPublicCheckbox = document.getElementById('bb-editor-is-public');
+            if (isPublicCheckbox) isPublicCheckbox.checked = !!item.isPublic;
+
             const tbody = document.getElementById('bb-editor-tbody');
             tbody.innerHTML = '';
             
@@ -1669,6 +1760,8 @@ class RodaARodaGame {
         }
         
         this.bbLibraryData[this.currentEditingListIndex].titulo = listName;
+        const isPublicCheckbox = document.getElementById('bb-editor-is-public');
+        this.bbLibraryData[this.currentEditingListIndex].isPublic = isPublicCheckbox ? isPublicCheckbox.checked : false;
         this.bbLibraryData[this.currentEditingListIndex].data = JSON.stringify(newDatabase);
         
         this.bbSaveBiblioteca(this.bbLibraryData);
@@ -1795,9 +1888,14 @@ document.addEventListener('DOMContentLoaded', () => {
     window.rodaARodaGame = new RodaARodaGame();
     window.goBackToModeSelection = () => window.rodaARodaGame.goBackToModeSelection();
     
-    // Editor globals
     window.bbCloseEditor = () => window.rodaARodaGame.bbCloseEditor();
     window.bbEditorAddRow = () => window.rodaARodaGame.bbEditorAddRow();
     window.bbEditorRemoveRow = (btn) => window.rodaARodaGame.bbEditorRemoveRow(btn);
     window.bbSaveEditor = () => window.rodaARodaGame.bbSaveEditor();
+    
+    // Comunidade globals
+    window.bbSwitchLibraryTab = (tab) => window.rodaARodaGame.bbSwitchLibraryTab(tab);
+    window.bbRenderCommunityLibrary = () => window.rodaARodaGame.bbRenderCommunityLibrary();
+    window.bbJogarComunidade = (idx) => window.rodaARodaGame.bbJogarComunidade(idx);
+    window.bbClonarComunidade = (idx) => window.rodaARodaGame.bbClonarComunidade(idx);
 });

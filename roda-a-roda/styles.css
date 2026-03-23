@@ -1,4 +1,4 @@
-﻿/* Estilos Gerais */
+/* Estilos Gerais */
 body.game-body {
   background-image: url('assets/images/background.webp');
   background-size: cover;
@@ -1709,4 +1709,57 @@ body.dark-mode .status-indicator {
 }
 .bb-editor-remove-btn:hover {
     background: #dc2626;
+}
+
+/* --- bb-tabs (Comunidade) --- */
+.bb-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    border-bottom: 2px solid #ddd;
+    margin-bottom: 20px;
+    padding-top: 10px;
+}
+
+.bb-tab-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    color: #555;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.bb-tab-btn:hover {
+    color: #007bff;
+}
+
+.bb-tab-btn.active {
+    color: #007bff;
+    border-bottom: 3px solid #007bff;
+}
+
+.bb-tab-content {
+    display: none;
+    animation: bbFadeIn 0.3s ease;
+}
+
+.bb-tab-content.active {
+    display: block;
+}
+
+/* Dark mode tab overrides if necessary */
+.dark-mode .bb-tabs {
+    border-color: #444;
+}
+.dark-mode .bb-tab-btn {
+    color: #ccc;
+}
+.dark-mode .bb-tab-btn:hover,
+.dark-mode .bb-tab-btn.active {
+    color: #4fa3f7;
+    border-bottom-color: #4fa3f7;
 }
