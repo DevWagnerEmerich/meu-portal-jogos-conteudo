@@ -1399,24 +1399,26 @@ class RodaARodaGame {
                 this.bbRenderLibrary();
             }
             if (type === 'BRINCABYTES_LOAD_COMMUNITY_RESULT') {
-                // Tentativa de normalizar o que vem do Portal (Pode vir Array direto ou {value: Array})
+                console.log("[Handshake Jogo] Processando Dados da Comunidade:", value);
+                
                 let dataToRender = [];
+                // Se value for array direto:
                 if (Array.isArray(value)) {
                     dataToRender = value;
-                } else if (value && Array.isArray(value.value)) {
+                } 
+                // Se for um envelope { value: [...] } ou { data: [...] }
+                else if (value && Array.isArray(value.value)) {
                     dataToRender = value.value;
-                } else if (value && typeof value === 'object') {
-                    // Caso o portal tenha enviado um único objeto em vez de array
+                } 
+                else if (value && Array.isArray(value.data)) {
+                    dataToRender = value.data;
+                }
+                // Se for um objeto único:
+                else if (value && typeof value === 'object' && value.titulo) {
                     dataToRender = [value];
                 }
 
-                // Limpeza: Se o item for apenas {value: null}, ignora
-                this.bbCommunityData = dataToRender.filter(item => {
-                    if (!item) return false;
-                    if (item.value === null && Object.keys(item).length === 1) return false;
-                    return true;
-                });
-                
+                this.bbCommunityData = dataToRender.filter(item => item && (item.titulo || item.data));
                 this.bbRenderCommunityLibrary();
             }
         });
@@ -1532,8 +1534,8 @@ class RodaARodaGame {
             document.getElementById('bb-tab-community').classList.add('active');
             document.getElementById('bb-tab-community').style.display = 'block';
             
-            // Requisita listas comunitárias
-            try { window.parent.postMessage({ type: 'BRINCABYTES_LOAD_COMMUNITY_DATA' }, '*'); } catch(e){}
+            // Requisita listas comunitárias (IMPORTANTE: Passar o gameId!)
+            try { window.parent.postMessage({ type: 'BRINCABYTES_LOAD_COMMUNITY_DATA', gameId: this.bbGameId }, '*'); } catch(e){}
             const container = document.getElementById('bb-lib-community-list');
             if (container) {
                 container.innerHTML = '<div style="padding:40px; text-align:center; opacity:0.5;">Carregando biblioteca pública...</div>';
