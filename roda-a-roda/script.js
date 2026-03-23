@@ -1399,8 +1399,24 @@ class RodaARodaGame {
                 this.bbRenderLibrary();
             }
             if (type === 'BRINCABYTES_LOAD_COMMUNITY_RESULT') {
-                // Nova mensagem implementada no back-end para retornar o DB de listas publicas
-                this.bbCommunityData = value ? (Array.isArray(value) ? value : [value]) : [];
+                // Tentativa de normalizar o que vem do Portal (Pode vir Array direto ou {value: Array})
+                let dataToRender = [];
+                if (Array.isArray(value)) {
+                    dataToRender = value;
+                } else if (value && Array.isArray(value.value)) {
+                    dataToRender = value.value;
+                } else if (value && typeof value === 'object') {
+                    // Caso o portal tenha enviado um único objeto em vez de array
+                    dataToRender = [value];
+                }
+
+                // Limpeza: Se o item for apenas {value: null}, ignora
+                this.bbCommunityData = dataToRender.filter(item => {
+                    if (!item) return false;
+                    if (item.value === null && Object.keys(item).length === 1) return false;
+                    return true;
+                });
+                
                 this.bbRenderCommunityLibrary();
             }
         });
@@ -1530,7 +1546,8 @@ class RodaARodaGame {
         if (!container) return;
         const termo = document.getElementById('bb-community-search')?.value.toLowerCase() || '';
         
-        const filtered = this.bbCommunityData.map((item, idx) => ({...item, originalIdx: idx}))
+        const normalizedData = this.bbCommunityData.map(item => { if (item && item.value && typeof item.value === 'object' && !Array.isArray(item.value)) { return { ...item.value, ...item }; } return item; }); 
+        const filtered = normalizedData.map((item, idx) => ({...item, originalIdx: idx}))
                                           .filter(i => (i.titulo || 'Sem Título').toLowerCase().includes(termo));
 
         if (filtered.length === 0) {
@@ -1554,8 +1571,14 @@ class RodaARodaGame {
 
     bbJogarComunidade(idx) {
         console.log("Tentando jogar lista comunidade índice:", idx);
-        const item = this.bbCommunityData[idx];
-        console.log("Item recuperado:", item);
+        let item = this.bbCommunityData[idx];
+        
+        // Normalização local caso o objeto venha aninhado
+        if (item && item.value && typeof item.value === 'object' && !Array.isArray(item.value)) {
+            item = { ...item.value, ...item };
+        }
+        
+        console.log("Item recuperado (normalizado):", item);
         
         if (!item) {
             this.showToast("Erro: Lista não encontrada na memória.", "error");
