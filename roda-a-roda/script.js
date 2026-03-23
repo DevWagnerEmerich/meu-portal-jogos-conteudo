@@ -184,11 +184,15 @@ class RodaARodaGame {
     }
 
     goBackToModeSelection() {
-        this.initialConfigModal.style.display = 'none';
-        this.gameModeMenu.style.display = 'flex';
+        if (this.initialConfigModal) this.initialConfigModal.style.display = 'none';
+        if (this.configModal) this.configModal.style.display = 'none';
+        if (this.gameArea) this.gameArea.style.display = 'none';
+        
+        if (this.gameModeMenu) this.gameModeMenu.style.display = 'flex';
         this.gameState = "modeSelection";
         this.updateStatusIndicator();
     }
+
 
     setupInitialConfig() {
 
