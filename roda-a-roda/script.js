@@ -1515,13 +1515,6 @@ class RodaARodaGame {
             const container = document.getElementById('bb-lib-community-list');
             if (container) {
                 container.innerHTML = '<div style="padding:40px; text-align:center; opacity:0.5;">Carregando biblioteca pública...</div>';
-                
-                // MOCK/SIMULAÇÃO: Como o backend do portal ainda não responde, 
-                // preenchemos com as listas locais públicas para fim visual.
-                setTimeout(() => {
-                    this.bbCommunityData = this.bbLibraryData.filter(list => list.isPublic);
-                    this.bbRenderCommunityLibrary();
-                }, 800);
             }
         }
     }
