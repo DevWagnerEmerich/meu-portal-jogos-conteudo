@@ -1,4 +1,4 @@
-/* Estilos Gerais */
+﻿/* Estilos Gerais */
 body.game-body {
   background-image: url('assets/images/background.webp');
   background-size: cover;
@@ -10,7 +10,7 @@ body.game-body {
   padding: 0;
   min-height: 100vh;
   overflow-y: hidden; /* Tenta esconder scroll */
-  overflow-x: hidden; /* Evita scroll horizontal com grid à esquerda */
+  overflow-x: hidden; /* Evita scroll horizontal com grid Ã  esquerda */
 }
 
 /* Container Principal do Jogo */
@@ -18,9 +18,9 @@ body.game-body {
   position: relative;
   width: 100%;
   min-height: 100vh;
-  /* display: flex; /* Adicionar se quiser controlar posições filhas com flex */
-  /* justify-content: space-between; /* Exemplo: Espaçar grid-section e roleta */
-  /* padding: 20px; /* Adicionar padding se necessário */
+  /* display: flex; /* Adicionar se quiser controlar posiÃ§Ãµes filhas com flex */
+  /* justify-content: space-between; /* Exemplo: EspaÃ§ar grid-section e roleta */
+  /* padding: 20px; /* Adicionar padding se necessÃ¡rio */
   box-sizing: border-box;
 }
 
@@ -91,7 +91,7 @@ body.game-body {
   cursor: not-allowed;
 }
 
-/* --- Modal de Configuração Inicial (MELHORADO) --- */
+/* --- Modal de ConfiguraÃ§Ã£o Inicial (MELHORADO) --- */
 #initial-config-modal .improved-start-modal {
   max-width: 800px;
   height: auto;
@@ -101,14 +101,14 @@ body.game-body {
 
 #initial-config-modal h2 {
   color: #003d82;
-  font-weight: 700; /* Título mais forte */
+  font-weight: 700; /* TÃ­tulo mais forte */
 }
 
 #initial-config-title {
   font-size: 28px;
-  margin-bottom: 30px; /* Mais espaço abaixo do título */
-  padding-bottom: 15px; /* Espaçamento no padding */
-  border-bottom: 2px solid #007bff; /* Linha azul abaixo do título */
+  margin-bottom: 30px; /* Mais espaÃ§o abaixo do tÃ­tulo */
+  padding-bottom: 15px; /* EspaÃ§amento no padding */
+  border-bottom: 2px solid #007bff; /* Linha azul abaixo do tÃ­tulo */
   display: inline-block; /* Para a borda funcionar corretamente */
 }
 
@@ -120,15 +120,15 @@ body.game-body {
   padding: 10px;
   background-color: #f8f9fa; /* Fundo claro */
   border-radius: 6px;
-  border-left: 4px solid #007bff; /* Destaque azul à esquerda */
-  font-style: italic; /* Itálico para dar um ar de status */
+  border-left: 4px solid #007bff; /* Destaque azul Ã  esquerda */
+  font-style: italic; /* ItÃ¡lico para dar um ar de status */
 }
 
-/* --- Título do Jogo (Roleta) --- */
+/* --- TÃ­tulo do Jogo (Roleta) --- */
 .titulo-roleta {
   position: fixed;
   top: 10px;
-  right: 30px; /* Mantém na direita */
+  right: 30px; /* MantÃ©m na direita */
   width: 380px;
   text-align: center;
   font-size: clamp(18px, 2vw, 26px);
@@ -142,22 +142,22 @@ body.game-body {
 }
 
 /* ======================================= */
-/* === NOVA SEÇÃO PARA GRID E ELEMENTOS RELACIONADOS === */
+/* === NOVA SEÃ‡ÃƒO PARA GRID E ELEMENTOS RELACIONADOS === */
 /* ======================================= */
 .grid-section {
     display: flex;             /* Habilita Flexbox */
     flex-direction: column;    /* Empilha os itens verticalmente */
     align-items: center;       /* Centraliza os itens horizontalmente */
-    gap: 20px;                 /* Espaço vertical entre os itens (ajuste conforme necessário) */
+    gap: 20px;                 /* EspaÃ§o vertical entre os itens (ajuste conforme necessÃ¡rio) */
 
-    /* Posicionamento da seção inteira na tela */
+    /* Posicionamento da seÃ§Ã£o inteira na tela */
     position: absolute;        /* Ou relative, dependendo do container .game-area */
-    top: 25px;                 /* Espaço do topo */
-    left: 25px;                /* Espaço da esquerda */
-    /* Não defina width/max-width fixo aqui para permitir centralização correta */
-    /* A largura será definida pelo conteúdo (principalmente a grade) */
-    /* width: max-content; /* Pode ser útil se houver problemas de largura */
-    z-index: 5;                /* Garante que fique abaixo do título/roleta/modais */
+    top: 25px;                 /* EspaÃ§o do topo */
+    left: 25px;                /* EspaÃ§o da esquerda */
+    /* NÃ£o defina width/max-width fixo aqui para permitir centralizaÃ§Ã£o correta */
+    /* A largura serÃ¡ definida pelo conteÃºdo (principalmente a grade) */
+    /* width: max-content; /* Pode ser Ãºtil se houver problemas de largura */
+    z-index: 5;                /* Garante que fique abaixo do tÃ­tulo/roleta/modais */
     box-sizing: border-box;
 }
 
@@ -172,12 +172,12 @@ body.game-body {
   gap: 8px;
   justify-content: center; /* Centraliza as letras dentro */
   width: auto;
-  max-width: 850px; /* Mantém um limite */
+  max-width: 850px; /* MantÃ©m um limite */
   padding: 15px;
   background-color: rgba(0, 0, 50, 0.7);
   border-radius: 10px;
-  /* O grid-section já tem gap, talvez não precise de margin */
-  /* margin-bottom: 20px; */ /* Se precisar de mais espaço */
+  /* O grid-section jÃ¡ tem gap, talvez nÃ£o precise de margin */
+  /* margin-bottom: 20px; */ /* Se precisar de mais espaÃ§o */
 }
 .alphabet-letter {
   width: 55px;
@@ -213,17 +213,17 @@ body.game-body {
      /* top: 186px; */ /* Calculado anteriormente, agora definido pelo flex gap */ /* REMOVIDO */
      /* left: 25px; */ /* REMOVIDO */
      /* z-index: 7; */ /* REMOVIDO */
-     /* A largura será determinada pelo conteúdo interno (inner-frame/grid) */
-     /* Não precisa de width ou max-width aqui */
+     /* A largura serÃ¡ determinada pelo conteÃºdo interno (inner-frame/grid) */
+     /* NÃ£o precisa de width ou max-width aqui */
 }
 .inner-frame {
-  position: relative; /* Mantém para os pseudo-elementos */
+  position: relative; /* MantÃ©m para os pseudo-elementos */
   padding: 13px;
   border-radius: 19.5px;
   box-shadow: 6.5px 6.5px 19.5px rgba(0, 0, 0, 0.3);
 }
 /* ======================================= */
-/* MODIFICAÇÃO: Aumentando a Grade (Mantida) */
+/* MODIFICAÃ‡ÃƒO: Aumentando a Grade (Mantida) */
 /* ======================================= */
 .grid-container {
   display: grid;
@@ -269,7 +269,7 @@ body.game-body {
   perspective: 1000px;
 }
 /* ======================================= */
-/* FIM DA MODIFICAÇÃO DA GRADE             */
+/* FIM DA MODIFICAÃ‡ÃƒO DA GRADE             */
 /* ======================================= */
 .grid-item.empty { background-color: white; color: white; }
 .grid-item.revealed { background-color: #ffffff !important; color: black !important; }
@@ -296,9 +296,9 @@ body.game-body {
   font-weight: bold;
   color: white;
   /* MODIFICADO: Alinhamento e Largura */
-  text-align: left; /* Alinha texto à esquerda dentro da caixa da dica */
-  max-width: 1013px; /* Largura máxima igual à largura da grade (12*78 + 11*7) */
-  width: 100%; /* Ocupa o espaço disponível até o max-width */
+  text-align: left; /* Alinha texto Ã  esquerda dentro da caixa da dica */
+  max-width: 1013px; /* Largura mÃ¡xima igual Ã  largura da grade (12*78 + 11*7) */
+  width: 100%; /* Ocupa o espaÃ§o disponÃ­vel atÃ© o max-width */
   margin: 0 auto; /* Centraliza o bloco da dica se for menor que o grid-section */
   /* FIM MODIFICADO */
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
@@ -307,8 +307,8 @@ body.game-body {
   border-radius: 8px;
   font-size: clamp(20px, 2vw, 22px); /* Ajustado levemente */
   box-sizing: border-box;
-  min-height: 1.5em; /* Garante altura mínima para evitar colapso */
-  overflow-wrap: break-word; /* Quebra palavras longas se necessário */
+  min-height: 1.5em; /* Garante altura mÃ­nima para evitar colapso */
+  overflow-wrap: break-word; /* Quebra palavras longas se necessÃ¡rio */
   white-space: normal; /* Permite quebras de linha normais */
 }
 
@@ -319,7 +319,7 @@ body.game-body {
     vertical-align: baseline; /* Opcional: para melhor alinhamento vertical com "Dica:" */
 }
 
-/* NOVO ESTILO: Para exibir pontos da palavra no modo "Resposta Rápida" */
+/* NOVO ESTILO: Para exibir pontos da palavra no modo "Resposta RÃ¡pida" */
 .word-points-display {
   text-align: center;
   font-size: clamp(20px, 2.2vw, 24px);
@@ -329,7 +329,7 @@ body.game-body {
   background-color: rgba(0, 0, 0, 0.6);
   padding: 8px 15px;
   border-radius: 8px;
-  margin-top: 10px; /* Espaço abaixo da dica ou do elemento anterior */
+  margin-top: 10px; /* EspaÃ§o abaixo da dica ou do elemento anterior */
   /* Controlado via JS (display: none/block ou visibility) */
 }
 
@@ -344,9 +344,9 @@ body.game-body {
   flex-wrap: wrap;
   justify-content: center; /* Centraliza os scores dentro do container */
   gap: 8px;
-  width: auto; /* Largura baseada no conteúdo */
-  max-width: 95%; /* Define uma largura máxima */
-  /* max-width: 1013px; */ /* Removido para testar centralização do pai */
+  width: auto; /* Largura baseada no conteÃºdo */
+  max-width: 95%; /* Define uma largura mÃ¡xima */
+  /* max-width: 1013px; */ /* Removido para testar centralizaÃ§Ã£o do pai */
   padding-bottom: 20px; /* Adiciona um respiro na parte inferior */
   box-sizing: border-box;
 }
@@ -383,7 +383,7 @@ body.game-body {
 }
 
 /* ======================================= */
-/* === FIM DA SEÇÃO GRID === */
+/* === FIM DA SEÃ‡ÃƒO GRID === */
 /* ======================================= */
 
 
@@ -445,7 +445,7 @@ body.game-body {
   height: 100%;
   border-radius: 50%;
 }
-/* Esconde botão se logo for carregado (controlado via JS/inline style) */
+/* Esconde botÃ£o se logo for carregado (controlado via JS/inline style) */
 #logo-space[style*="background-image"] #spin-button {
   display: none;
 }
@@ -469,7 +469,7 @@ body.game-body {
 }
 
 
-/* --- Modal Genérico (MELHORADO) --- */
+/* --- Modal GenÃ©rico (MELHORADO) --- */
 .modal {
   display: none; /* Controlado por JS */
   position: fixed;
@@ -529,15 +529,15 @@ body.game-body {
 }
 
 .modal .input-group {
-  margin-bottom: 20px; /* Mais espaço entre os grupos */
+  margin-bottom: 20px; /* Mais espaÃ§o entre os grupos */
   text-align: left;
-  padding-bottom: 20px; /* Espaço inferior */
+  padding-bottom: 20px; /* EspaÃ§o inferior */
   border-bottom: 1px solid #e0e0e0; /* Linha separadora */
   position: relative;
 }
 
 .modal .input-group:last-of-type {
-  border-bottom: none; /* Remove a borda do último item */
+  border-bottom: none; /* Remove a borda do Ãºltimo item */
   padding-bottom: 0;
 }
 
@@ -552,12 +552,12 @@ body.game-body {
   padding: 14px 18px; /* Mais padding interno */
   font-size: 16px;
   border-radius: 8px; /* Bordas mais suaves */
-  border: 1px solid #ced4da; /* Borda cinza padrão */
+  border: 1px solid #ced4da; /* Borda cinza padrÃ£o */
   background-color: #ffffff; /* Fundo branco puro */
   color: #333;
   width: 100%;
   box-sizing: border-box;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* Transição suave */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* TransiÃ§Ã£o suave */
 }
 
 .modal .improved-input:focus, .modal .improved-select:focus {
@@ -571,17 +571,17 @@ body.game-body {
 }
 
 .modal button.improved-button {
-  padding: 14px 30px; /* Botões maiores */
+  padding: 14px 30px; /* BotÃµes maiores */
   margin: 8px 5px;
   font-size: 17px;
-  font-weight: bold; /* Texto do botão em negrito */
+  font-weight: bold; /* Texto do botÃ£o em negrito */
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
   border: none;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-  text-transform: uppercase; /* Letras maiúsculas */
-  letter-spacing: 0.5px; /* Espaçamento entre letras */
+  text-transform: uppercase; /* Letras maiÃºsculas */
+  letter-spacing: 0.5px; /* EspaÃ§amento entre letras */
 }
 
 .modal button.primary-btn {
@@ -615,7 +615,7 @@ body.game-body {
   transform: none;
 }
 
-/* --- DESTAQUE PARA BOTÃO DE CARREGAR PLANILHA --- */
+/* --- DESTAQUE PARA BOTÃƒO DE CARREGAR PLANILHA --- */
 #load-csv-initial,
 #load-csv-ingame {
   background: linear-gradient(145deg, #28a745, #218838); /* Gradiente verde */
@@ -659,20 +659,20 @@ body.game-body {
   color: #333;
 }
 
-/* Estilos para o Modal In-Game e Estatísticas */
+/* Estilos para o Modal In-Game e EstatÃ­sticas */
 #ingame-config-modal .modal-content {
   max-width: 750px; /* Aumentar um pouco para acomodar as abas */
   width: 90%;
 }
 #stats-display-area {
   text-align: left;
-  max-height: 250px; /* Pode ser ajustado conforme o conteúdo da aba */
+  max-height: 250px; /* Pode ser ajustado conforme o conteÃºdo da aba */
   overflow-y: auto;
   background: #f8f9fa;
   padding: 15px;
   border-radius: 8px;
   border: 1px solid #e9ecef;
-  margin-top: 10px; /* Reduzido, pois o H3 da aba já dá espaço */
+  margin-top: 10px; /* Reduzido, pois o H3 da aba jÃ¡ dÃ¡ espaÃ§o */
   font-size: 15px;
   line-height: 1.6;
   color: #333;
@@ -682,10 +682,10 @@ body.game-body {
 }
 #stats-display-area p {
   margin-bottom: 8px;
-  font-size: 15px; /* Consistente com o texto da área */
+  font-size: 15px; /* Consistente com o texto da Ã¡rea */
 }
 
-/* --- Botões de Ação (Mantidos Fixos) --- */
+/* --- BotÃµes de AÃ§Ã£o (Mantidos Fixos) --- */
 .action-buttons-container {
   position: fixed;
   bottom: 15px;
@@ -717,7 +717,7 @@ body.game-body {
 }
 #reveal-button { background-color: #28a745; }
 #pass-button { background-color: #dc3545; }
-#timer-button { background-color: #ffc107; color: #333; } /* Botão que aciona o timer flutuante */
+#timer-button { background-color: #ffc107; color: #333; } /* BotÃ£o que aciona o timer flutuante */
 .sound-toggle { background-color: #17a2b8; }
 .config-button-ingame { background-color: #6c757d; }
 #reveal-button:hover:not(:disabled) { background-color: #218838; }
@@ -733,19 +733,19 @@ body.game-body {
   opacity: 0.6;
 }
 
-/* --- Indicador de Status (Mantido Próximo à Roleta) --- */
+/* --- Indicador de Status (Mantido PrÃ³ximo Ã  Roleta) --- */
 .status-indicator {
   position: fixed;
-  /* Ajustar posição se a roleta também mudar */
-  top: calc(50% + (420px / 2) + 10px); /* Posição relativa à altura da roleta */
-  right: calc(30px + (420px / 2));   /* Posição relativa à largura/posição da roleta */
+  /* Ajustar posiÃ§Ã£o se a roleta tambÃ©m mudar */
+  top: calc(50% + (420px / 2) + 10px); /* PosiÃ§Ã£o relativa Ã  altura da roleta */
+  right: calc(30px + (420px / 2));   /* PosiÃ§Ã£o relativa Ã  largura/posiÃ§Ã£o da roleta */
   transform: translate(50%, 0);
   background-color: rgba(0, 86, 179, 0.9);
   color: white;
   padding: 8px 15px;
   border-radius: 15px;
   font-weight: bold;
-  z-index: 460; /* Abaixo dos botões de ação, mas acima do resto */
+  z-index: 460; /* Abaixo dos botÃµes de aÃ§Ã£o, mas acima do resto */
   font-size: 14px;
   max-width: 300px;
   text-align: center;
@@ -762,29 +762,29 @@ body.game-body {
 .status-indicator[data-state="choosingLetter"]::after { content: "Escolha uma letra"; }
 .status-indicator[data-state="gameOver"]::after { content: "Fim de Jogo!"; }
 
-/* --- Timer (Posicionado em relação ao .score.active) --- */
-/* Este é o timer original, que aparece no placar do jogador. */
-/* O novo #floating-timer-container é diferente e centralizado. */
+/* --- Timer (Posicionado em relaÃ§Ã£o ao .score.active) --- */
+/* Este Ã© o timer original, que aparece no placar do jogador. */
+/* O novo #floating-timer-container Ã© diferente e centralizado. */
 .countdown-timer {
   position: absolute; /* Relativo ao .score pai */
   top: -20px;         /* Acima do score */
-  left: -20px;        /* À esquerda do score */
+  left: -20px;        /* Ã€ esquerda do score */
   background-color: rgba(220, 53, 69, 0.9);
   color: white;
   border: 3px solid white;
   border-radius: 50%;
   width: 60px;
   height: 60px;
-  display: flex; /* Usado para centralizar o número */
+  display: flex; /* Usado para centralizar o nÃºmero */
   align-items: center;
   justify-content: center;
   font-size: 30px;
   font-weight: bold;
-  opacity: 0; /* Começa invisível */
+  opacity: 0; /* ComeÃ§a invisÃ­vel */
   transition: opacity 0.5s ease, transform 0.3s ease;
   z-index: 15; /* Acima do score */
   box-shadow: 0 0 10px rgba(220, 53, 69, 0.7);
-  pointer-events: none; /* Não interagir com cliques */
+  pointer-events: none; /* NÃ£o interagir com cliques */
 }
 .countdown-timer.active {
   opacity: 1;
@@ -794,7 +794,7 @@ body.game-body {
 /* --- Toast Notifications --- */
 .toast-container {
   position: fixed;
-  top: 70px; /* Abaixo do título */
+  top: 70px; /* Abaixo do tÃ­tulo */
   right: 30px; /* No canto superior direito */
   z-index: 1100; /* Acima de tudo */
   display: flex;
@@ -802,7 +802,7 @@ body.game-body {
   gap: 10px;
   width: auto;
   max-width: 350px;
-  align-items: flex-end; /* Alinha toasts à direita */
+  align-items: flex-end; /* Alinha toasts Ã  direita */
 }
 .toast {
   padding: 15px 20px;
@@ -814,14 +814,14 @@ body.game-body {
   gap: 15px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   transform: translateX(120%); /* Inicia fora da tela */
-  animation: slideInToastRight 0.4s forwards cubic-bezier(0.25, 0.8, 0.25, 1), fadeOutToastRight 0.5s forwards 3.5s ease-in; /* fadeOut começa após 3.5s */
+  animation: slideInToastRight 0.4s forwards cubic-bezier(0.25, 0.8, 0.25, 1), fadeOutToastRight 0.5s forwards 3.5s ease-in; /* fadeOut comeÃ§a apÃ³s 3.5s */
   max-width: 350px;
   min-width: 250px;
   border-left: 6px solid;
 }
 .toast i, .toast .toast-icon {
   font-size: 24px;
-  font-style: normal; /* Para garantir que ícones de texto não fiquem itálicos */
+  font-style: normal; /* Para garantir que Ã­cones de texto nÃ£o fiquem itÃ¡licos */
 }
 .toast-success { background: linear-gradient(135deg, #28a745, #218838); border-left-color: #155724; }
 .toast-warning { background: linear-gradient(135deg, #ffc107, #e0a800); border-left-color: #856404; color: #333; }
@@ -829,7 +829,7 @@ body.game-body {
 .toast-info    { background: linear-gradient(135deg, #17a2b8, #138496); border-left-color: #0c5460; }
 .toast-pass    { background: linear-gradient(135deg, #6c757d, #5a6268); border-left-color: #343a40; }
 .toast-loseall { background: linear-gradient(135deg, #343a40, #23272b); border-left-color: #1d2124; }
-/* Animação renomeada para evitar conflito com nome antigo */
+/* AnimaÃ§Ã£o renomeada para evitar conflito com nome antigo */
 @keyframes slideInToastRight {
   from { transform: translateX(120%); }
   to { transform: translateX(0); }
@@ -853,7 +853,7 @@ body.game-body {
        width: 300px; /* Reduzido */
      }
      .status-indicator {
-       /* Recalcular posição baseada na roleta menor */
+       /* Recalcular posiÃ§Ã£o baseada na roleta menor */
        top: calc(50% + (300px / 2) + 10px);
        right: calc(15px + (300px / 2));
      }
@@ -861,21 +861,21 @@ body.game-body {
        right: 15px;
      }
 
-     /* Opcional: Ajustar posição/tamanho do grid-section se necessário */
+     /* Opcional: Ajustar posiÃ§Ã£o/tamanho do grid-section se necessÃ¡rio */
      .grid-section {
-         left: 15px; /* Menos espaço à esquerda */
+         left: 15px; /* Menos espaÃ§o Ã  esquerda */
          /* Talvez reduzir o gap se a tela ficar muito apertada */
          /* gap: 15px; */
      }
-     /* Se a grade ainda for muito larga, pode ser necessário reduzir o tamanho dos grid-items aqui */
+     /* Se a grade ainda for muito larga, pode ser necessÃ¡rio reduzir o tamanho dos grid-items aqui */
      /* Lembre-se que isso exigiria recalcular os clip-paths */
 
      /* Ajustar max-width da dica para telas menores */
      .hint {
-         max-width: 90%; /* Usar porcentagem pode ser mais flexível aqui */
+         max-width: 90%; /* Usar porcentagem pode ser mais flexÃ­vel aqui */
          /* Ou calcular baseado no tamanho reduzido da grade se ela mudar */
      }
-     .word-points-display { /* Ajustar também para telas menores */
+     .word-points-display { /* Ajustar tambÃ©m para telas menores */
         max-width: 90%;
      }
 }
@@ -907,11 +907,11 @@ body.game-body {
       margin: 20px auto;
       width: 90%; /* Responsivo */
       max-width: 300px; /* Limite */
-      height: auto; /* Altura automática */
+      height: auto; /* Altura automÃ¡tica */
       transform: none; /* Resetar transform */
-      top: auto; right: auto; /* Resetar posições */
+      top: auto; right: auto; /* Resetar posiÃ§Ãµes */
     }
-     .roleta-image { aspect-ratio: 1 / 1; } /* Mantém proporção quadrada */
+     .roleta-image { aspect-ratio: 1 / 1; } /* MantÃ©m proporÃ§Ã£o quadrada */
      .logo-space { width: 30%; height: 30%; } /* Logo responsivo */
      .ponto-referencia { display: none; } /* Esconder ponteiro fixo */
 
@@ -920,21 +920,21 @@ body.game-body {
       order: 3; /* Ordem no flex container */
       left: 50%; transform: translateX(-50%);
       margin-top: -10px; margin-bottom: 15px;
-      top: auto; right: auto; /* Resetar posições */
-      width: auto; /* Largura automática */
+      top: auto; right: auto; /* Resetar posiÃ§Ãµes */
+      width: auto; /* Largura automÃ¡tica */
       white-space: normal; /* Permitir quebra de linha */
       z-index: auto; /* Resetar z-index */
     }
 
-    /* Seção da grade e relacionados */
+    /* SeÃ§Ã£o da grade e relacionados */
     .grid-section {
         position: relative; /* Tira do absolute */
         order: 4; /* Ordem no flex container */
-        width: 100%; /* Ocupa a largura disponível */
-        max-width: 650px; /* Limita a largura máxima em telas menores */
+        width: 100%; /* Ocupa a largura disponÃ­vel */
+        max-width: 650px; /* Limita a largura mÃ¡xima em telas menores */
         top: auto; left: auto; /* Reseta */
-        gap: 15px; /* Ajuste o gap se necessário */
-        margin-bottom: 20px; /* Espaço antes dos botões */
+        gap: 15px; /* Ajuste o gap se necessÃ¡rio */
+        margin-bottom: 20px; /* EspaÃ§o antes dos botÃµes */
         z-index: auto; /* Resetar z-index */
     }
 
@@ -953,16 +953,16 @@ body.game-body {
     .inner-frame::before, .inner-frame::after { display: none; } /* Esconde moldura complexa */
 
     .grid-container {
-        /* Usar fr para colunas flexíveis */
-        grid-template-columns: repeat(12, minmax(0, 1fr)); /* Colunas flexíveis */
-        grid-template-rows: repeat(3, auto); /* Altura automática */
-        gap: 4px; /* Espaço menor */
-        /* A largura total será controlada pelo .grid-section */
+        /* Usar fr para colunas flexÃ­veis */
+        grid-template-columns: repeat(12, minmax(0, 1fr)); /* Colunas flexÃ­veis */
+        grid-template-rows: repeat(3, auto); /* Altura automÃ¡tica */
+        gap: 4px; /* EspaÃ§o menor */
+        /* A largura total serÃ¡ controlada pelo .grid-section */
     }
     .grid-item {
        width: 100%; /* Ocupa a coluna do grid */
-       padding-bottom: 100%; /* Truque para manter proporção 1:1 */
-       height: 0; /* Necessário para o truque de padding-bottom */
+       padding-bottom: 100%; /* Truque para manter proporÃ§Ã£o 1:1 */
+       height: 0; /* NecessÃ¡rio para o truque de padding-bottom */
        font-size: clamp(16px, 3.5vw, 24px); /* Reduzir fonte */
        border-radius: 5px; /* Menor */
        border-width: 1.5px;
@@ -973,9 +973,9 @@ body.game-body {
         max-width: 100%; /* Ocupa largura do pai */
         font-size: clamp(16px, 3vw, 18px);
         padding: 10px 15px;
-        text-align: left; /* Mantém alinhamento esquerdo */
+        text-align: left; /* MantÃ©m alinhamento esquerdo */
     }
-    .word-points-display { /* Ajustar também para telas menores */
+    .word-points-display { /* Ajustar tambÃ©m para telas menores */
         max-width: 100%;
         font-size: clamp(16px, 3.2vw, 20px);
         padding: 8px 12px;
@@ -992,33 +992,33 @@ body.game-body {
      .score-value {
        font-size: clamp(13px, 3vw, 16px);
     }
-    /* Ajuste posição timer no mobile */
+    /* Ajuste posiÃ§Ã£o timer no mobile */
     .countdown-timer {
          width: 45px; height: 45px; font-size: 22px;
          top: -15px; left: -15px;
     }
 
 
-    /* Botões e Toasts */
+    /* BotÃµes e Toasts */
     .toast-container {
       top: 10px; right: 10px; left: 10px; /* Ocupar largura */
       bottom: auto;
-      width: auto; /* Largura automática */
+      width: auto; /* Largura automÃ¡tica */
       max-width: none; /* Sem limite */
       align-items: center; /* Centralizar toasts */
-      z-index: 1100; /* Mantém na frente */
+      z-index: 1100; /* MantÃ©m na frente */
     }
      .toast { max-width: 90%; }
 
     .action-buttons-container {
        position: fixed; /* Manter fixo na base */
-       order: 5; /* Último elemento no fluxo normal, mas fixed o sobrepõe */
+       order: 5; /* Ãšltimo elemento no fluxo normal, mas fixed o sobrepÃµe */
        bottom: 10px;
        left: 50%;
        transform: translateX(-50%);
        right: auto; /* Resetar right */
-       width: auto; /* Largura baseada no conteúdo */
-       z-index: 500; /* Mantém na frente */
+       width: auto; /* Largura baseada no conteÃºdo */
+       z-index: 500; /* MantÃ©m na frente */
     }
 
      /* Modal In-Game em telas menores */
@@ -1042,15 +1042,15 @@ body.game-body {
     }
 }
 
-/* Outras media queries podem ser adicionadas/ajustadas conforme necessário */
+/* Outras media queries podem ser adicionadas/ajustadas conforme necessÃ¡rio */
 
 /* =================================================================== */
-/* === NOVOS ESTILOS PARA CRONÔMETRO FLUTUANTE E ABAS DE CONFIGURAÇÃO === */
+/* === NOVOS ESTILOS PARA CRONÃ”METRO FLUTUANTE E ABAS DE CONFIGURAÃ‡ÃƒO === */
 /* =================================================================== */
 
-/* --- Cronômetro Flutuante --- */
+/* --- CronÃ´metro Flutuante --- */
 .floating-timer-container {
-  position: fixed; /* Posição fixa em relação à viewport */
+  position: fixed; /* PosiÃ§Ã£o fixa em relaÃ§Ã£o Ã  viewport */
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%); /* Centraliza o elemento */
@@ -1058,17 +1058,17 @@ body.game-body {
   color: #ffffff;
   padding: 20px;
   border-radius: 50%; /* Faz o container principal circular */
-  width: 180px;  /* Largura do círculo */
-  height: 180px; /* Altura do círculo */
-  display: flex; /* Para centralizar o conteúdo interno (o número) */
+  width: 180px;  /* Largura do cÃ­rculo */
+  height: 180px; /* Altura do cÃ­rculo */
+  display: flex; /* Para centralizar o conteÃºdo interno (o nÃºmero) */
   justify-content: center;
   align-items: center;
   z-index: 1200; /* Garante que fique acima da maioria dos outros elementos */
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 0 5px rgba(255, 193, 7, 0.7); /* Sombra e borda amarela temática */
-  opacity: 0; /* Começa invisível para animação */
-  pointer-events: none; /* Não interage com cliques quando invisível */
-  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; /* Transição suave */
-  /* display: none; é controlado via JavaScript para mostrar/esconder */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 0 0 5px rgba(255, 193, 7, 0.7); /* Sombra e borda amarela temÃ¡tica */
+  opacity: 0; /* ComeÃ§a invisÃ­vel para animaÃ§Ã£o */
+  pointer-events: none; /* NÃ£o interage com cliques quando invisÃ­vel */
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; /* TransiÃ§Ã£o suave */
+  /* display: none; Ã© controlado via JavaScript para mostrar/esconder */
 }
 
 .floating-timer-container.visible {
@@ -1077,30 +1077,30 @@ body.game-body {
   transform: translate(-50%, -50%) scale(1); /* Efeito de escala ao aparecer */
 }
 
-.floating-timer-container.hidden { /* Esta classe pode ser usada para a animação de saída antes do display:none */
+.floating-timer-container.hidden { /* Esta classe pode ser usada para a animaÃ§Ã£o de saÃ­da antes do display:none */
   opacity: 0;
   pointer-events: none;
   transform: translate(-50%, -50%) scale(0.8); /* Efeito de escala ao desaparecer */
 }
 
 #floating-timer-countdown {
-  font-size: 72px; /* Tamanho bem grande para o número */
+  font-size: 72px; /* Tamanho bem grande para o nÃºmero */
   font-weight: bold;
   font-family: 'Arial Black', Gadget, sans-serif; /* Uma fonte mais impactante */
-  color: #ffc107; /* Cor amarela, como o botão do timer */
+  color: #ffc107; /* Cor amarela, como o botÃ£o do timer */
   text-shadow: 0 0 10px rgba(0,0,0,0.7), 2px 2px 3px rgba(0,0,0,0.5);
 }
 
-/* --- Estilos para Abas no Modal de Configuração In-Game --- */
+/* --- Estilos para Abas no Modal de ConfiguraÃ§Ã£o In-Game --- */
 .config-tabs {
   display: flex;
-  margin-bottom: 25px; /* Espaço maior antes do conteúdo da aba */
+  margin-bottom: 25px; /* EspaÃ§o maior antes do conteÃºdo da aba */
   border-bottom: 3px solid #0056b3; /* Linha separadora mais grossa */
   flex-wrap: wrap; /* Permite que as abas quebrem linha em telas menores */
 }
 
 .tab-link {
-  padding: 12px 20px; /* Mais padding para um clique mais fácil */
+  padding: 12px 20px; /* Mais padding para um clique mais fÃ¡cil */
   cursor: pointer;
   background-color: #f0f2f5; /* Um cinza bem claro */
   border: 1px solid #d1d9e0;
@@ -1124,18 +1124,18 @@ body.game-body {
 
 .tab-link.active {
   background-color: #ffffff; /* Fundo branco para aba ativa */
-  color: #007bff; /* Cor azul primária */
-  border-color: #0056b3 #0056b3 #ffffff; /* Borda da aba ativa se conecta com o conteúdo */
+  color: #007bff; /* Cor azul primÃ¡ria */
+  border-color: #0056b3 #0056b3 #ffffff; /* Borda da aba ativa se conecta com o conteÃºdo */
   font-weight: 700; /* Mais destaque para o texto */
   z-index: 2; /* Garante que a aba ativa fique sobre as outras e a borda */
-  transform: translateY(0); /* Reseta a transformação do hover */
+  transform: translateY(0); /* Reseta a transformaÃ§Ã£o do hover */
 }
 
 .tab-content {
-  display: none; /* Todas as abas de conteúdo começam escondidas */
+  display: none; /* Todas as abas de conteÃºdo comeÃ§am escondidas */
   padding: 25px 10px; /* Padding interno */
-  border: 1px solid #d1d9e0; /* Borda sutil ao redor do conteúdo */
-  border-top: none; /* Remove a borda superior pois já temos a das abas */
+  border: 1px solid #d1d9e0; /* Borda sutil ao redor do conteÃºdo */
+  border-top: none; /* Remove a borda superior pois jÃ¡ temos a das abas */
   border-radius: 0 0 10px 10px; /* Cantos inferiores arredondados */
   background-color: #ffffff;
   animation: tabContentFadeIn 0.4s ease-out;
@@ -1147,7 +1147,7 @@ body.game-body {
 }
 
 .tab-content.active {
-  display: block; /* Apenas a aba ativa é mostrada */
+  display: block; /* Apenas a aba ativa Ã© mostrada */
 }
 
 /* Estilos para Sub-Abas (Tutorial) */
@@ -1163,7 +1163,7 @@ body.game-body {
   cursor: pointer;
   background-color: transparent;
   border: none;
-  border-bottom: 3px solid transparent; /* Borda inferior sutil para indicar seleção */
+  border-bottom: 3px solid transparent; /* Borda inferior sutil para indicar seleÃ§Ã£o */
   margin-right: 12px;
   font-size: 15px;
   color: #555;
@@ -1185,12 +1185,12 @@ body.game-body {
 .sub-tab-link:disabled {
   color: #aaaaaa;
   cursor: not-allowed;
-  border-bottom-color: transparent !important; /* Garante que não haja borda para desabilitados */
+  border-bottom-color: transparent !important; /* Garante que nÃ£o haja borda para desabilitados */
 }
 
 .sub-tab-content {
   display: none;
-  padding: 15px 5px; /* Padding para o conteúdo da sub-aba */
+  padding: 15px 5px; /* Padding para o conteÃºdo da sub-aba */
   animation: tabContentFadeIn 0.3s ease-out;
 }
 
@@ -1198,11 +1198,11 @@ body.game-body {
   display: block;
 }
 
-/* Estilos para o conteúdo do tutorial (dentro das sub-abas) */
+/* Estilos para o conteÃºdo do tutorial (dentro das sub-abas) */
 .sub-tab-content h4 {
   margin-top: 5px;
   margin-bottom: 18px;
-  color: #003d82; /* Um azul mais escuro para o título */
+  color: #003d82; /* Um azul mais escuro para o tÃ­tulo */
   font-size: 20px;
   border-bottom: 1px solid #eee;
   padding-bottom: 8px;
@@ -1240,7 +1240,7 @@ body.game-body {
   width: 52px;  /* Ligeiramente maior */
   height: 30px;
   vertical-align: middle;
-  margin-left: 10px; /* Espaço do label */
+  margin-left: 10px; /* EspaÃ§o do label */
 }
 
 .switch input {
@@ -1264,7 +1264,7 @@ body.game-body {
 .slider:before {
   position: absolute;
   content: "";
-  height: 22px; /* Círculo interno */
+  height: 22px; /* CÃ­rculo interno */
   width: 22px;
   left: 4px;
   bottom: 4px;
@@ -1275,7 +1275,7 @@ body.game-body {
 }
 
 input:checked + .slider {
-  background-color: #007bff; /* Azul primário quando ativo */
+  background-color: #007bff; /* Azul primÃ¡rio quando ativo */
 }
 
 input:focus + .slider {
@@ -1283,7 +1283,7 @@ input:focus + .slider {
 }
 
 input:checked + .slider:before {
-  transform: translateX(22px); /* Distância de movimento do círculo */
+  transform: translateX(22px); /* DistÃ¢ncia de movimento do cÃ­rculo */
 }
 
 /* Melhorias gerais para os input-groups dentro das abas */
@@ -1298,17 +1298,17 @@ input:checked + .slider:before {
   color: #495057;
 }
 
-/* Botão de Som dentro do Modal */
+/* BotÃ£o de Som dentro do Modal */
 #toggle-sound-ingame {
-  min-width: 180px; /* Espaço para o texto e ícone */
+  min-width: 180px; /* EspaÃ§o para o texto e Ã­cone */
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px; /* Espaço entre ícone e texto */
+  gap: 8px; /* EspaÃ§o entre Ã­cone e texto */
 }
 
 /* Select de Idioma */
-#language-select.improved-select { /* Garante especificidade se necessário */
+#language-select.improved-select { /* Garante especificidade se necessÃ¡rio */
   width: 100%;
   background-color: #f8f9fa; /* Fundo claro para o select */
 }
@@ -1338,7 +1338,7 @@ body.dark-mode .game-mode-menu h2,
 body.dark-mode .modal h2,
 body.dark-mode .modal h3,
 body.dark-mode .sub-tab-content h4 {
-  color: #00aaff; /* Um azul claro para títulos no modo escuro */
+  color: #00aaff; /* Um azul claro para tÃ­tulos no modo escuro */
 }
 body.dark-mode .improved-label,
 body.dark-mode .improved-input,
@@ -1352,7 +1352,7 @@ body.dark-mode .improved-input::placeholder {
 }
 body.dark-mode .mode-button,
 body.dark-mode .modal button.improved-button.primary-btn {
-  background-color: #007bff; /* Manter azul para botões primários */
+  background-color: #007bff; /* Manter azul para botÃµes primÃ¡rios */
 }
 body.dark-mode .modal button.improved-button.secondary-btn {
   background-color: #333;
@@ -1368,7 +1368,7 @@ body.dark-mode .hint {
 }
 /* Estilo para modo escuro do word-points-display */
 body.dark-mode .word-points-display {
-    color: #ffeb3b; /* Mantém a cor amarela vibrante */
+    color: #ffeb3b; /* MantÃ©m a cor amarela vibrante */
     background-color: rgba(45, 45, 45, 0.75); /* Um pouco mais escuro que o hint */
     text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
 }
@@ -1412,13 +1412,13 @@ body.dark-mode .tab-link {
   color: #bbb;
 }
 body.dark-mode .tab-link.active {
-  background-color: #1e1e1e; /* Fundo do conteúdo */
+  background-color: #1e1e1e; /* Fundo do conteÃºdo */
   color: #00aaff;
-  border-color: #0056b3 #0056b3 #1e1e1e; /* Ajustar para conectar com a borda do conteúdo */
+  border-color: #0056b3 #0056b3 #1e1e1e; /* Ajustar para conectar com a borda do conteÃºdo */
 }
 body.dark-mode .tab-content {
     background-color: #1e1e1e;
-    border-color: #444; /* Borda do conteúdo */
+    border-color: #444; /* Borda do conteÃºdo */
 }
 body.dark-mode .sub-tab-link {
     color: #aaa;
@@ -1449,7 +1449,7 @@ body.dark-mode .action-buttons-container {
 body.dark-mode .status-indicator {
   background-color: rgba(0, 66, 129, 0.9); /* Um pouco mais escuro que o azul claro */
 }
-/* Necessário para o texto descritivo do cronômetro flutuante para leitores de tela */
+/* NecessÃ¡rio para o texto descritivo do cronÃ´metro flutuante para leitores de tela */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -1461,7 +1461,7 @@ body.dark-mode .status-indicator {
   white-space: nowrap;
   border-width: 0;
 }
-/* ... mais estilos de dark-mode podem ser necessários para cobrir tudo ... */
+/* ... mais estilos de dark-mode podem ser necessÃ¡rios para cobrir tudo ... */
 
 /* ============================================================
    BRINCABYTES PORTAL INTEGRATION - REFINED V3 (SOLID & SIMPLE)
@@ -1685,4 +1685,28 @@ body.dark-mode .status-indicator {
 @keyframes bbFadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes bbScaleUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-
+
+/* --- bb-editor-modal estilizacao --- */
+#bb-editor-table td {
+    padding: 5px;
+    vertical-align: top;
+}
+#bb-editor-table .improved-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    margin: 0;
+}
+.bb-editor-remove-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+}
+.bb-editor-remove-btn:hover {
+    background: #dc2626;
+}

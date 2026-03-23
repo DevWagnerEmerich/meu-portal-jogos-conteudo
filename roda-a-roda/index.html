@@ -78,10 +78,11 @@
                 <option value="">Carregue uma planilha primeiro</option>
             </select>
         </div>
-        <button id="start-game-btn" class="improved-button primary-btn start-btn" disabled>INICIAR JOGO 🚀</button>
+        <button id="start-game-btn" class="improved-button primary-btn start-btn">INICIAR JOGO 🚀</button>
       </div>
       
       <div style="text-align: center; margin-top: 20px;">
+
           <button id="reset-game-btn" class="improved-button secondary-btn" style="border-color: #ef4444; color: #ef4444; margin-bottom: 10px;">Restaurar Jogo Original</button>
           <button class="improved-button secondary-btn" onclick="goBackToModeSelection()" style="width: 100%; max-width: 300px;">⬅️ Voltar aos Modos</button>
       </div>
@@ -182,9 +183,10 @@
         </div>
         <div class="input-group"> 
           <div class="button-row">
-              <button id="apply-theme-and-restart-btn" class="improved-button primary-btn" disabled>Aplicar e Reiniciar</button>
+              <button id="apply-theme-and-restart-btn" class="improved-button primary-btn">Aplicar e Reiniciar</button>
               <button id="btn-bb-library-ingame" class="bb-btn-library" disabled>📚 Minha Biblioteca</button>
           </div>
+
           <button id="bb-btn-save" class="bb-btn-save" style="margin-top: 5px; width: 100%;" disabled>💾 Salvar Lista na Biblioteca BrincaBytes</button>
         </div>
 
@@ -349,6 +351,43 @@
           </div>
       </div>
   </div>
+  <!-- MODAL DE EDITOR DE LISTAS BRINCABYTES -->
+  <div id="bb-editor-modal" class="bb-modal-overlay">
+      <div class="bb-modal-box" style="max-width: 800px; width: 90%;">
+          <div class="bb-modal-header" style="display: flex; justify-content: space-between; align-items: center;">
+              <span id="bb-editor-title">Editar Lista</span>
+              <button onclick="window.bbCloseEditor()" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">&times;</button>
+          </div>
+          <div class="bb-modal-body" style="max-height: 60vh; overflow-y: auto;">
+              <div class="input-group">
+                  <label class="improved-label">Nome da Lista na Biblioteca:</label>
+                  <input type="text" id="bb-editor-list-name" class="improved-input">
+              </div>
+              <div class="input-group" style="margin-top: 15px;">
+                  <label class="improved-label">Palavras e Dicas:</label>
+                  <table style="width: 100%; border-collapse: collapse; margin-top: 10px;" id="bb-editor-table">
+                      <thead>
+                          <tr style="border-bottom: 2px solid rgba(255,255,255,0.1); text-align: left;">
+                              <th style="padding: 10px;">Tema</th>
+                              <th style="padding: 10px;">Palavra/Frase</th>
+                              <th style="padding: 10px;">Dica</th>
+                              <th style="padding: 10px; text-align: center; width: 50px;">Ação</th>
+                          </tr>
+                      </thead>
+                      <tbody id="bb-editor-tbody">
+                          <!-- Linhas geradas dinamicamente -->
+                      </tbody>
+                  </table>
+                  <button class="improved-button secondary-btn" onclick="window.bbEditorAddRow()" style="margin-top: 10px; width: 100%;">+ Adicionar Nova Palavra</button>
+              </div>
+          </div>
+          <div class="bb-modal-footer">
+              <button class="bb-clean-btn secondary" onclick="window.bbCloseEditor()">Cancelar</button>
+              <button class="bb-clean-btn primary" onclick="window.bbSaveEditor()">Salvar Alterações</button>
+          </div>
+      </div>
+  </div>
 
 </body>
+
 </html>

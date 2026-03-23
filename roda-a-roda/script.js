@@ -185,7 +185,7 @@ class RodaARodaGame {
 
     goBackToModeSelection() {
         if (this.initialConfigModal) this.initialConfigModal.style.display = 'none';
-        if (this.configModal) this.configModal.style.display = 'none';
+        if (this.ingameConfigModal) this.ingameConfigModal.style.display = 'none';
         if (this.gameArea) this.gameArea.style.display = 'none';
         
         if (this.gameModeMenu) this.gameModeMenu.style.display = 'flex';
@@ -236,8 +236,8 @@ class RodaARodaGame {
     }
 
     checkInitialConfigReady() {
-        this.startGameBtn.disabled = !(this.userDatabase.length > 0 && this.themeSelectorInitial.value !== "" && this.themeSelectorInitial.value !== null);
-        this.startGameBtn.setAttribute('aria-disabled', String(this.startGameBtn.disabled));
+        
+        
     }
 
     initGameStructures() {
@@ -351,9 +351,10 @@ class RodaARodaGame {
                 this.confirmThemeChangeBtn.setAttribute('aria-disabled', String(!isSelectionValid));
             }
             if (this.applyThemeAndRestartBtn) {
-                this.applyThemeAndRestartBtn.disabled = !isSelectionValid;
-                this.applyThemeAndRestartBtn.setAttribute('aria-disabled', String(!isSelectionValid));
+                // this.applyThemeAndRestartBtn.disabled = !isSelectionValid;
+                // this.applyThemeAndRestartBtn.setAttribute('aria-disabled', String(!isSelectionValid));
             }
+
         });
         if (this.confirmThemeChangeBtn) {
             this.confirmThemeChangeBtn.addEventListener('click', () => {
@@ -428,8 +429,8 @@ class RodaARodaGame {
                 const currentInDbIndex = this.userDatabase.findIndex(t => t.theme === this.currentTheme.theme);
                 if (currentInDbIndex !== -1) this.themeSelectorIngame.value = currentInDbIndex;
                 const isSelectionValid = this.themeSelectorIngame.value !== "" && this.userDatabase.length > 0;
-                if (this.confirmThemeChangeBtn) { this.confirmThemeChangeBtn.disabled = !isSelectionValid; this.confirmThemeChangeBtn.setAttribute('aria-disabled', String(!isSelectionValid)); }
-                if (this.applyThemeAndRestartBtn) { this.applyThemeAndRestartBtn.disabled = !isSelectionValid; this.applyThemeAndRestartBtn.setAttribute('aria-disabled', String(!isSelectionValid)); }
+                
+                
             }
         } else if (!this.currentTheme) {
             if (this.userDatabase.length > 0) {
@@ -439,8 +440,8 @@ class RodaARodaGame {
                 if (this.themeSelectorIngame) {
                     this.themeSelectorIngame.value = "0";
                     const isSelectionValid = this.themeSelectorIngame.value !== "" && this.userDatabase.length > 0;
-                    if (this.confirmThemeChangeBtn) { this.confirmThemeChangeBtn.disabled = !isSelectionValid; this.confirmThemeChangeBtn.setAttribute('aria-disabled', String(!isSelectionValid)); }
-                    if (this.applyThemeAndRestartBtn) { this.applyThemeAndRestartBtn.disabled = !isSelectionValid; this.applyThemeAndRestartBtn.setAttribute('aria-disabled', String(!isSelectionValid)); }
+                    
+                    
                 }
             } else {
                 this.showToast("Erro fatal: Nenhuma planilha carregada. Configure o jogo.", "error");
@@ -1179,8 +1180,8 @@ class RodaARodaGame {
                 input.value = '';
                 if (context === 'ingame' && this.themeSelectorIngame) {
                     const isValid = this.themeSelectorIngame.value !== "" && this.userDatabase.length > 0;
-                    if (this.applyThemeAndRestartBtn) { this.applyThemeAndRestartBtn.disabled = !isValid; this.applyThemeAndRestartBtn.setAttribute('aria-disabled', String(!isValid)); }
-                    if (this.confirmThemeChangeBtn) { this.confirmThemeChangeBtn.disabled = !isValid; this.confirmThemeChangeBtn.setAttribute('aria-disabled', String(!isValid)); }
+                    
+                    
                 } else if (context === 'initial') {
                     this.checkInitialConfigReady();
                 }
@@ -1297,8 +1298,8 @@ class RodaARodaGame {
 
         if (selEl === this.themeSelectorIngame) {
             const isValid = selEl.value !== "" && this.userDatabase.length > 0;
-            if (this.confirmThemeChangeBtn) { this.confirmThemeChangeBtn.disabled = !isValid; this.confirmThemeChangeBtn.setAttribute('aria-disabled', String(!isValid)); }
-            if (this.applyThemeAndRestartBtn) { this.applyThemeAndRestartBtn.disabled = !isValid; this.applyThemeAndRestartBtn.setAttribute('aria-disabled', String(!isValid)); }
+            
+            
         } else if (selEl === this.themeSelectorInitial) {
             this.checkInitialConfigReady();
         }
@@ -1552,16 +1553,130 @@ class RodaARodaGame {
     }
 
     bbEditList(index) {
-        const item = this.bbLibraryData[index];
-        this.showCustomPrompt("Digite o novo nome para a lista:", "Renomear Lista", item.titulo, (novoNome) => {
-            if (novoNome !== null && novoNome.trim() !== "" && novoNome.trim() !== item.titulo) {
-                item.titulo = novoNome.trim();
-                this.bbSaveBiblioteca(this.bbLibraryData);
-                this.bbRenderLibrary();
-                this.showToast('Lista renomeada com sucesso.', 'success');
-            }
-        });
+        this.bbOpenEditor(index);
     }
+
+    bbOpenEditor(index) {
+        const item = this.bbLibraryData[index];
+        if (!item || !item.data) return;
+        
+        this.currentEditingListIndex = index;
+        
+        try {
+            const parsedData = JSON.parse(item.data);
+            const flatList = [];
+            parsedData.forEach(tEl => {
+                if (tEl.words && Array.isArray(tEl.words)) {
+                    tEl.words.forEach(wEl => {
+                        flatList.push({
+                            theme: tEl.theme || "",
+                            word: wEl.word || "",
+                            hint: wEl.hint || ""
+                        });
+                    });
+                }
+            });
+            
+            document.getElementById('bb-editor-list-name').value = item.titulo || "";
+            const tbody = document.getElementById('bb-editor-tbody');
+            tbody.innerHTML = '';
+            
+            flatList.forEach(entry => this.bbEditorAppendRowHTML(entry.theme, entry.word, entry.hint));
+            
+            document.getElementById('bb-editor-modal').style.display = 'flex';
+        } catch (e) {
+            console.error(e);
+            this.showToast("Erro ao ler os dados da lista.", "error");
+        }
+    }
+    
+    bbEditorAppendRowHTML(theme = "", word = "", hint = "") {
+        const tbody = document.getElementById('bb-editor-tbody');
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = "1px solid rgba(0,0,0,0.1)";
+        tr.innerHTML = `
+            <td style="padding: 5px;"><input type="text" class="improved-input bb-edit-theme" value="${theme.replace(/"/g, '&quot;')}"></td>
+            <td style="padding: 5px;"><input type="text" class="improved-input bb-edit-word" value="${word.replace(/"/g, '&quot;')}"></td>
+            <td style="padding: 5px;"><input type="text" class="improved-input bb-edit-hint" value="${hint.replace(/"/g, '&quot;')}"></td>
+            <td style="padding: 5px; text-align: center;"><button class="bb-editor-remove-btn" onclick="window.bbEditorRemoveRow(this)">X</button></td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    bbEditorAddRow() {
+        this.bbEditorAppendRowHTML("", "", "");
+    }
+    
+    bbEditorRemoveRow(btn) {
+        const row = btn.closest('tr');
+        if (row) row.remove();
+    }
+    
+    bbCloseEditor() {
+        document.getElementById('bb-editor-modal').style.display = 'none';
+        this.currentEditingListIndex = null;
+    }
+    
+    bbSaveEditor() {
+        if (this.currentEditingListIndex === null) return;
+        
+        const listName = document.getElementById('bb-editor-list-name').value.trim();
+        if (!listName) {
+            this.showToast("Dê um nome para a lista.", "error");
+            return;
+        }
+        
+        const tbody = document.getElementById('bb-editor-tbody');
+        const rows = tbody.querySelectorAll('tr');
+        
+        const newMap = {};
+        let hasErrors = false;
+        
+        rows.forEach((row, idx) => {
+            if (hasErrors) return; // skip processing se já acho erro
+            const theme = row.querySelector('.bb-edit-theme').value.trim();
+            const word = row.querySelector('.bb-edit-word').value.trim().toUpperCase();
+            const hint = row.querySelector('.bb-edit-hint').value.trim();
+            
+            if (!theme || !word || !hint) {
+                this.showToast(`Preencha Tela, Palavra e Dica na linha ${idx + 1}.`, "error");
+                hasErrors = true;
+                return;
+            }
+            
+            const wordsInPhrase = word.split(' ');
+            if (wordsInPhrase.length > 3) {
+                this.showToast(`A palavra "${word}" tem mais de 3 palavras.`, "error");
+                hasErrors = true;
+                return;
+            }
+            if (wordsInPhrase.some(w => w.length > 12)) {
+                this.showToast(`A palavra "${word}" possui termo com mais de 12 letras.`, "error");
+                hasErrors = true;
+                return;
+            }
+            
+            if (!newMap[theme]) newMap[theme] = { theme: theme, words: [] };
+            newMap[theme].words.push({ word: word, hint: hint, used: false });
+        });
+        
+        if (hasErrors) return;
+        
+        const newDatabase = Object.values(newMap);
+        if (newDatabase.length === 0) {
+            this.showToast("A lista deve ter pelo menos uma palavra.", "error");
+            return;
+        }
+        
+        this.bbLibraryData[this.currentEditingListIndex].titulo = listName;
+        this.bbLibraryData[this.currentEditingListIndex].data = JSON.stringify(newDatabase);
+        
+        this.bbSaveBiblioteca(this.bbLibraryData);
+        this.bbRenderLibrary();
+        this.bbCloseEditor();
+        this.showToast('Lista alterada e salva com sucesso!', 'success');
+    }
+
 
 
     showCustomModal(message, type = 'alert', onConfirm = null) {
@@ -1679,4 +1794,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.rodaARodaGame = new RodaARodaGame();
     window.goBackToModeSelection = () => window.rodaARodaGame.goBackToModeSelection();
-});
+    
+    // Editor globals
+    window.bbCloseEditor = () => window.rodaARodaGame.bbCloseEditor();
+    window.bbEditorAddRow = () => window.rodaARodaGame.bbEditorAddRow();
+    window.bbEditorRemoveRow = (btn) => window.rodaARodaGame.bbEditorRemoveRow(btn);
+    window.bbSaveEditor = () => window.rodaARodaGame.bbSaveEditor();
+});
