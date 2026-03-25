@@ -1872,17 +1872,23 @@
     try {
         if (typeof window.supabase !== 'undefined') {
             sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log("✅ Supabase SDK carregado e cliente inicializado.");
+        } else {
+            console.error("❌ SDK do Supabase não foi encontrado no window. Verifique se o script da CDN foi bloqueado.");
         }
     } catch (e) {
-        console.warn("Falha ao carregar SDK Supabase:", e);
+        console.error("❌ Erro ao inicializar Supabase:", e);
     }
 
     // Canal Realtime (resolve isolamento de iframe do BroadcastChannel)
     const realtimeChannel = sbClient ? sbClient.channel('cruzadinha_sync', {
         config: { broadcast: { self: false } }
-    }).subscribe() : null;
+    }).subscribe((status) => {
+        console.log(`🔌 Status do Canal Realtime: ${status}`);
+    }) : null;
 
     function broadcastAll(msg) {
+        console.log(`📤 Broadcasting: ${msg.type}`, msg);
         // 1. Local (BroadcastChannel - Mesma sessão, mesmo browser)
         try { CH.postMessage(msg); } catch (e) { }
         
@@ -1892,7 +1898,11 @@
                 type: 'broadcast',
                 event: 'sync',
                 payload: msg
+            }).then(resp => {
+                if (resp !== 'ok') console.warn(`⚠️ Falha ao enviar via Realtime: ${resp}`);
             });
+        } else {
+            console.warn("⚠️ Canal Realtime não disponível para broadcast.");
         }
     }
 
@@ -2884,17 +2894,21 @@
     }
 
     CH.onmessage = (e) => {
+      console.log("📥 Professor recebeu mensagem via BroadcastChannel:", e.data);
       handleTeacherMessage(e.data);
     };
 
     if (realtimeChannel) {
       realtimeChannel.on('broadcast', { event: 'sync' }, (payload) => {
+        console.log("📥 Professor recebeu mensagem via Supabase Realtime:", payload.payload);
         handleTeacherMessage(payload.payload);
       });
     }
 
     function handleTeacherMessage(msg) {
+      if (!msg) return;
       if (msg.type === 'REQUEST_STATE' && G.grade.length) {
+        console.log("⚡ Professor respondendo a REQUEST_STATE...");
         // Envia o início do jogo com as células já reveladas
         broadcastAll({ 
           type: 'GAME_START', 
@@ -2983,16 +2997,20 @@
       const diffColor = ['', 'var(--easy)', 'var(--med)', 'var(--hard)'];
 
       CH.onmessage = (e) => {
+        console.log("📥 Projetor recebeu mensagem via BroadcastChannel:", e.data);
         handleProjectorMessage(e.data);
       };
 
       if (realtimeChannel) {
         realtimeChannel.on('broadcast', { event: 'sync' }, (payload) => {
+          console.log("📥 Projetor recebeu mensagem via Supabase Realtime:", payload.payload);
           handleProjectorMessage(payload.payload);
         });
       }
 
       function handleProjectorMessage(msg) {
+        if (!msg) return;
+        console.log(`🎮 Projetor processando: ${msg.type}`);
 
         switch (msg.type) {
 
