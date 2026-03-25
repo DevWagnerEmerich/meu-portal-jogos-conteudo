@@ -2900,12 +2900,7 @@
 
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
-    // ═══════════════════════════════════════════════════
-    // BROADCAST
-    // ═══════════════════════════════════════════════════
-    function broadcastAll(msg) {
-      try { CH.postMessage(msg); } catch (e) { }
-    }
+    // BroadcastAll movido para o topo com suporte a Realtime
 
     CH.onmessage = (e) => {
       console.log("📥 Professor recebeu mensagem via BroadcastChannel:", e.data);
