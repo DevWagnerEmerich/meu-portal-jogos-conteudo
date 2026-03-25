@@ -2297,8 +2297,20 @@
       document.addEventListener('DOMContentLoaded', () => {
         goTo('projector');
         setupProjListener();
-        CH.postMessage({ type: 'REQUEST_STATE' });
-        broadcastAll({ type: 'REQUEST_STATE' }); // Via Realtime também
+        
+        // Espera o canal estar pronto ou tenta após 2 segundos
+        const sendInitialRequest = () => {
+          console.log("📡 Projetor enviando pedido de estado inicial...");
+          CH.postMessage({ type: 'REQUEST_STATE' });
+          broadcastAll({ type: 'REQUEST_STATE' });
+        };
+
+        if (realtimeChannel) {
+          // Se já estiver conectado, manda. Se não, o subscribe vai logar e podemos mandar lá também.
+          setTimeout(sendInitialRequest, 1000); 
+        } else {
+          sendInitialRequest();
+        }
       });
     } else {
       document.addEventListener('DOMContentLoaded', checkPortalUser);
@@ -2488,7 +2500,8 @@
     // PROCESSAMENTO E INÍCIO DE JOGO
     // ═══════════════════════════════════════════════════
 
-    async function processarFormulario(skipSave = false) {
+    async function processarFormulario() {
+      console.log("📝 Processando formulário de configuração...");
       const nome = document.getElementById('s-nome').value.trim();
       const disc = document.getElementById('s-disc').value.trim();
       const tema = document.getElementById('s-tema').value.trim();
@@ -2624,6 +2637,7 @@
     // INICIAR PAINEL
     // ═══════════════════════════════════════════════════
     function iniciarPainel() {
+      console.log("🚀 Iniciando Painel do Professor...");
       goTo('professor');
       document.getElementById('p-tema-label').textContent = `${G.disciplina} · ${G.tema}`;
       renderGrade('p-grid', 'p');
