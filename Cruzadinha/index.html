@@ -2500,7 +2500,7 @@
     // PROCESSAMENTO E INÍCIO DE JOGO
     // ═══════════════════════════════════════════════════
 
-    async function processarFormulario() {
+    async function processarFormulario(skipSave = false) {
       console.log("📝 Processando formulário de configuração...");
       const nome = document.getElementById('s-nome').value.trim();
       const disc = document.getElementById('s-disc').value.trim();
