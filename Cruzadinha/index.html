@@ -2849,7 +2849,21 @@
 
     CH.onmessage = (e) => {
       if (e.data.type === 'REQUEST_STATE' && G.grade.length) {
-        broadcastAll({ type: 'GAME_START', grade: G.grade, pistas: G.pistas, bncc: G.bncc, rows: G.rows, cols: G.cols });
+        // Envia o início do jogo com as células já reveladas
+        broadcastAll({ 
+          type: 'GAME_START', 
+          grade: G.grade, 
+          pistas: G.pistas, 
+          bncc: G.bncc, 
+          rows: G.rows, 
+          cols: G.cols,
+          reveladas: Array.from(G.reveladas) 
+        });
+        
+        // Envia o progresso atual imediatamente
+        const done = G.pistas.filter((_, i) => G.reveladas.has(`pista-${i}`)).length;
+        broadcastAll({ type: 'PROGRESS', done, total: G.pistas.length });
+
         if (G.pistaAtual !== null) {
           broadcastAll({ type: 'PISTA_SELECT', pistaIdx: G.pistaAtual, revealed: G.reveladas.has(`pista-${G.pistaAtual}`) });
         }
@@ -2928,14 +2942,22 @@
         switch (msg.type) {
 
           case 'GAME_START':
+            document.getElementById('proj-idle').style.display = 'none';
             document.getElementById('proj-gameover').style.display = 'none';
             document.getElementById('proj-gameover').classList.remove('show');
             projGrade = msg.grade;
-            projPistas = msg.pistas;
+            projPistas = msg.pistas || [];
             projRows = msg.rows;
             projCols = msg.cols;
-            projReveladas = [];
+            projReveladas = msg.reveladas || [];
+            
             buildProjGrid(projGrade, projRows, projCols, projReveladas);
+            
+            // Atualiza progresso inicial se possível
+            const totalStart = projPistas.length;
+            document.getElementById('proj-prog-txt').textContent = `0 / ${totalStart}`;
+            document.getElementById('proj-prog-fill').style.width = '0%';
+
             if (msg.bncc) {
               document.getElementById('proj-bncc').style.display = 'block';
               document.getElementById('proj-bncc-text').textContent = msg.bncc;
