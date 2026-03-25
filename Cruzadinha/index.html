@@ -10,6 +10,8 @@
     rel="stylesheet">
   <!-- SheetJS para ler planilhas XLSX direto no navegador -->
   <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+  <!-- Supabase para Sincronização Realtime (Resolve isolamento de Iframe) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --bg: #0b0f1a;
@@ -1856,10 +1858,43 @@
 
   <script>
     // ═══════════════════════════════════════════════════
-    // BROADCAST
+    // BROADCAST & REALTIME (Sincronização Iframe Safe)
     // ═══════════════════════════════════════════════════
     const CH = new BroadcastChannel('cruzadinha_edu_v1');
     let projWin = null;
+
+    // Configuração Supabase (BrincaBytes Project)
+    const SUPABASE_URL = 'https://zvhyyvusshivqqrpkssp.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp2aHl5dnVzc2hpdnFxcnBrc3NwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzMjk0NzAsImV4cCI6MjA4ODkwNTQ3MH0.5dzZgnPuW3_nQS2-yKF9nDlNIUPJPKfHH3tY-ZDbyoc';
+    
+    // Inicialização segura do cliente Supabase
+    let sbClient = null;
+    try {
+        if (typeof window.supabase !== 'undefined') {
+            sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+    } catch (e) {
+        console.warn("Falha ao carregar SDK Supabase:", e);
+    }
+
+    // Canal Realtime (resolve isolamento de iframe do BroadcastChannel)
+    const realtimeChannel = sbClient ? sbClient.channel('cruzadinha_sync', {
+        config: { broadcast: { self: false } }
+    }).subscribe() : null;
+
+    function broadcastAll(msg) {
+        // 1. Local (BroadcastChannel - Mesma sessão, mesmo browser)
+        try { CH.postMessage(msg); } catch (e) { }
+        
+        // 2. Realtime (Supabase - Cross-tab, Iframe, Cloud safe)
+        if (realtimeChannel) {
+            realtimeChannel.send({
+                type: 'broadcast',
+                event: 'sync',
+                payload: msg
+            });
+        }
+    }
 
     // ═══════════════════════════════════════════════════
     // INTEGRAÇÃO BRINCABYTES
@@ -2253,6 +2288,7 @@
         goTo('projector');
         setupProjListener();
         CH.postMessage({ type: 'REQUEST_STATE' });
+        broadcastAll({ type: 'REQUEST_STATE' }); // Via Realtime também
       });
     } else {
       document.addEventListener('DOMContentLoaded', checkPortalUser);
@@ -2848,7 +2884,17 @@
     }
 
     CH.onmessage = (e) => {
-      if (e.data.type === 'REQUEST_STATE' && G.grade.length) {
+      handleTeacherMessage(e.data);
+    };
+
+    if (realtimeChannel) {
+      realtimeChannel.on('broadcast', { event: 'sync' }, (payload) => {
+        handleTeacherMessage(payload.payload);
+      });
+    }
+
+    function handleTeacherMessage(msg) {
+      if (msg.type === 'REQUEST_STATE' && G.grade.length) {
         // Envia o início do jogo com as células já reveladas
         broadcastAll({ 
           type: 'GAME_START', 
@@ -2868,7 +2914,7 @@
           broadcastAll({ type: 'PISTA_SELECT', pistaIdx: G.pistaAtual, revealed: G.reveladas.has(`pista-${G.pistaAtual}`) });
         }
       }
-    };
+    }
 
     // ═══════════════════════════════════════════════════
     // PROJECTOR LISTENER
@@ -2937,7 +2983,16 @@
       const diffColor = ['', 'var(--easy)', 'var(--med)', 'var(--hard)'];
 
       CH.onmessage = (e) => {
-        const msg = e.data;
+        handleProjectorMessage(e.data);
+      };
+
+      if (realtimeChannel) {
+        realtimeChannel.on('broadcast', { event: 'sync' }, (payload) => {
+          handleProjectorMessage(payload.payload);
+        });
+      }
+
+      function handleProjectorMessage(msg) {
 
         switch (msg.type) {
 
@@ -3033,7 +3088,7 @@
             break;
           }
         }
-      };
+      }
     }
 
     // ═══════════════════════════════════════════════════
